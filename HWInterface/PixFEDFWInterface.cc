@@ -31,18 +31,18 @@ std::string PixFEDFWInterface::getBoardType()
 	// adapt me!
 	std::string cBoardTypeString;
 
-	uhal::ValWord<uint32_t> cBoardType = ReadReg( BOARD_TYPE );
+	uhal::ValWord<uint32_t> cBoardType = ReadReg( "board_id" );
 
-	char cChar = ( ( cBoardType & cMask4 ) >> 24 );
+	char cChar = ( ( cBoardType & 0xFF000000 ) >> 24 );
 	cBoardTypeString.push_back( cChar );
 
-	cChar = ( ( cBoardType & cMask3 ) >> 16 );
+	cChar = ( ( cBoardType & 0x00FF0000 ) >> 16 );
 	cBoardTypeString.push_back( cChar );
 
-	cChar = ( ( cBoardType & cMask2 ) >> 8 );
+	cChar = ( ( cBoardType & 0x0000FF00 ) >> 8 );
 	cBoardTypeString.push_back( cChar );
 
-	cChar = ( cBoardType & cMask1 );
+	cChar = ( cBoardType & 0x000000FF );
 	cBoardTypeString.push_back( cChar );
 
 	return cBoardTypeString;
@@ -51,31 +51,16 @@ std::string PixFEDFWInterface::getBoardType()
 
 void PixFEDFWInterface::getBoardInfo()
 {
-	// adapt me!
-	std::cout << "FMC1 present : " << ReadReg( FMC1_PRESENT ) << std::endl;
-	std::cout << "FMC2 present : " << ReadReg( FMC2_PRESENT ) << std::endl;
-	std::cout << "FW version : " << ReadReg( FW_VERSION_MAJOR ) << "." << ReadReg( FW_VERSION_MINOR ) << "." << ReadReg( FW_VERSION_BUILD ) << std::endl;
+	std::cout << "Board Info: " << getBoardType() << std::endl;
 
-	uhal::ValWord<uint32_t> cBoardType = ReadReg( BOARD_TYPE );
+	std::cout << ReadReg( "pixfed_stat_regs.user_ascii_code_01" ) << ReadReg( "pixfed_stat_regs.user_ascii_code_02" ) << ReadReg( "pixfed_stat_regs.user_ascii_code_03" ) << ReadReg( "pixfed_stat_regs.user_ascii_code_04" ) << ReadReg( "pixfed_stat_regs.user_ascii_code_05" ) << ReadReg( "pixfed_stat_regs.user_ascii_code_06" ) << ReadReg( "pixfed_stat_regs.user_ascii_code_07" ) << ReadReg( "pixfed_stat_regs.user_ascii_code_08" ) << std::endl;
 
-	std::cout << "BoardType : ";
+	std::cout << "FW version IPHC : " << ReadReg( "pixfed_stat_regs.user_iphc_fw_id.fw_ver_nb" ) << ", " << ReadReg( "pixfed_stat_regs.user_iphc_fw_id.archi_ver_nb" ) << ", Date: " << ReadReg( "pixfed_stat_regs.user_iphc_fw_id.fw_ver_day" ) << "." << ReadReg( "pixfed_stat_regs.user_iphc_fw_id.fw_ver_month" ) << "." << ReadReg( "pixfed_stat_regs.user_iphc_fw_id.fw_ver_year" ) std::endl;
+	std::cout << "FW version HEPHY : " << ReadReg( "pixfed_stat_regs.user_hephy_fw_id.fw_ver_nb" ) << ", " << ReadReg( "pixfed_stat_regs.user_hephy_fw_id.archi_ver_nb" ) << ", Date: " << ReadReg( "pixfed_stat_regs.user_hephy_fw_id.fw_ver_day" ) << "." << ReadReg( "pixfed_stat_regs.user_hephy_fw_id.fw_ver_month" ) << "." << ReadReg( "pixfed_stat_regs.user_hephy_fw_id.fw_ver_year" ) std::endl;
 
-	char cChar = ( ( cBoardType & cMask4 ) >> 24 );
-	std::cout << cChar;
 
-	cChar = ( ( cBoardType & cMask3 ) >> 16 );
-	std::cout << cChar;
-
-	cChar = ( ( cBoardType & cMask2 ) >> 8 );
-	std::cout << cChar;
-
-	cChar = ( cBoardType & cMask1 );
-	std::cout << cChar << std::endl;
-
-	std::cout << "FMC User Board ID : " << ReadReg( FMC_USER_BOARD_ID ) << std::endl;
-	std::cout << "FMC User System ID : " << ReadReg( FMC_USER_SYS_ID ) << std::endl;
-	std::cout << "FMC User Version : " << ReadReg( FMC_USER_VERSION ) << std::endl;
-
+	std::cout << "FMC 8 Present : " << ReadReg( "status.fmc_l8_present" ) << std::endl;
+	std::cout << "FMC 12 Present : " << ReadReg( "status.fmc_l12_present" ) << std::endl;
 }
 
 void PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED )

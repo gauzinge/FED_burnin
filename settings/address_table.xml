@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-16"?>
+<?xml-stylesheet type="text/xsl" href="param_table.xsl"?>
+<!-- G. Auzinger, georg.auzinger@SPAMNOTcern.ch, 30.11.2015 -->
+
+<node id="PixFED">
+	<!-- DEFAULT CTA GOLDEN FW REGISTERS -->
+
+	<!-- SYSTEM VERSION INFO -->
+	<node id="board_id" address="0x00000000" mask="0xFFFFFFFF" permission="r">
+		<node id="char1" mask="0xFF000000"/>
+		<node id="char2" mask="0x00FF0000"/>
+		<node id="char3" mask="0x0000FF00"/>
+		<node id="char4" mask="0x000000FF"/>
+	</node>
+
+	<node id="rev_id" address="0x00000001"  mask="0xFFFFFFFF" permission="r">
+		<node id="char1" mask="0xFF000000"/>
+		<node id="char2" mask="0x00FF0000"/>
+		<node id="char3" mask="0x0000FF00"/>
+		<node id="char4" mask="0x000000FF"/>
+	</node>
+
+	<node id="firmware_id" address="0x00000002"  mask="0xFFFFFFFF" permission="r" mode="single">
+		<node id="major" mask="0xF0000000"/>
+		<node id="minor" mask="0x0F000000"/>
+		<node id="build" mask="0x00FF0000"/>
+		<node id="yy" mask="0x0000fe00"/>
+		<node id="mm" mask="0x000001e0"/>
+		<node id="dd" mask="0x0000001F"/>
+	</node>
+
+	<!-- TEST -->
+	<node id="test" address="00000003" mask="ffffffff" permission="rw" />
+
+	<!-- CONTROL -->
+	<node id="ctrl" address="00000004" mask="ffffffff" permission="rw">		
+		<node id="pcieclk_pll_sel" mask="00000001"/> 	
+		<node id="pcieclk_mr" mask="00000002"/> 	
+		<node id="pcieclk_fsel1" mask="00000004"/> 	
+		<node id="pcieclk_fsel0" mask="00000008"/> 	
+		<node id="cdce_powerup" mask="00000010"/>       
+		<node id="cdce_refsel" mask="00000020"/>    
+		<node id="cdce_sync" mask="00000040"/>      
+		<node id="cdce_ctrl_sel" mask="00000080"/>      		
+		<node id="cdce_xpoint_out1" mask="00400000" />       
+		<node id="cdce_xpoint_out2" mask="00000100"/> 
+		<node id="cdce_xpoint_out3" mask="00000200"/> 
+		<node id="cdce_xpoint_out4" mask="00000400"/>     
+		<node id="ttc_xpoint_B_out4" mask="00000800" description="osc_coax_sel"/>      
+		<node id="ttc_xpoint_A_out1" mask="00003000" description="master_xpoint[1:0]"/>		     
+		<node id="ttc_xpoint_A_out2" mask="0000c000" description="master_xpoint[3:2]"/>		     
+		<node id="ttc_xpoint_A_out3" mask="00030000" description="master_xpoint[5:4]"/>		     
+		<node id="ttc_xpoint_A_out4" mask="000c0000" description="master_xpoint[7:6]"/>		     
+		<node id="ttc_xpoint_B_out1" mask="00300000" description="master_xpoint[9:8]"/>		     
+		<node id="tclkb_tclkd_en" mask="00800000"/>     
+		<node id="mgt_xpoint_out1" mask="03000000" description="osc_xpoint_ctrl[1:0]"/>      
+		<node id="mgt_xpoint_out2" mask="0c000000" description="osc_xpoint_ctrl[3:2]"/>      
+		<node id="mgt_xpoint_out3" mask="30000000" description="osc_xpoint_ctrl[5:4]"/>      
+		<node id="mgt_xpoint_out4" mask="c0000000" description="osc_xpoint_ctrl[7:6]"/>      
+	</node>
+
+	<!-- CONTROL_2 -->
+	<node id="ctrl_2" address="00000005" mask="ffffffff" permission="rw">
+		<node id="icap_page" mask="00000003"/>       
+		<node id="icap_trigg" mask="00000010"/> 
+		<node id="phase_mon_lower" mask="0000ff00"/>
+		<node id="phase_mon_upper" mask="00ff0000"/> 
+		<node id="phase_mon_strobe" mask="01000000"/> 
+		<node id="phase_mon_refclk_sel" mask="02000000"/> 
+		<node id="phase_mon_auto" mask="08000000"/> 
+		<node id="fmc_l12_pwr_en" mask="10000000"/>
+		<node id="fmc_l8_pwr_en" mask="20000000"/>
+		<node id="fmc_pg_c2m" mask="40000000"/>
+	</node>
+
+	<!-- STATUS -->
+	<node id="status" address="00000006" mask="ffffffff" permission="r">
+		<node id="cpld2fpga_gpio" mask="  0000000f"/>
+		<node id="pca8574_int" mask="  00000010"/>
+		<node id="phase_mon_count" mask="  0000ff00"/>
+		<node id="phase_mon_done" mask=" 00010000"/>
+		<node id="phase_mon_ok" mask=" 00020000"/>
+		<node id="cdce_sync_busy" mask="  01000000"/>
+		<node id="cdce_sync_done" mask="  02000000"/>
+		<node id="cdce_lock" mask=" 04000000"/>
+		<node id="fmc_l12_pg_m2c" mask=" 10000000"/>
+		<node id="fmc_l12_present" mask="  20000000"/>
+		<node id="fmc_l8_pg_m2c" mask="  40000000"/>
+		<node id="fmc_l8_present" mask=" 80000000"/>
+	</node>
+
+	<!-- STATUS_2-->
+	<node id="status_2" address="00000007" mask="ffffffff" permission="r"/>
+
+	<!-- SPI COMMANDS -->
+	<node id="spi_txdata" address="0000000a" mask="ffffffff" permission="rw"/>
+	<node id="spi_command" address="0000000b" mask="ffffffff" permission="rw" description="autoclear removed"/>
+	<node id="spi_rxdata" address="0000000c" mask="ffffffff" permission="r"/>
+
+	<!-- I2C SETTINGS -->
+	<node id="i2c_settings" address="0000000d" mask="ffffffff" permission="rw">
+		<node id="enable" mask="00000800"/>
+		<node id="bus_select" mask="00000400"/>
+		<node id="prescaler" mask="000003ff"/>
+	</node>
+
+	<!-- I2C COMMANDS -->
+	<node id="i2c_command" address="0000000e" mask="ffffffff" permission="rw">
+		<node id="strobe" mask="80000000"/>
+		<node id="mode16" mask="02000000"/>
+		<node id="mem" mask="01000000"/>
+		<node id="write" mask="00800000"/>
+		<node id="slvaddr_7b" mask="007f00000"/>
+		<node id="regaddr" mask="0000ff00"/>
+		<node id="wrdata" mask="0000ff"/>
+	</node>
+
+	<!-- I2C REPLY -->
+	<node id="i2c_reply" address="0000000f" mask="ffffffff" permission="r">
+		<node id="status" mask="0c000000"/>
+		<node id="error" mask="08000000"/>
+		<node id="done" mask="04000000"/>
+		<node id="8b" mask="000000ff"/>
+		<node id="16b" mask="0000ffff"/>
+	</node>
+
+	<!-- MISC -->
+	<node id="eep_read_done" address="0000001c" mask="10000000" permission="r"/>
+	<node id="mac_ip_source" address="0000001c" mask="0fff0000" permission="r"/>
+	<node id="mac_b5" address="0000001c" mask="0000ff00" permission="r"/>	
+	<node id="mac_b4" address="0000001c" mask="000000ff" permission="r"/>	
+	<node id="mac_b3" address="0000001d" mask="ff000000" permission="r"/>	
+	<node id="mac_b2" address="0000001d" mask="00ff0000" permission="r"/>	
+	<node id="mac_b1" address="0000001d" mask="0000ff00" permission="r"/>	
+	<node id="mac_b0" address="0000001d" mask="000000ff" permission="r"/>
+	<node id="dipsw" address="0000001e" mask="ff000000" permission="r"/>
+	<node id="eui48_hi" address="0000001e" mask="0000ffff" permission="r"/>	
+	<node id="eui_b5" address="0000001e" mask="0000ff00" permission="r"/>	
+	<node id="eui_b4" address="0000001e" mask="000000ff" permission="r"/>	
+	<node id="eui48_lo" address="0000001f" mask="ffffffff" permission="r"/>	
+	<node id="eui_b3" address="0000001f" mask="ff000000" permission="r"/>	
+	<node id="eui_b2" address="0000001f" mask="00ff0000" permission="r"/>	
+	<node id="eui_b1" address="0000001f" mask="0000ff00" permission="r"/>	
+	<node id="eui_b0" address="0000001f" mask="000000ff" permission="r"/>
+
+	<!-- ICAP MEMORY SPACE -->
+	<node id="icap" address="00000200" mask="ffffffff" permission="rw"/>
+
+	<!-- IPHC CMS Ph1 Pixel FED FW Address Table -->
+	<!-- according to user_logic.vhd of fc7_basic projecd -->
+
+	<!-- STATUS REGISTER MAPPING from pixfed_stat_reg: STATUS & FLAGS -->
+	<node id="pixfed_stat_regs">
+		<!-- USER ASCII CODE -->
+		<node id="user_ascii_code_01" address="40000000" mask="ff000000" permission="r"/>
+		<node id="user_ascii_code_02" address="40000000" mask="00ff0000" permission="r"/>
+		<node id="user_ascii_code_03" address="40000000" mask="0000ff00" permission="r"/>
+		<node id="user_ascii_code_04" address="40000000" mask="000000ff" permission="r"/>
+		<node id="user_ascii_code_05" address="40000001" mask="ff000000" permission="r"/>
+		<node id="user_ascii_code_06" address="40000001" mask="00ff0000" permission="r"/>
+		<node id="user_ascii_code_07" address="40000001" mask="0000ff00" permission="r"/>
+		<node id="user_ascii_code_08" address="40000001" mask="000000ff" permission="r"/>
+
+		<!-- IPHC FW ID -->
+		<node id="user_iphc_fw_id" address="40000002" permission="r">
+			<node id="fw_ver_year" mask="fe000000"/>   
+			<node id="fw_ver_month" mask="01e00000"/>
+			<node id="fw_ver_day" mask="001f0000"/>   
+			<node id="archi_ver_nb" mask="0000ff00"/>
+			<node id="fw_ver_nb" mask="000000ff"/>   
+		</node>
+
+		<!-- HEPHY FW ID -->
+		<node id="user_hephy_fw_id" address="40000003" permission="r">
+			<node id="fw_ver_year" mask="fe000000"/>	
+			<node id="fw_ver_month" mask="01e00000"/>	
+			<node id="fw_ver_day" mask="001f0000"/>	
+			<node id="archi_ver_nb" mask="0000ff00"/>	
+			<node id="fw_ver_nb" mask="000000ff"/>	
+		</node>
+
+		<!-- others -->
+		<node id="ddr3_init_calib_done" address="40000004" mask="00000001" permission="r"/>
+		<node id="DDR0_full" address="40000004" mask="00000010" permission="r"/>
+		<node id="DDR1_full" address="40000004" mask="00000020" permission="r"/>
+		<node id="fitel_config_ack" address="40000004" mask="00000300" permission="r"/>
+	</node>
+
+	<!-- CTRL - REGISTER MAPPING - from pixfed_ctrl_regs: CTRL & CMD => RD/WR -->
+	<node id="pixfed_ctrl_regs" permission="rw">
+		<node id="PC_config_ok" address="40010000" mask="00000001"/>	
+		<node id="CMD_START_BY_PC" address="40010000" mask="00000002"/>
+		<node id="TRIGGER_SEL" address="40010000" mask="00000004"/>	
+		<node id="INT_TRIGGER_FREQ_SEL" address="40010000" mask="000000f0"/>
+		<node id="INT_TRIGGER_EN" address="40010000" mask="00000100"/>	
+		<node id="DDR0_end_readout" address="40010000" mask="00001000"/>
+		<node id="DDR1_end_readout" address="40010000" mask="00002000"/>
+		<node id="ddr0_ctrl_sel" address="40010000" mask="00004000"/>	
+		<node id="ddr1_ctrl_sel" address="40010000" mask="00008000"/>
+		<node id="data_type" address="40010000" mask="00070000"/>	
+		<node id="trig_6to9" address="40010000" mask="00700000"/>
+		<node id="trig_10to12" address="40010000" mask="07000000"/>
+		<node id="8sfp_scope_index" address="40010000" mask="f0000000"/>
+
+		<node id="PACKET_NB" address="40010001" mask="001fffff"/>
+		<node id="fitel_config_req" address="40010002" mask="00000003"/>
+		<node id="fitel_i2c_addr" address="40010002" mask="000007f0"/>
+		<node id="fitel_i2c_cmd_reset" address="40010002" mask="00000800"/>
+
+		<node id="chipscope_tbm_index" address="40010003" mask="0000007f"/>
+		<node id="rx_index_sel" address="40010003" mask="00000300"/>				
+		<node id="rx_index_sel_en" address="40010003" mask="00000400"/>
+
+		<node id="TBM_MASK_1" address="40010004" mask="ffffffff"/>	
+		<node id="TBM_MASK_2" address="40010005" mask="ffffffff"/>	
+		<node id="TBM_MASK_3" address="40010006" mask="ffffffff"/>	
+	</node>
+
+	<!-- MISC -->
+	<node id="fitel_config_fifo_tx" address="40100000" mask="ffffffff" permission="rw"/>
+	<node id="fitel_config_fifo_rx" address="40100001" mask="ffffffff" permission="r"/>
+	<node id="ddr0" address="60000000" mask="ffffffff" permission="rw"/>
+	<node id="ddr1" address="61000000" mask="ffffffff" permission="rw"/>
+</node>

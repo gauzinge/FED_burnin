@@ -80,7 +80,7 @@ class PixFEDFWInterface : public RegManager
 	 * \brief Configure the board with its Config File
 	 * \param pPixFED
 	 */
-	void ConfigureBoard( const PixFED* pPixFED ) override;
+	bool ConfigureBoard( const PixFED* pPixFED ) override;
 
 	/*!
 	 * \brief Start a DAQ

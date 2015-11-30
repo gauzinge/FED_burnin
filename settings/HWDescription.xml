@@ -5,8 +5,8 @@
         <PixFED Id="0" connectionId="board0" boardType="CTA">
             <!-- Trigger -->
             <Register name="pixfed_ctrl_regs.TRIGGER_SEL">0</Register>
-            <Register name="pixfed_ctrl_regs.INT_TRIGGER_EN">1</Register>
-            <Register name="pixfed_ctrl_regs.INT_TRIGGER_FREQ_SEL">5</Register>
+<!--             <Register name="pixfed_ctrl_regs.INT_TRIGGER_EN">1</Register>
+ -->            <Register name="pixfed_ctrl_regs.INT_TRIGGER_FREQ_SEL">5</Register>
             <Register name="pixfed_ctrl_regs.TRIGGER_SEL">0</Register>
             <Register name="pixfed_ctrl_regs.rx_index_sel_en">0</Register>
 

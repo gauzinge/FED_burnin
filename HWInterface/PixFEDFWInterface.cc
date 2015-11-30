@@ -63,7 +63,7 @@ void PixFEDFWInterface::getBoardInfo()
 	std::cout << "FMC 12 Present : " << ReadReg( "status.fmc_l12_present" ) << std::endl;
 }
 
-void PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED )
+bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED )
 {
 
 	//We may here switch in the future with the StackReg method of the RegManager
@@ -75,10 +75,14 @@ void PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED )
 	std::chrono::milliseconds cPause( 200 );
 
 	//Primary Configuration
-	cPairReg.first = PC_CONFIG_OK;
-	cPairReg.second = 1;
-	cVecReg.push_back( cPairReg );
+	cVecReg.push_back( {"pixfed_ctrl_regs.PC_config_ok", 0} );
+	cVecReg.push_back( {"pixfed_ctrl_regs.INT_TRIGGER_EN", 0} );
+	cVecReg.push_back( {"pixfed_ctrl_regs.rx_index_sel_en", 0} );
 
+	cVecReg.push_back( {"pixfed_ctrl_regs.DDR0_end_readout", 0} );
+	cVecReg.push_back( {"pixfed_ctrl_regs.DDR1_end_readout", 0} );
+
+	cVecReg.push_back( {"pixfed_ctrl_regs.CMD_START_BY_PC", 0} );
 
 	WriteStackReg( cVecReg );
 
@@ -107,30 +111,19 @@ void PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED )
 
 	cVecReg.clear();
 
-	// FixME
-	cPairReg.first = SPURIOUS_FRAME;
-	cPairReg.second = 0;
-	cVecReg.push_back( cPairReg );
+	cVecReg.push_back( {"pixfed_ctrl_regs.PC_CONFIG_OK", 1} );
 	WriteStackReg( cVecReg );
 
 	cVecReg.clear();
 
-	// FixME
-	cPairReg.first = PC_CONFIG_OK;
-	cPairReg.second = 0;
-	cVecReg.push_back( cPairReg );
-
-
-	WriteStackReg( cVecReg );
-
-	cVecReg.clear();
 
 	std::this_thread::sleep_for( cPause );
 
+	// Read back the DDR3 calib done flag
+	bool cDDR3calibrated = ( ReadReg( "pixfed_stat_regs.ddr3_init_calib_done" ) & 0x00000001 );
 
-	cVecReg.clear();
-
-	std::this_thread::sleep_for( cPause * 3 );
+	if ( cDDR3calibrated ) std::cout << "DDR3 calibrated, board configured!" << std::endl;
+	return cDDR3calibrated;
 
 }
 

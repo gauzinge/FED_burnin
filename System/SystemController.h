@@ -17,6 +17,7 @@
 #include "../Utils/pugixml.hpp"
 #include "../Utils/ConsoleColor.h"
 #include "../HWInterface/PixFEDFWInterface.h"
+#include "../HWInterface/PixFEDInterface.h"
 #include <iostream>
 #include <vector>
 #include <map>
@@ -33,9 +34,11 @@ typedef std::map<std::string, uint32_t> SettingsMap;    /*!< Maps the settings *
 class SystemController
 {
 public:
+    PixFEDInterface*        fFEDInterface;
+    PixFEDFWMap             fFWMap;
     PixFEDFWInterface*       fPixFEDFWInterface;                     /*!< Interface to the BeBoard */
-    SettingsMap fSettingsMap;                                         /*!< Maps the settings */
-
+    std::vector<PixFED*> fPixFEDVector;
+    SettingsMap    fSettingsMap;
 public:
     /*!
      * \brief Constructor of the SystemController class

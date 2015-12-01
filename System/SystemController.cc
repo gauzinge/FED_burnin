@@ -38,6 +38,11 @@ void SystemController::InitializeSettings( const std::string& pFilename, std::os
 void SystemController::ConfigureHw( std::ostream& os , bool bIgnoreI2c )
 {
     // write some code
+    for (auto& cFED : fPixFEDVector)
+    {
+        fFEDInterface->ConfigureFED(cFED);
+
+    }
 }
 
 // void SystemController::Run( BeBoard* pBeBoard, uint32_t pNthAcq )
@@ -74,7 +79,6 @@ void SystemController::parseHWxml( const std::string& pFilename, std::ostream& o
     os << "\n";
     os << "\n";
 
-    // Iterate the Shelve Nodes
 
     // Iterate the BeBoard Node
     for ( pugi::xml_node cBeBoardNode = doc.child( "HwDescription" ).child( "PixFED" ); cBeBoardNode; cBeBoardNode = cBeBoardNode.next_sibling() )
@@ -85,12 +89,7 @@ void SystemController::parseHWxml( const std::string& pFilename, std::ostream& o
         cBeId = cBeBoardNode.attribute( "Id" ).as_int();
         PixFED* cPixFED = new PixFED( cBeId );
 
-        // pugi::xml_node cBeBoardFWVersionNode = cBeBoardNode.child( "FW_Version" );
-        // uint16_t cNCbcDataSize = 0;
-        // cNCbcDataSize = uint16_t( cBeBoardFWVersionNode.attribute( "NCbcDataSize" ).as_int() );
-
-        // if ( cNCbcDataSize != 0 ) os << BOLDCYAN << "|" << "----" << cBeBoardFWVersionNode.name() << " NCbcDataSize: " << cNCbcDataSize  <<  RESET << std:: endl;
-        // cBeBoard->setNCbcDataSize( cNCbcDataSize );
+        // the connection ID is not used but built in RegManager constructor!
 
         // Iterate the BeBoardRegister Nodes
         for ( pugi::xml_node cBeBoardRegNode = cBeBoardNode.child( "Register" ); cBeBoardRegNode/* != cBeBoardNode.child( "Module" )*/; cBeBoardRegNode = cBeBoardRegNode.next_sibling() )
@@ -99,11 +98,12 @@ void SystemController::parseHWxml( const std::string& pFilename, std::ostream& o
             cPixFED->setReg( std::string( cBeBoardRegNode.attribute( "name" ).value() ), atoi( cBeBoardRegNode.first_child().value() ) );
         }
 
-
+        fFWMap[cPixFED->getBeId()] = new PixFEDFWInterface(doc.child( "HwDescription" ).child( "Connections" ).attribute( "name" ).value(), cBeId );
     }
 
+    // create the actual FED Interface using the map I previously filled
+    fFEDInterface = new PixFEDInterface(fFWMap);
 
-    fPixFEDFWInterface = new PixFEDFWInterface(doc.child( "HwDescription" ).child( "Connections" ).attribute( "name" ).value(), cBeId );
     os << "\n";
     os << "\n";
     for ( i = 0; i < 80; i++ )

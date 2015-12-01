@@ -18,7 +18,6 @@
 #include <ios>
 #include <istream>
 #include <limits>
-#include "../HWDescription/Definition.h"
 #include <iostream>
 
 /*!

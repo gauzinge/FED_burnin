@@ -1,1 +1,4 @@
 *.o
+bin/*
+      src/run
+      lib/*

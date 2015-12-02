@@ -36,7 +36,6 @@ class SystemController
 public:
     PixFEDInterface*        fFEDInterface;
     PixFEDFWMap             fFWMap;
-    PixFEDFWInterface*       fPixFEDFWInterface;                     /*!< Interface to the BeBoard */
     std::vector<PixFED*> fPixFEDVector;
     SettingsMap    fSettingsMap;
 public:
@@ -63,7 +62,7 @@ public:
     /*!
      * \brief Configure the Hardware with XML file indicated values
      */
-    void ConfigureHw( std::ostream& os = std::cout , bool bIgnoreI2c = false );
+    void ConfigureHw( std::ostream& os = std::cout );
     /*!
      * \brief Run a DAQ
      * \param pBeBoard

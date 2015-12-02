@@ -16,7 +16,7 @@
 #include <vector>
 #include <map>
 #include <stdint.h>
-
+#include <string>
 
 typedef std::map< std::string, uint32_t > PixFEDRegMap;     /*!< Map containing the registers of a board */
 

@@ -46,7 +46,7 @@ private:
 
     // to be computed internally
     uint32_t fBlockSize;    // the number of bits to read from the DDR memory
-    uint32_t fBlockSize_32; // the number of 32-bit words to read from DDR memory
+    uint32_t fBlockSize32; // the number of 32-bit words to read from DDR memory
     uint32_t fNthAcq;       // the index of the current Acquistion - to be used to select the correct DDR bank
     //struct timeval fStartVeto;
     CtaFpgaConfig* fpgaConfig;

@@ -35,14 +35,15 @@ void SystemController::InitializeSettings( const std::string& pFilename, std::os
         std::cerr << "Could not parse settings file " << pFilename << " - it is not .xml!" << std::endl;
 }
 
-void SystemController::ConfigureHw( std::ostream& os , bool bIgnoreI2c )
+void SystemController::ConfigureHw( std::ostream& os )
 {
     // write some code
     for (auto& cFED : fPixFEDVector)
     {
         fFEDInterface->ConfigureFED(cFED);
-
+        std::cout << "Fed ID: " << +cFED->getBeId() << std::endl;
     }
+    std::cout << "All FEDs successfully configured!" << std::endl;
 }
 
 // void SystemController::Run( BeBoard* pBeBoard, uint32_t pNthAcq )
@@ -94,11 +95,14 @@ void SystemController::parseHWxml( const std::string& pFilename, std::ostream& o
         // Iterate the BeBoardRegister Nodes
         for ( pugi::xml_node cBeBoardRegNode = cBeBoardNode.child( "Register" ); cBeBoardRegNode/* != cBeBoardNode.child( "Module" )*/; cBeBoardRegNode = cBeBoardRegNode.next_sibling() )
         {
-            os << BOLDCYAN << "|" << "_____" << cBeBoardRegNode.name() << "  " << cBeBoardRegNode.first_attribute().name() << " :" << cBeBoardRegNode.attribute( "name" ).value() << RESET << std:: endl;
+            os << BOLDCYAN << "|" << "_____" << cBeBoardRegNode.name() << "  " << cBeBoardRegNode.first_attribute().name() << " :" << cBeBoardRegNode.attribute( "name" ).value() << " " << BOLDRED << atoi(cBeBoardRegNode.first_child().value()) << RESET << std:: endl;
             cPixFED->setReg( std::string( cBeBoardRegNode.attribute( "name" ).value() ), atoi( cBeBoardRegNode.first_child().value() ) );
         }
-
-        fFWMap[cPixFED->getBeId()] = new PixFEDFWInterface(doc.child( "HwDescription" ).child( "Connections" ).attribute( "name" ).value(), cBeId );
+        fPixFEDVector.push_back(cPixFED);
+        PixFEDFWInterface* cTmpFWInterface = new PixFEDFWInterface(doc.child("HwDescription").child("Connections").attribute("name").value(), cBeId);
+        //FIXEM
+        cTmpFWInterface->setNTBM(48);
+        fFWMap[cPixFED->getBeId()] = cTmpFWInterface;
     }
 
     // create the actual FED Interface using the map I previously filled

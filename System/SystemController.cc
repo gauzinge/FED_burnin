@@ -38,12 +38,13 @@ void SystemController::InitializeSettings( const std::string& pFilename, std::os
 void SystemController::ConfigureHw( std::ostream& os )
 {
     // write some code
+    std::cout << BOLDGREEN <<  "Configuring FEDs: " << RESET << std::endl;
     for (auto& cFED : fPixFEDVector)
     {
         fFEDInterface->ConfigureFED(cFED);
-        std::cout << "Fed ID: " << +cFED->getBeId() << std::endl;
+        std::cout << "Configured FED " << +cFED->getBeId() << std::endl;
     }
-    std::cout << "All FEDs successfully configured!" << std::endl;
+    std::cout << BOLDGREEN << "All FEDs successfully configured!" << RESET << std::endl;
 }
 
 // void SystemController::Run( BeBoard* pBeBoard, uint32_t pNthAcq )
@@ -68,7 +69,7 @@ void SystemController::parseHWxml( const std::string& pFilename, std::ostream& o
         return;
     }
 
-    os << "\n\n\n";
+    os << "\n";
     for ( i = 0; i < 80; i++ )
         os << "*";
     os << "\n";
@@ -101,7 +102,12 @@ void SystemController::parseHWxml( const std::string& pFilename, std::ostream& o
         fPixFEDVector.push_back(cPixFED);
         PixFEDFWInterface* cTmpFWInterface = new PixFEDFWInterface(doc.child("HwDescription").child("Connections").attribute("name").value(), cBeId);
         //FIXEM
-        cTmpFWInterface->setNTBM(48);
+        //////////////////////////////////
+        auto cSetting = fSettingsMap.find("NTBM");
+        uint32_t cNTBM = (cSetting != std::end(fSettingsMap)) ? cSetting->second : 8;
+        if (cSetting == std::end(fSettingsMap)) std::cout << "Settings Map not yet initialized!, reverting to default value (8)" << std::endl;
+        cTmpFWInterface->setNTBM(cNTBM);
+        /////////////////////////////////
         fFWMap[cPixFED->getBeId()] = cTmpFWInterface;
     }
 
@@ -138,7 +144,7 @@ void SystemController::parseSettingsxml( const std::string& pFilename, std::ostr
         for ( pugi::xml_node nSetting = nSettings.child( "Setting" ); nSetting; nSetting = nSetting.next_sibling() )
         {
             fSettingsMap[nSetting.attribute( "name" ).value()] = convertAnyInt( nSetting.first_child().value() );
-            os << RED << "Setting" << RESET << " --" << BOLDCYAN << nSetting.attribute( "name" ).value() << RESET << ":" << BOLDYELLOW << convertAnyInt( nSetting.first_child().value() ) << RESET << std:: endl;
+            os << RED << "Setting" << RESET << " --" << BOLDCYAN << nSetting.attribute( "name" ).value() << RESET << " : " << BOLDYELLOW << convertAnyInt( nSetting.first_child().value() ) << RESET << std:: endl;
         }
     }
 }

@@ -13,6 +13,7 @@
 
 #include "PixFEDFWInterface.h"
 #include "FpgaConfig.h"
+#include <iomanip>
 
 #define DEV_FLAG         0
 
@@ -51,9 +52,17 @@ std::string PixFEDFWInterface::getBoardType()
 
 }
 
+void PixFEDFWInterface::getFEDNetworkParameters()
+{
+    std::cout << "MAC & IP Source: " << ReadReg("mac_ip_source") << std::endl;
+
+    std::cout << "MAC Address: " << std::hex << ReadReg("mac_b5") << ":" << ReadReg("mac_b4") << ":" << ReadReg("mac_b3") << ":" << ReadReg("mac_b2") << ":" << ReadReg("mac_b1") << ":" << ReadReg("mac_b0") << std::dec << std::endl;
+}
+
 void PixFEDFWInterface::getBoardInfo()
 {
-    std::cout << "Board Info: " << getBoardType() << std::endl;
+    std::cout << std::endl << "Board Type: " << getBoardType() << std::endl;
+    getFEDNetworkParameters();
     std::string cBoardTypeString;
 
     uhal::ValWord<uint32_t> cBoardType = ReadReg( "pixfed_stat_regs.user_ascii_code_01to04" );
@@ -70,7 +79,7 @@ void PixFEDFWInterface::getBoardInfo()
     cChar = ( cBoardType & 0x000000FF );
     cBoardTypeString.push_back( cChar );
 
-    cBoardType = ReadReg("pixfed_stat_regs.user_ascii_code_05to08");
+    cBoardType = ReadReg( "pixfed_stat_regs.user_ascii_code_05to08" );
     cChar = ( ( cBoardType & 0xFF000000 ) >> 24 );
     cBoardTypeString.push_back( cChar );
 
@@ -83,30 +92,24 @@ void PixFEDFWInterface::getBoardInfo()
     cChar = ( ( cBoardType & 0x00000000 ) );
     cBoardTypeString.push_back( cChar );
 
-    std::cout << cBoardTypeString << std::endl;
+    std::cout << "Board Use: " << cBoardTypeString << std::endl;
 
-    // std::cout << ReadReg( "pixfed_stat_regs.user_ascii_code_01" ) << ReadReg( "pixfed_stat_regs.user_ascii_code_02" ) << ReadReg( "pixfed_stat_regs.user_ascii_code_03" ) << ReadReg( "pixfed_stat_regs.user_ascii_code_04" ) << ReadReg( "pixfed_stat_regs.user_ascii_code_05" ) << ReadReg( "pixfed_stat_regs.user_ascii_code_06" ) << ReadReg( "pixfed_stat_regs.user_ascii_code_07" ) << ReadReg( "pixfed_stat_regs.user_ascii_code_08" ) << std::endl;
-
-    //std::cout << "FW version IPHC : " << ReadReg( "pixfed_stat_regs.user_iphc_fw_id.fw_ver_nb" ) << ", " << ReadReg( "pixfed_stat_regs.user_iphc_fw_id.archi_ver_nb" ) << ", Date: " << ReadReg( "pixfed_stat_regs.user_iphc_fw_id.fw_ver_day" ) << "." << ReadReg( "pixfed_stat_regs.user_iphc_fw_id.fw_ver_month" ) << "." << ReadReg( "pixfed_stat_regs.user_iphc_fw_id.fw_ver_year" ) <<  std::endl;
-    //std::cout << "FW version HEPHY : " << ReadReg( "pixfed_stat_regs.user_hephy_fw_id.fw_ver_nb" ) << ", " << ReadReg( "pixfed_stat_regs.user_hephy_fw_id.archi_ver_nb" ) << ", Date: " << ReadReg( "pixfed_stat_regs.user_hephy_fw_id.fw_ver_day" ) << "." << ReadReg( "pixfed_stat_regs.user_hephy_fw_id.fw_ver_month" ) << "." << ReadReg( "pixfed_stat_regs.user_hephy_fw_id.fw_ver_year" ) << std::endl;
+    std::cout << "FW version IPHC : " << ReadReg( "pixfed_stat_regs.user_iphc_fw_id.fw_ver_nb" ) << "." << ReadReg( "pixfed_stat_regs.user_iphc_fw_id.archi_ver_nb" ) << "; Date: " << ReadReg( "pixfed_stat_regs.user_iphc_fw_id.fw_ver_day" ) << "." << ReadReg( "pixfed_stat_regs.user_iphc_fw_id.fw_ver_month" ) << "." << ReadReg( "pixfed_stat_regs.user_iphc_fw_id.fw_ver_year" ) <<  std::endl;
+    std::cout << "FW version HEPHY : " << ReadReg( "pixfed_stat_regs.user_hephy_fw_id.fw_ver_nb" ) << "." << ReadReg( "pixfed_stat_regs.user_hephy_fw_id.archi_ver_nb" ) << "; Date: " << ReadReg( "pixfed_stat_regs.user_hephy_fw_id.fw_ver_day" ) << "." << ReadReg( "pixfed_stat_regs.user_hephy_fw_id.fw_ver_month" ) << "." << ReadReg( "pixfed_stat_regs.user_hephy_fw_id.fw_ver_year" ) << std::endl;
 
 
     std::cout << "FMC 8 Present : " << ReadReg( "status.fmc_l8_present" ) << std::endl;
-    std::cout << "FMC 12 Present : " << ReadReg( "status.fmc_l12_present" ) << std::endl;
+    std::cout << "FMC 12 Present : " << ReadReg( "status.fmc_l12_present" ) << std::endl << std::endl;
 }
 
 bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED )
 {
-    std::cout << "Configuring board!" << std::endl;
-    //We may here switch in the future with the StackReg method of the RegManager
-    //when the timeout thing will be implemented in a transparent and pretty way
-
     std::vector< std::pair<std::string, uint32_t> > cVecReg;
 
     std::chrono::milliseconds cPause( 200 );
-    WriteReg("pixfed_ctrl_regs.PC_config_ok", 0);
+    WriteReg( "pixfed_ctrl_regs.PC_CONFIG_OK", 0 );
     //Primary Configuration
-    cVecReg.push_back( {"pixfed_ctrl_regs.PC_config_ok", 0} );
+    cVecReg.push_back( {"pixfed_ctrl_regs.PC_CONFIG_OK", 0} );
     cVecReg.push_back( {"pixfed_ctrl_regs.INT_TRIGGER_EN", 0} );
     cVecReg.push_back( {"pixfed_ctrl_regs.rx_index_sel_en", 0} );
 
@@ -118,17 +121,9 @@ bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED )
 
     // the FW needs to be aware of the true 32 bit workd Block size for some reason! This is the Packet_nb_true in the python script?!
     computeBlockSize();
-    cVecReg.push_back({"pixfed_ctrl_regs.PACKET_NB", (fBlockSize32 - 1)  });
+    cVecReg.push_back( {"pixfed_ctrl_regs.PACKET_NB", ( fBlockSize32 - 1 )  } );
 
-    //WriteStackReg( cVecReg );
-    /*
-            GlibRegMap : map<std::string,uint8_t> created from Glib class
-
-       Mandatory to go through a created cPixFEDRegMap.
-       If you want to put directly pGlib.getGlibRegMap(), you'll end up with
-       a seg fault error, as it is not putting all the map in mem but only
-       begin() and end().
-     */
+    WriteStackReg( cVecReg );
 
     PixFEDRegMap cPixFEDRegMap = pPixFED->getPixFEDRegMap();
     for ( auto const& it : cPixFEDRegMap )
@@ -136,7 +131,7 @@ bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED )
         cVecReg.push_back( {it.first, it.second} );
     }
 
-    //WriteStackReg( cVecReg );
+    WriteStackReg( cVecReg );
 
     cVecReg.clear();
 
@@ -150,7 +145,6 @@ bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED )
 
     // Read back the DDR3 calib done flag
     bool cDDR3calibrated = ( ReadReg( "pixfed_stat_regs.ddr3_init_calib_done" ) & 0x00000001 );
-    //bool cDDR3calibrated = true;
     if ( cDDR3calibrated ) std::cout << "DDR3 calibrated, board configured!" << std::endl;
     return cDDR3calibrated;
 
@@ -252,7 +246,10 @@ uint32_t PixFEDFWInterface::ReadData( PixFED* pPixFED )
     //fData = new Data();
     //fData->Set(pPixFED, cData, )
     for ( auto& cWord : cData )
-        std::cout << std::hex <<  cWord << std::dec << std::endl;
+    {
+        std::cout << std::hex << std::setw(8) << std::setfill('0');
+        std::cout << cWord << std::dec << std::endl;
+    }
     fNthAcq++;
 }
 
@@ -280,8 +277,8 @@ bool PixFEDFWInterface::WriteBlockReg( const std::string& pRegNode, const std::v
 
 void PixFEDFWInterface::SelectDaqDDR( uint32_t pNthAcq )
 {
-    fStrDDR  = ( ( pNthAcq % 2 + 1 ) == 1 ? "ddr0" : "ddr1" );
-    fStrDDRControl = ( ( pNthAcq % 2 + 1 ) == 1 ? "pixfed_ctrl_regs.ddr0_ctrl_sel" : "pixfed_ctrl_regs.ddr1_ctrl_sel" );
+    fStrDDR  = ( ( pNthAcq % 2 + 1 ) == 1 ? "DDR0" : "DDR1" );
+    fStrDDRControl = ( ( pNthAcq % 2 + 1 ) == 1 ? "pixfed_ctrl_regs.DDR0_ctrl_sel" : "pixfed_ctrl_regs.DDR1_ctrl_sel" );
     fStrFull = ( ( pNthAcq % 2 + 1 ) == 1 ? "pixfed_stat_regs.DDR0_full" : "pixfed_stat_regs.DDR1_full" );
     fStrReadout = ( ( pNthAcq % 2 + 1 ) == 1 ? "pixfed_ctrl_regs.DDR0_end_readout" : "pixfed_ctrl_regs.DDR1_end_readout" );
 }

@@ -160,6 +160,7 @@ protected:
     //void ReadFitelBlockReg( uint8_t pFitelId, std::vector<uint32_t>& pVecReq );
 
 private:
+    void getFEDNetworkParameters();
     /*!
      * \brief DDR selection for DAQ
      * \param pNthAcq : actual number of acquisitions

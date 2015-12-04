@@ -5,19 +5,17 @@
         <!-- Trigger -->
         <Register name="pixfed_ctrl_regs.TRIGGER_SEL">0</Register>
         <Register name="pixfed_ctrl_regs.INT_TRIGGER_FREQ_SEL">5</Register>
-        <Register name="pixfed_ctrl_regs.TRIGGER_SEL">0</Register>
         <!--<Register name="pixfed_ctrl_regs.rx_index_sel_en">0</Register>-->
         <!-- TBM MASK -->
-        <!--
-           -<Register name="pixfed_ctrl_regs.TBM_MASK_1">0b00000000</Register>
-           -<Register name="pixfed_ctrl_regs.TBM_MASK_2">0b00000000</Register>
-           -<Register name="pixfed_ctrl_regs.TBM_MASK_3">0b00000000</Register>
-           -->
-        <!-- ACQUISITION -->
+        <Register name="pixfed_ctrl_regs.TBM_MASK_1">0b00000000</Register>
+        <Register name="pixfed_ctrl_regs.TBM_MASK_2">0b00000000</Register>
+        <Register name="pixfed_ctrl_regs.TBM_MASK_3">0b00000000</Register>
+        <!--ACQUISITION -->
         <!--<Register name="pixfed_ctrl_regs.PACKET_NB">10</Register>-->
-        <Register name="pixfed_ctrl_regs.data_type">1</Register>
+        <Register name="pixfed_ctrl_regs.data_type">2</Register>
     </PixFED>
 </HwDescription>
 <Settings>
-    <Setting name="NTBM">48</Setting>
+    <Setting name="NTBM">8</Setting>
+    <Setting name="NAcq">2</Setting>
 </Settings>

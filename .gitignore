@@ -1,4 +1,4 @@
 *.o
-bin/*
-      src/run
-      lib/*
+bin/
+src/run
+

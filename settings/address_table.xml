@@ -5,7 +5,7 @@
     <!-- DEFAULT CTA GOLDEN FW REGISTERS -->
     <!-- SYSTEM VERSION INFO -->
     <node id="board_id" address="0x00000000">
-        <node id="char1" mask="0xFF000000" permission="r"/>
+        <node id="char1" mask="0xFF000000" permission="r" />
         <node id="char2" mask="0x00FF0000" permission="r" />
         <node id="char3" mask="0x0000FF00" permission="r" />
         <node id="char4" mask="0x000000FF" permission="r" />
@@ -133,68 +133,68 @@
     <!-- IPHC CMS Ph1 Pixel FED FW Address Table -->
     <!-- according to user_logic.vhd of fc7_basic projecd -->
     <!-- STATUS REGISTER MAPPING from pixfed_stat_reg: STATUS & FLAGS -->
-    <!--<node id="pixfed_stat_regs" address="40000000">-->
-    <!-- USER ASCII CODE -->
-    <node id="user_ascii_code_01to04" address="0x40000000">
-        <node id="01" mask="0xff000000" permission="r" />
-        <node id="02" mask="0x00ff0000" permission="r" />
-        <node id="03" mask="0x0000ff00" permission="r" />
-        <node id="04" mask="0x000000ff" permission="r" />
+    <node id="pixfed_stat_regs">
+        <!-- USER ASCII CODE -->
+        <node id="user_ascii_code_01to04" address="0x40000000">
+            <node id="01" address="40000000" mask="0xff000000" permission="r" />
+            <node id="02" address="40000000" mask="0x00ff0000" permission="r" />
+            <node id="03" address="40000000" mask="0x0000ff00" permission="r" />
+            <node id="04" address="40000000" mask="0x000000ff" permission="r" />
+        </node>
+        <node id="user_ascii_code_05to08">
+            <node id="05" address="0x40000001" mask="0xff000000" permission="r" />
+            <node id="06" address="0x40000001" mask="0x00ff0000" permission="r" />
+            <node id="07" address="0x40000001" mask="0x0000ff00" permission="r" />
+            <node id="08" address="0x40000001" mask="0x000000ff" permission="r" />
+        </node>
+        <!-- IPHC FW ID -->
+        <node id="user_iphc_fw_id">
+            <node id="fw_ver_year" address="0x40000002" mask="0xfe000000" permission="r" />
+            <node id="fw_ver_month" address="0x40000002" mask="0x01e00000" permission="r" />
+            <node id="fw_ver_day" address="0x40000002" mask="0x001f0000" permission="r" />
+            <node id="archi_ver_nb" address="0x40000002" mask="0x0000ff00" permission="r" />
+            <node id="fw_ver_nb" address="0x40000002" mask="0x000000ff" permission="r" />
+        </node>
+        <!-- HEPHY FW ID -->
+        <node id="user_hephy_fw_id">
+            <node id="fw_ver_year" address="0x40000003" mask="0xfe000000" permission="r" />
+            <node id="fw_ver_month" address="0x40000003" mask="0x01e00000" permission="r" />
+            <node id="fw_ver_day" address="0x40000003" mask="0x001f0000" permission="r" />
+            <node id="archi_ver_nb" address="0x40000003" mask="0x0000ff00" permission="r" />
+            <node id="fw_ver_nb" address="0x40000003" mask="0x000000ff" permission="r" />
+        </node>
+        <!-- others -->
+        <node id="ddr3_init_calib_done" address="0x40000004" mask="0x00000001" permission="r" />
+        <node id="DDR0_full" address="0x40000004" mask="0x00000010" permission="r" />
+        <node id="DDR1_full" address="0x40000004" mask="0x00000020" permission="r" />
+        <node id="fitel_config_ack" address="0x40000004" mask="0x00000300" permission="r" />
     </node>
-    <node id="user_ascii_code_05to08" address="0x40000001">
-        <node id="05" mask="0xff000000" permission="r" />
-        <node id="06" mask="0x00ff0000" permission="r" />
-        <node id="07" mask="0x0000ff00" permission="r" />
-        <node id="08" mask="0x000000ff" permission="r" />
-    </node>
-    <!-- IPHC FW ID -->
-    <node id="user_iphc_fw_id" address="0x40000002">
-        <node id="fw_ver_year" mask="0xfe000000" permission="r" />
-        <node id="fw_ver_month" mask="0x01e00000" permission="r" />
-        <node id="fw_ver_day" mask="0x001f0000" permission="r" />
-        <node id="archi_ver_nb" mask="0x0000ff00" permission="r" />
-        <node id="fw_ver_nb" mask="0x000000ff" permission="r" />
-    </node>
-    <!-- HEPHY FW ID -->
-    <node id="user_hephy_fw_id" address="0x40000003">
-        <node id="fw_ver_year" mask="0xfe000000" permission="r" />
-        <node id="fw_ver_month" mask="0x01e00000" permission="r" />
-        <node id="fw_ver_day" mask="0x001f0000" permission="r" />
-        <node id="archi_ver_nb" mask="0x0000ff00" permission="r" />
-        <node id="fw_ver_nb" mask="0x000000ff" permission="r" />
-    </node>
-    <!-- others -->
-    <node id="ddr3_init_calib_done" address="0x40000004" mask="0x00000001" permission="r" />
-    <node id="DDR0_full" address="0x40000004" mask="0x00000010" permission="r" />
-    <node id="DDR1_full" address="0x40000004" mask="0x00000020" permission="r" />
-    <node id="fitel_config_ack" address="0x40000004" mask="0x00000300" permission="r" />
-    <!--</node>-->
     <!-- CTRL - REGISTER MAPPING - from pixfed_ctrl_regs: CTRL & CMD => RD/WR -->
-    <!--<node id="pixfed_ctrl_regs" permission="rw">-->
-    <node id="PC_config_ok" address="0x40010000" mask="0x00000001" />
-    <node id="CMD_START_BY_PC" address="0x40010000" mask="0x00000002" />
-    <node id="TRIGGER_SEL" address="0x40010000" mask="0x00000004" />
-    <node id="INT_TRIGGER_FREQ_SEL" address="0x40010000" mask="0x000000f0" />
-    <node id="INT_TRIGGER_EN" address="0x40010000" mask="0x00000100" />
-    <node id="DDR0_end_readout" address="0x40010000" mask="0x00001000" />
-    <node id="DDR1_end_readout" address="0x40010000" mask="0x00002000" />
-    <node id="ddr0_ctrl_sel" address="0x40010000" mask="0x00004000" />
-    <node id="ddr1_ctrl_sel" address="0x40010000" mask="0x00008000" />
-    <node id="data_type" address="0x40010000" mask="0x00070000" />
-    <node id="trig_6to9" address="0x40010000" mask="0x00700000" />
-    <node id="trig_10to12" address="0x40010000" mask="0x07000000" />
-    <node id="8sfp_scope_index" address="0x40010000" mask="0xf0000000" />
-    <node id="PACKET_NB" address="0x40010001" mask="0x001fffff" />
-    <node id="fitel_config_req" address="0x40010002" mask="0x00000003" />
-    <node id="fitel_i2c_addr" address="0x40010002" mask="0x000007f0" />
-    <node id="fitel_i2c_cmd_reset" address="0x40010002" mask="0x00000800" />
-    <node id="chipscope_tbm_index" address="0x40010003" mask="0x0000007f" />
-    <node id="rx_index_sel" address="0x40010003" mask="0x00000300" />
-    <node id="rx_index_sel_en" address="0x40010003" mask="0x00000400" />
-    <node id="TBM_MASK_1" address="0x40010004" mask="0xffffffff" />
-    <node id="TBM_MASK_2" address="0x40010005" mask="0xffffffff" />
-    <node id="TBM_MASK_3" address="0x40010006" mask="0xffffffff" />
-    <!--</node>-->
+    <node id="pixfed_ctrl_regs">
+        <node id="PC_config_ok" address="0x40010000" mask="0x00000001" />
+        <node id="CMD_START_BY_PC" address="0x40010000" mask="0x00000002" />
+        <node id="TRIGGER_SEL" address="0x40010000" mask="0x00000004" />
+        <node id="INT_TRIGGER_FREQ_SEL" address="0x40010000" mask="0x000000f0" />
+        <node id="INT_TRIGGER_EN" address="0x40010000" mask="0x00000100" />
+        <node id="DDR0_end_readout" address="0x40010000" mask="0x00001000" />
+        <node id="DDR1_end_readout" address="0x40010000" mask="0x00002000" />
+        <node id="ddr0_ctrl_sel" address="0x40010000" mask="0x00004000" />
+        <node id="ddr1_ctrl_sel" address="0x40010000" mask="0x00008000" />
+        <node id="data_type" address="0x40010000" mask="0x00070000" />
+        <node id="trig_6to9" address="0x40010000" mask="0x00700000" />
+        <node id="trig_10to12" address="0x40010000" mask="0x07000000" />
+        <node id="8sfp_scope_index" address="0x40010000" mask="0xf0000000" />
+        <node id="PACKET_NB" address="0x40010001" mask="0x001fffff" />
+        <node id="fitel_config_req" address="0x40010002" mask="0x00000003" />
+        <node id="fitel_i2c_addr" address="0x40010002" mask="0x000007f0" />
+        <node id="fitel_i2c_cmd_reset" address="0x40010002" mask="0x00000800" />
+        <node id="chipscope_tbm_index" address="0x40010003" mask="0x0000007f" />
+        <node id="rx_index_sel" address="0x40010003" mask="0x00000300" />
+        <node id="rx_index_sel_en" address="0x40010003" mask="0x00000400" />
+        <node id="TBM_MASK_1" address="0x40010004" mask="0xffffffff" />
+        <node id="TBM_MASK_2" address="0x40010005" mask="0xffffffff" />
+        <node id="TBM_MASK_3" address="0x40010006" mask="0xffffffff" />
+    </node>
     <!-- MISC -->
     <node id="fitel_config_fifo_tx" address="0x40100000" mask="0xffffffff" permission="rw" />
     <node id="fitel_config_fifo_rx" address="0x40100001" mask="0xffffffff" permission="r" />

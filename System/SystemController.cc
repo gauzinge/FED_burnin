@@ -99,9 +99,30 @@ void SystemController::parseHWxml( const std::string& pFilename, std::ostream& o
             os << BOLDCYAN << "|" << "_____" << cBeBoardRegNode.name() << "  " << cBeBoardRegNode.first_attribute().name() << " :" << cBeBoardRegNode.attribute( "name" ).value() << " " << BOLDRED << atoi(cBeBoardRegNode.first_child().value()) << RESET << std:: endl;
             cPixFED->setReg( std::string( cBeBoardRegNode.attribute( "name" ).value() ), atoi( cBeBoardRegNode.first_child().value() ) );
         }
+
+        // here I need to crate the Fitels and push them back in the fFitelVector of PixFED
+
+        pugi::xml_node cFitelPathPrefixNode = cBeBoardNode.child( "Fitel_Files" );
+        std::string cFilePrefix = std::string( cFitelPathPrefixNode.attribute( "path" ).value() );
+        if ( !cFilePrefix.empty() ) os << GREEN << "|" << std::endl <<  "|" << "----" << "Fitel Files Path : " << cFilePrefix << RESET << std::endl;
+
+        // Iterate the Fitel node
+        for ( pugi::xml_node cFitelNode = cBeBoardNode.child( "Fitel" ); cFitelNode; cFitelNode = cFitelNode.next_sibling() )
+        {
+            os << BOLDCYAN << "|" << "----" << cFitelNode.name() << "  " << cFitelNode.first_attribute().name() << " :" << cFitelNode.attribute( "FMC" ).value() << cFitelNode.attribute( "Id" ).value() << ", File: " << cFitelNode.attribute( "file" ).value() << RESET << std:: endl;
+
+
+            std::string cFileName;
+            if ( !cFilePrefix.empty() )
+                cFileName = cFilePrefix + cFitelNode.attribute( "file" ).value();
+            else cFileName = cFitelNode.attribute( "file" ).value();
+
+            Fitel* cFitel = new Fitel( cBeId, cFitelNode.attribute( "FMC" ).as_int(), cFitelNode.attribute( "Id" ).as_int(), cFileName );
+            cPixFED->addFitel(cFitel);
+        }
+
         fPixFEDVector.push_back(cPixFED);
         PixFEDFWInterface* cTmpFWInterface = new PixFEDFWInterface(doc.child("HwDescription").child("Connections").attribute("name").value(), cBeId);
-        //FIXEM
         //////////////////////////////////
         auto cSetting = fSettingsMap.find("NTBM");
         uint32_t cNTBM = (cSetting != std::end(fSettingsMap)) ? cSetting->second : 8;
@@ -128,7 +149,7 @@ void SystemController::parseHWxml( const std::string& pFilename, std::ostream& o
     os << "\n";
 }
 
-void SystemController::parseSettingsxml( const std::string& pFilename, std::ostream& os )
+void SystemController::parseSettingsxml( const std::string & pFilename, std::ostream & os )
 {
     pugi::xml_document doc;
     pugi::xml_parse_result result = doc.load_file( pFilename.c_str() );

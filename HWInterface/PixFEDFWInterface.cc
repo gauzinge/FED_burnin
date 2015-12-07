@@ -119,7 +119,7 @@ bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED )
     cVecReg.push_back( {"pixfed_ctrl_regs.CMD_START_BY_PC", 0} );
 
     // fitel I2C bus reset & fifo TX & RX reset
-    cVecReg.push_back({"fitel_i2c_cmd_reset", 1});
+    cVecReg.push_back({"pixfed_ctrl_regs.fitel_i2c_cmd_reset", 1});
 
 
     // the FW needs to be aware of the true 32 bit workd Block size for some reason! This is the Packet_nb_true in the python script?!
@@ -139,9 +139,9 @@ bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED )
     cVecReg.clear();
 
     cVecReg.push_back( {"pixfed_ctrl_regs.PC_CONFIG_OK", 1} );
-    cVecReg.push_back({"fitel_i2c_cmd_reset", 0});
-    cVecReg.push_back({"fitel_config_reg", 0});
-    cVecReg.push_back({"fitel_i2c_addr", 0x4d});
+    cVecReg.push_back({"pixfed_ctrl_regs.fitel_i2c_cmd_reset", 0});
+    cVecReg.push_back({"pixfed_ctrl_regs.fitel_config_req", 0});
+    cVecReg.push_back({"pixfed_ctrl_regs.fitel_i2c_addr", 0x4d});
     WriteStackReg( cVecReg );
 
     cVecReg.clear();
@@ -150,7 +150,7 @@ bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED )
     std::this_thread::sleep_for( cPause );
 
     // read FITEL I2C address
-    std::cout << "FITEL I2C address: " << ReadReg("fitel_i2c_addr") << std::endl;
+    std::cout << "FITEL I2C address: " << ReadReg("pixfed_ctrl_regs.fitel_i2c_addr") << std::endl;
     // Read back the DDR3 calib done flag
     bool cDDR3calibrated = ( ReadReg( "pixfed_stat_regs.ddr3_init_calib_done" ) & 0x00000001 );
     if ( cDDR3calibrated ) std::cout << "DDR3 calibrated, board configured!" << std::endl;
@@ -328,7 +328,7 @@ bool PixFEDFWInterface::I2cCmdAckWait( uint32_t pAckVal, uint8_t pNcount )
 
     do
     {
-        cVal = ReadReg( "fitel_config_ack" );
+        cVal = ReadReg( "pixfed_stat_regs.fitel_config_ack" );
         if ( cVal != pAckVal )
         {
             std::cout << "Waiting for the I2c command acknowledge to be " << pAckVal << " for " << pNcount << " registers." << std::endl;
@@ -353,14 +353,14 @@ void PixFEDFWInterface::SendFitelI2cRequest( std::vector<uint32_t>& pVecReq, boo
     WriteBlockReg( "fitel_config_fifo_tx", pVecReq );
 
     // 1 to write, 3 to read
-    WriteReg( "fitel_config_req", pWrite ? 1 : 3 );
+    WriteReg( "pixfed_ctrl_regs.fitel_config_req", pWrite ? 1 : 3 );
 
     pVecReq.pop_back();
 
     if ( I2cCmdAckWait( ( uint32_t )1, pVecReq.size() ) == 0 )
         throw Exception( "FitelInterface: I2cCmdAckWait 1 failed." );
 
-    WriteReg("fitel_config_req", 0);
+    WriteReg("pixfed_ctrl_regs.fitel_config_req", 0);
 
     if ( I2cCmdAckWait( ( uint32_t )0, pVecReq.size() ) == 0 )
         throw Exception( "FitelInterface: I2cCmdAckWait 0 failed." );
@@ -370,11 +370,11 @@ void PixFEDFWInterface::SendFitelI2cRequest( std::vector<uint32_t>& pVecReq, boo
 void PixFEDFWInterface::ReadFitelI2cValues( std::vector<uint32_t>& pVecReq )
 {
 
-    WriteReg( "fitel_config_req", 3 );
+    WriteReg( "pixfed_ctrl_regs.fitel_config_req", 3 );
 
     pVecReq = ReadBlockRegValue( "fitel_config_fifo_rx", pVecReq.size() );
 
-    WriteReg( "fitel_config_requ", 0 );
+    WriteReg( "pixfed_ctrl_regs.fitel_config_req", 0 );
 
 }
 

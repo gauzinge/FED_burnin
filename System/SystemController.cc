@@ -42,6 +42,15 @@ void SystemController::ConfigureHw( std::ostream& os )
     for (auto& cFED : fPixFEDVector)
     {
         fFEDInterface->ConfigureFED(cFED);
+
+        if (!cFED.fFitelVector.empty())
+        {
+            for (auto& cFitel : cFED.fFitelVector)
+            {
+                fFEDInterface->ConfigureFitel(cFitel);
+                std::cout << "Configured Fitel Rx " << +cFitel->getFitelId() << " on FMC " << +cFitel->getFMCId() << std::endl;
+            }
+        }
         std::cout << "Configured FED " << +cFED->getBeId() << std::endl;
     }
     std::cout << BOLDGREEN << "All FEDs successfully configured!" << RESET << std::endl;

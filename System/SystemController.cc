@@ -43,9 +43,9 @@ void SystemController::ConfigureHw( std::ostream& os )
     {
         fFEDInterface->ConfigureFED(cFED);
 
-        if (!cFED.fFitelVector.empty())
+        if (!cFED->fFitelVector.empty())
         {
-            for (auto& cFitel : cFED.fFitelVector)
+            for (auto& cFitel : cFED->fFitelVector)
             {
                 fFEDInterface->ConfigureFitel(cFitel);
                 std::cout << "Configured Fitel Rx " << +cFitel->getFitelId() << " on FMC " << +cFitel->getFMCId() << std::endl;

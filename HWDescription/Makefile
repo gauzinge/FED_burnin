@@ -1,4 +1,4 @@
-Objs                    = PixFED.o 
+Objs                    = Fitel.o PixFED.o
 CC              = gcc
 CXX             = g++
 CCFlags         = -g -O1 -Wall -fPIC

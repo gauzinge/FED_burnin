@@ -13,6 +13,7 @@
 #define _PixFED_h__
 
 // #include "Definition.h"
+#include "Fitel.h"
 #include <vector>
 #include <map>
 #include <stdint.h>
@@ -22,7 +23,7 @@ typedef std::map< std::string, uint32_t > PixFEDRegMap;     /*!< Map containing 
 
 /*!
  * \class PiXFED
- * \brief Read/Write PiXFED's registers on a file, handles a register map and handles a vector of Module which are connected to the PiXFED
+ * \brief Read/Write PiXFED's registers on a file, handles a register map and handles a vector of Fitel which are connected to the PiXFED
  */
 class PixFED
 {
@@ -93,6 +94,34 @@ public:
     {
         fBeId = pBeId;
     };
+
+    std::vector<Fitel*> fFitelVector;
+    /*!
+    * \brief Adding a module to the vector
+    * \param pFitel
+    */
+    void addFitel( Fitel& pFitel )
+    {
+        fFitelVector.push_back( &pFitel );
+    }
+
+    void addFitel( Fitel* pFitel )
+    {
+        fFitelVector.push_back( pFitel );
+    }
+
+    /*!
+     * \brief Remove a Fitel from the vector
+     * \param pFitelId
+     * \return a bool which indicate if the removing was successful
+     */
+    bool removeFitel( uint8_t pFitelId );
+    /*!
+     * \brief Get a module from the vector
+     * \param pFitelId
+     * \return a pointer of module, so we can manipulate directly the module contained in the vector
+     */
+    Fitel* getFitel( uint8_t pFitelId ) const;
 
 protected:
     //Connection Members

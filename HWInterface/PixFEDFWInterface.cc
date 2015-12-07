@@ -118,6 +118,9 @@ bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED )
 
     cVecReg.push_back( {"pixfed_ctrl_regs.CMD_START_BY_PC", 0} );
 
+    // fitel I2C bus reset & fifo TX & RX reset
+    cVecReg.push_back({"fitel_i2c_cmd_reset", 1});
+
 
     // the FW needs to be aware of the true 32 bit workd Block size for some reason! This is the Packet_nb_true in the python script?!
     computeBlockSize();
@@ -136,6 +139,9 @@ bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED )
     cVecReg.clear();
 
     cVecReg.push_back( {"pixfed_ctrl_regs.PC_CONFIG_OK", 1} );
+    cVecReg.push_back({"fitel_i2c_cmd_reset", 0});
+    cVecReg.push_back({"fitel_config_reg", 0});
+    cVecReg.push_back({"fitel_i2c_addr", 0x4d});
     WriteStackReg( cVecReg );
 
     cVecReg.clear();
@@ -143,6 +149,8 @@ bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED )
 
     std::this_thread::sleep_for( cPause );
 
+    // read FITEL I2C address
+    std::cout << "FITEL I2C address: " << ReadReg("fitel_i2c_addr") << std::endl;
     // Read back the DDR3 calib done flag
     bool cDDR3calibrated = ( ReadReg( "pixfed_stat_regs.ddr3_init_calib_done" ) & 0x00000001 );
     if ( cDDR3calibrated ) std::cout << "DDR3 calibrated, board configured!" << std::endl;
@@ -288,170 +296,116 @@ void PixFEDFWInterface::SelectDaqDDR( uint32_t pNthAcq )
 // FITEL METHODS
 //Methods for Fitels:
 ////////////////////////////////////////////
-
 // Fix ME!
-/*void PixFEDFWInterface::EncodeReg( const FitelRegItem& pRegItem, uint8_t pFitelId, std::vector<uint32_t>& pVecReq )*/
-//{
-//// temporary for 16CBC readout FW  (Beamtest NOV 15)
-//// will have to be corrected if we want to read two modules from the same GLIB
-//// (pFitelId >> 3) becomes FE ID and is encoded starting from bit21 (not used so far)
-//// (pFitelId & 7) restarts FitelIDs from 0 for FE 1 (if FitelID > 7)
-//pVecReq.push_back( ( pFitelId >> 3 ) << 21 | ( pFitelId & 7 ) << 17 | pRegItem.fPage << 16 | pRegItem.fAddress << 8 | pRegItem.fValue );
-//}
+void PixFEDFWInterface::EncodeReg( const FitelRegItem& pRegItem, uint8_t pFMCId, uint8_t pFitelId, std::vector<uint32_t>& pVecReq )
+{
+    pVecReq.push_back(  pFMCId  << 24 |  pFitelId << 20 |  pRegItem.fAddress << 8 | pRegItem.fValue );
+}
 
 
-//void PixFEDFWInterface::DecodeReg( FitelRegItem& pRegItem, uint8_t pFitelId, uint32_t pWord )
-//{
-//// temporary for 16CBC readout FW  (Beamtest NOV 15)
-//// will have to be corrected if we want to read two modules from the same GLIB
-//uint8_t cFeId = ( pWord & cMask7 ) >> 21;
-//pFitelId = ( ( pWord & cMask5 ) | ( cFeId << 3 ) ) >> 17;
-//pRegItem.fPage = ( pWord & cMask6 ) >> 16;
-//pRegItem.fAddress = ( pWord & cMask2 ) >> 8;
-//pRegItem.fValue = pWord & cMask1;
-////std::cout << "FEID " << +(cFeId) << " pFitelID " << +(pFitelId) << std::endl;
-//}
+void PixFEDFWInterface::DecodeReg( FitelRegItem& pRegItem, uint8_t pFMCId, uint8_t pFitelId, uint32_t pWord )
+{
+    uint8_t cFMCId = ( pWord & 0xff000000 ) >> 24;
+    pFitelId = (  pWord & 0x00f00000   ) >> 20;
+    pRegItem.fAddress = ( pWord & 0x0000ff00 ) >> 8;
+    pRegItem.fValue = pWord & 0x000000ff;
+    std::cout << "FMCID " << +(cFMCId) << " pFitelID " << +(pFitelId) << std::endl;
+}
 
 
-//void PixFEDFWInterface::SelectFitelDDR( uint32_t pFitelId )
-//{
-//pFitelId = 0;
-//// fStrSram = ( pFe ? SRAM2 : SRAM1 );
-//// fStrOtherSram = ( pFe ? SRAM1 : SRAM2 );
-//// fStrSramUserLogic = ( pFe ? SRAM2_USR_LOGIC : SRAM1_USR_LOGIC );
-//// fStrOtherSramUserLogic = ( pFe ? SRAM1_USR_LOGIC : SRAM2_USR_LOGIC );
-//}
+bool PixFEDFWInterface::I2cCmdAckWait( uint32_t pAckVal, uint8_t pNcount )
+{
+    unsigned int cWait( 100 );
+
+    if ( pAckVal )
+        cWait = pNcount * 500;
 
 
-//bool PixFEDFWInterface::I2cCmdAckWait( uint32_t pAckVal, uint8_t pNcount )
-//{
-//unsigned int cWait( 100 );
+    usleep( cWait );
 
-//if ( pAckVal )
-//cWait = pNcount * 500;
+    uhal::ValWord<uint32_t> cVal;
+    uint32_t cLoop = 0;
 
+    do
+    {
+        cVal = ReadReg( "fitel_config_ack" );
+        if ( cVal != pAckVal )
+        {
+            std::cout << "Waiting for the I2c command acknowledge to be " << pAckVal << " for " << pNcount << " registers." << std::endl;
+            usleep( cWait );
+        }
 
-//usleep( cWait );
+    }
+    while ( cVal != pAckVal && ++cLoop < MAX_NB_LOOP );
 
-//uhal::ValWord<uint32_t> cVal;
-//uint32_t cLoop = 0;
+    if ( cLoop >= MAX_NB_LOOP )
+    {
+        std::cout << "Warning: time out in I2C acknowledge loop (" << pAckVal << ")" << std::endl;
+        return false;
+    }
 
-//do
-//{
-//cVal = ReadReg( CBC_I2C_CMD_ACK );
+    return true;
+}
 
-//if ( cVal != pAckVal )
-//{
-//// std::cout << "Waiting for the I2c command acknowledge to be " << pAckVal << " for " << pNcount << " registers." << std::endl;
-//usleep( cWait );
-//}
+void PixFEDFWInterface::SendFitelI2cRequest( std::vector<uint32_t>& pVecReq, bool pWrite )
+{
+    // fill encoded vector to txfifo
+    WriteBlockReg( "fitel_config_fifo_tx", pVecReq );
 
-//}
-//while ( cVal != pAckVal && ++cLoop < MAX_NB_LOOP );
+    // 1 to write, 3 to read
+    WriteReg( "fitel_config_req", pWrite ? 1 : 3 );
 
-//if ( cLoop >= MAX_NB_LOOP )
-//{
-//std::cout << "Warning: time out in I2C acknowledge loop (" << pAckVal << ")" << std::endl;
-//return false;
-//}
+    pVecReq.pop_back();
 
-//return true;
-//}
+    if ( I2cCmdAckWait( ( uint32_t )1, pVecReq.size() ) == 0 )
+        throw Exception( "FitelInterface: I2cCmdAckWait 1 failed." );
 
-//void PixFEDFWInterface::SendBlockFitelI2cRequest( std::vector<uint32_t>& pVecReq, bool pWrite )
-//{
-//WriteReg( fStrSramUserLogic, 1 );
+    WriteReg("fitel_config_req", 0);
 
-//pVecReq.push_back( 0xFFFFFFFF );
+    if ( I2cCmdAckWait( ( uint32_t )0, pVecReq.size() ) == 0 )
+        throw Exception( "FitelInterface: I2cCmdAckWait 0 failed." );
 
-//WriteReg( fStrSramUserLogic, 0 );
+}
 
-//WriteBlockReg( fStrSram, pVecReq );
-//WriteReg( fStrOtherSram, 0xFFFFFFFF );
+void PixFEDFWInterface::ReadFitelI2cValues( std::vector<uint32_t>& pVecReq )
+{
 
-//WriteReg( fStrSramUserLogic, 1 );
+    WriteReg( "fitel_config_req", 3 );
 
-//WriteReg( CBC_HARD_RESET, 0 );
+    pVecReq = ReadBlockRegValue( "fitel_config_fifo_rx", pVecReq.size() );
 
-////r/w request
-//WriteReg( CBC_I2C_CMD_RQ, pWrite ? 3 : 1 );
-//// WriteReg( CBC_I2C_CMD_RQ, 1 );
+    WriteReg( "fitel_config_requ", 0 );
 
-//pVecReq.pop_back();
-
-//if ( I2cCmdAckWait( ( uint32_t )1, pVecReq.size() ) == 0 )
-//throw Exception( "FitelInterface: I2cCmdAckWait 1 failed." );
-
-//WriteReg( CBC_I2C_CMD_RQ, 0 );
-
-//if ( I2cCmdAckWait( ( uint32_t )0, pVecReq.size() ) == 0 )
-//throw Exception( "FitelInterface: I2cCmdAckWait 0 failed." );
-
-//}
-
-//void PixFEDFWInterface::ReadI2cBlockValuesInDDR( std::vector<uint32_t>& pVecReq )
-//{
-
-//WriteReg( fStrSramUserLogic, 0 );
-
-//pVecReq = ReadBlockRegValue( fStrSram, pVecReq.size() );
-
-//WriteReg( fStrSramUserLogic, 1 );
-//WriteReg( CBC_I2C_CMD_RQ, 0 );
-
-//}
+}
 
 
-//void PixFEDFWInterface::EnableI2c( bool pEnable )
-//{
-//uint32_t cValue = I2C_CTRL_ENABLE;
+void PixFEDFWInterface::WriteFitelBlockReg( std::vector<uint32_t>& pVecReq )
+{
+    try
+    {
+        SendFitelI2cRequest( pVecReq, true );
+    }
 
-//if ( !pEnable )
-//cValue = I2C_CTRL_DISABLE;
+    catch ( Exception& except )
+    {
+        throw except;
+    }
+}
 
-//WriteReg( I2C_SETTINGS, cValue );
+void PixFEDFWInterface::ReadFitelBlockReg( std::vector<uint32_t>& pVecReq )
+{
+    try
+    {
+        SendFitelI2cRequest( pVecReq, false );
+    }
 
-//if ( pEnable )
-//usleep( 100000 );
-//}
+    catch ( Exception& except )
+    {
+        throw except;
+    }
 
-//void PixFEDFWInterface::WriteFitelBlockReg( uint8_t pFeId, std::vector<uint32_t>& pVecReq )
-//{
-//SelectFeSRAM( pFeId );
-//EnableI2c( 1 );
-
-//try
-//{
-//SendBlockFitelI2cRequest( pVecReq, true );
-//}
-
-//catch ( Exception& except )
-//{
-//throw except;
-//}
-
-//EnableI2c( 0 );
-//}
-
-//void PixFEDFWInterface::ReadFitelBlockReg( uint8_t pFeId, std::vector<uint32_t>& pVecReq )
-//{
-//SelectFeSRAM( pFeId );
-//EnableI2c( 1 );
-
-//try
-//{
-//SendBlockFitelI2cRequest( pVecReq, false );
-//}
-
-//catch ( Exception& e )
-//{
-//throw e;
-//}
-
-//ReadI2cBlockValuesInDDR( pVecReq );
-
-//EnableI2c( 0 );
-//}
+    ReadFitelI2cValuesInDDR( pVecReq );
+}
 
 
 
@@ -461,14 +415,14 @@ void PixFEDFWInterface::SelectDaqDDR( uint32_t pNthAcq )
 ////////////////////////////////////////////
 
 
-void PixFEDFWInterface::FlashProm( const std::string& strConfig, const char* pstrFile )
+void PixFEDFWInterface::FlashProm( const std::string & strConfig, const char* pstrFile )
 {
     checkIfUploading();
 
     fpgaConfig->runUpload( strConfig, pstrFile );
 }
 
-void PixFEDFWInterface::JumpToFpgaConfig( const std::string& strConfig )
+void PixFEDFWInterface::JumpToFpgaConfig( const std::string & strConfig )
 {
     checkIfUploading();
 
@@ -481,7 +435,7 @@ std::vector<std::string> PixFEDFWInterface::getFpgaConfigList()
     return fpgaConfig->getFirmwareImageNames( );
 }
 
-void PixFEDFWInterface::DeleteFpgaConfig( const std::string& strId )
+void PixFEDFWInterface::DeleteFpgaConfig( const std::string & strId )
 {
     checkIfUploading();
     fpgaConfig->deleteFirmwareImage( strId );

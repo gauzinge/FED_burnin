@@ -25,6 +25,8 @@
 #include <iostream>
 #include <fstream>
 
+#define MAX_NB_LOOP 50
+
 class CtaFpgaConfig;
 
 /*!
@@ -135,29 +137,27 @@ protected:
     * \param pFitelId : Id of the Fitel to work with
     * \param pVecReq : Vector to stack the encoded words
     */
-    //void EncodeReg( const FitelRegItem& pRegItem, uint8_t pFitelId, std::vector<uint32_t>& pVecReq ); [>!< Encode a/several word(s) readable for a Fitel<]
+    void EncodeReg( const FitelRegItem& pRegItem, uint8_t pFitelId, std::vector<uint32_t>& pVecReq );
     /*!
     * \brief Decode a word from a read of a register of the Fitel
     * \param pRegItem : RegItem containing infos (name, adress, value...) about the register to read
     * \param pFitelId : Id of the Fitel to work with
     * \param pWord : variable to put the decoded word
     */
-    //void DecodeReg( FitelRegItem& pRegItem, uint8_t pCFitelId, uint32_t pWord ); [>!< Decode a word from a read of a register of the Fitel<]
+    void DecodeReg( FitelRegItem& pRegItem, uint8_t pCFitelId, uint32_t pWord );
 
     //pure methods which are defined in the proper BoardFWInterface class
     //r/w the Fitel registers
     /*!
     * \brief Write register blocks of a Fitel
-    * \param pFeId : FrontEnd to work with
     * \param pVecReq : Block of words to write
     */
-    //void WriteFitelBlockReg( uint8_t pFitelId, std::vector<uint32_t>& pVecReq );
+    void WriteFitelBlockReg( std::vector<uint32_t>& pVecReq );
     /*!
     * \brief Read register blocks of a Fitel
-    * \param pFeId : FrontEnd to work with
     * \param pVecReq : Vector to stack the read words
     */
-    //void ReadFitelBlockReg( uint8_t pFitelId, std::vector<uint32_t>& pVecReq );
+    void ReadFitelBlockReg( std::vector<uint32_t>& pVecReq );
 
 private:
     void getFEDNetworkParameters();
@@ -166,6 +166,7 @@ private:
      * \param pNthAcq : actual number of acquisitions
      */
     void SelectDaqDDR( uint32_t pNthAcq );
+
     //I2C Methods
 
     /*!
@@ -180,19 +181,12 @@ private:
      * \param pVecReq : Block of words to send
      * \param pWrite : 1/0 -> Write/Read
      */
-    void SendBlockFitelI2cRequest( std::vector<uint32_t>& pVecReq, bool pWrite );
+    void SendFitelI2cRequest( std::vector<uint32_t>& pVecReq, bool pWrite );
     /*!
      * \brief Read blocks from SRAM via I2C
      * \param pVecReq : Vector to stack the read words
      */
-    void ReadI2cBlockValuesInDDR( std::vector<uint32_t>& pVecReq );
-    /*!
-     * \brief Enable I2C communications
-     * \param pEnable : 1/0 -> Enable/Disable
-     */
-    void EnableI2c( bool pEnable );
-
-    void SelectFitelDDR( uint32_t pFitelId );
+    void ReadFitelI2cValuesInDDR( std::vector<uint32_t>& pVecReq );
 
     /*! Compute the size of an acquisition data block
      * \return Number of 32-bit words to be read at each iteration */

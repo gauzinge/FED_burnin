@@ -25,6 +25,5 @@ struct FitelRegItem
     uint8_t fDefValue;
     uint8_t fValue;
 };
-}
 
 #endif

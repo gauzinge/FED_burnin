@@ -131,8 +131,9 @@ public:
 protected:
 
     uint8_t fBeId;
-    uint8_t fFitelId;
     uint8_t fFMCId;
+    uint8_t fFitelId;
+
     // Map of Register Name vs. RegisterItem that contains: Page, Address, Default Value, Value
     FitelRegMap fRegMap;
 

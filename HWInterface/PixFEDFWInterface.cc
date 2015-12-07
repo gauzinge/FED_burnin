@@ -404,7 +404,7 @@ void PixFEDFWInterface::ReadFitelBlockReg( std::vector<uint32_t>& pVecReq )
         throw except;
     }
 
-    ReadFitelI2cValuesInDDR( pVecReq );
+    ReadFitelI2cValues( pVecReq );
 }
 
 

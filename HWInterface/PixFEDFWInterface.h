@@ -129,7 +129,7 @@ public:
     bool WriteBlockReg( const std::string& pRegNode, const std::vector< uint32_t >& pValues );
 
     //FITEL METHODS
-protected:
+
     //Encode/Decode FITEL FMC values
     /*!
     * \brief Encode a/several word(s) readable for a Fitel
@@ -137,14 +137,14 @@ protected:
     * \param pFitelId : Id of the Fitel to work with
     * \param pVecReq : Vector to stack the encoded words
     */
-    void EncodeReg( const FitelRegItem& pRegItem, uint8_t pFitelId, std::vector<uint32_t>& pVecReq );
+    void EncodeReg( const FitelRegItem& pRegItem, uint8_t pFMCId, uint8_t pFitelId, std::vector<uint32_t>& pVecReq );
     /*!
     * \brief Decode a word from a read of a register of the Fitel
     * \param pRegItem : RegItem containing infos (name, adress, value...) about the register to read
     * \param pFitelId : Id of the Fitel to work with
     * \param pWord : variable to put the decoded word
     */
-    void DecodeReg( FitelRegItem& pRegItem, uint8_t pCFitelId, uint32_t pWord );
+    void DecodeReg( FitelRegItem& pRegItem, uint8_t pFMCId, uint8_t pCFitelId, uint32_t pWord );
 
     //pure methods which are defined in the proper BoardFWInterface class
     //r/w the Fitel registers
@@ -186,7 +186,7 @@ private:
      * \brief Read blocks from SRAM via I2C
      * \param pVecReq : Vector to stack the read words
      */
-    void ReadFitelI2cValuesInDDR( std::vector<uint32_t>& pVecReq );
+    void ReadFitelI2cValues( std::vector<uint32_t>& pVecReq );
 
     /*! Compute the size of an acquisition data block
      * \return Number of 32-bit words to be read at each iteration */

@@ -11,7 +11,9 @@
 #define PixFEDInterface_h_
 
 #include "PixFEDFWInterface.h"
-
+#include "../Utils/ConsoleColor.h"
+#include "../HWDescription/Fitel.h"
+#include "../HWDescription/PixFED.h"
 
 /*!
  * \namespace Ph2_HwInterface
@@ -101,20 +103,20 @@ public:
 
     void EncodeFitelReg( const FitelRegItem& pRegItem, uint8_t pFMCId, uint8_t pFitelId , std::vector<uint32_t>& pVecReq )
     {
-        fBoardFW->EncodeReg( pRegItem, pFMCId, pCbcId, pVecReq );
+        fFEDFW->EncodeReg( pRegItem, pFMCId, pFitelId, pVecReq );
     }
 
 
-    void DecodeFitelReg( CbcRegItem& pRegItem, uint8_t pFMCId, uint8_t pFitelId, uint32_t pWord )
+    void DecodeFitelReg( FitelRegItem& pRegItem, uint8_t pFMCId, uint8_t pFitelId, uint32_t pWord )
     {
-        fBoardFW->DecodeReg( pRegItem, pFMCId, pFitelId, pWord );
+        fFEDFW->DecodeReg( pRegItem, pFMCId, pFitelId, pWord );
     }
 
     bool WriteFitelReg(Fitel* pFitel, const std::string& pRegNode, uint8_t pValue, bool pVerifLoop = true);
 
     uint8_t ReadFitelReg(Fitel* pFitel, const std::string& pRegNode);
 
-    void ConfigureFitel(Fitel* pFitel, bool pVerifLoop = true);
+    void ConfigureFitel(const Fitel* pFitel, bool pVerifLoop = true);
 
 
     /////////////////////////////////////

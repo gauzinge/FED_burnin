@@ -94,7 +94,7 @@ void PixFEDInterface::ReadBoardMultReg( PixFED* pFED, std::vector < std::pair< s
 //FITEL METHODS
 /////////////////////////
 
-void FitelInterface::ConfigureFitel( const Fitel* pFitel, bool pVerifLoop, uint32_t pBlockSize )
+void PixFEDInterface::ConfigureFitel( const Fitel* pFitel, bool pVerifLoop )
 {
     setBoard( pFitel->getBeId() );
 
@@ -111,8 +111,6 @@ void FitelInterface::ConfigureFitel( const Fitel* pFitel, bool pVerifLoop, uint3
         for ( cIt; cIt != cFitelRegMap.end(); cIt++ )
         {
 
-            if ( cCounter >= pBlockSize ) break;
-
             EncodeFitelReg( cIt->second, pFitel->getFMCId(), pFitel->getFitelId(), cVecWrite );
 
             if ( pVerifLoop )
@@ -128,7 +126,7 @@ void FitelInterface::ConfigureFitel( const Fitel* pFitel, bool pVerifLoop, uint3
             cCounter++;
         }
 
-        fBoardFW->WriteFitelBlockReg(  cVecWrite );
+        fFEDFW->WriteFitelBlockReg(  cVecWrite );
 
 #ifdef COUNT_FLAG
         fTransactionCount++;
@@ -138,7 +136,7 @@ void FitelInterface::ConfigureFitel( const Fitel* pFitel, bool pVerifLoop, uint3
             uint8_t cFMCId = pFitel->getFMCId();
             uint8_t cFitelId = pFitel->getFitelId();
 
-            fBoardFW->ReadFitelBlockReg( cVecRead );
+            fFEDFW->ReadFitelBlockReg( cVecRead );
 
 
             // for ( int i = 0; i < cVecWrite.size(); i++ )
@@ -188,8 +186,8 @@ void FitelInterface::ConfigureFitel( const Fitel* pFitel, bool pVerifLoop, uint3
                         EncodeFitelReg( cRegItemRead, cFMCId, cFitelId, cRead_again );
                     }
 
-                    fBoardFW->WriteFitelBlockReg( cWrite_again );
-                    fBoardFW->ReadFitelBlockReg( cRead_again );
+                    fFEDFW->WriteFitelBlockReg( cWrite_again );
+                    fFEDFW->ReadFitelBlockReg( cRead_again );
 
                     if ( cWrite_again != cRead_again )
                     {
@@ -225,7 +223,7 @@ bool PixFEDInterface::WriteFitelReg(Fitel* pFitel, const std::string& pRegNode, 
 
     EncodeFitelReg( cRegItem, pFitel->getFMCId(), pFitel->getFitelId(), cVecWrite );
 
-    fBoardFW->WriteFitelBlockReg( cVecWrite );
+    fFEDFW->WriteFitelBlockReg( cVecWrite );
 
 #ifdef COUNT_FLAG
     fRegisterCount++;
@@ -243,7 +241,7 @@ bool PixFEDInterface::WriteFitelReg(Fitel* pFitel, const std::string& pRegNode, 
 
         EncodeFitelReg( cRegItem, pFitel->getFMCId(), pFitel->getFitelId(), cVecRead );
 
-        fBoardFW->ReadFitelBlockReg( cVecRead );
+        fFEDFW->ReadFitelBlockReg( cVecRead );
 
         // for ( int i = 0; i < cVecWrite.size(); i++ )
         // {
@@ -281,8 +279,8 @@ bool PixFEDInterface::WriteFitelReg(Fitel* pFitel, const std::string& pRegNode, 
                 cReadItem.fValue = 0;
                 EncodeFitelReg( cReadItem, cFMCId, cFitelId, cRead_again );
 
-                fBoardFW->WriteFitelBlockReg( cWrite_again );
-                fBoardFW->ReadFitelBlockReg( cRead_again );
+                fFEDFW->WriteFitelBlockReg( cWrite_again );
+                fFEDFW->ReadFitelBlockReg( cRead_again );
 
                 if ( cWrite_again != cRead_again )
                 {
@@ -316,7 +314,7 @@ uint8_t PixFEDInterface::ReadFitelReg( Fitel* pFitel, const std::string& pRegNod
 
     EncodeFitelReg( cRegItem, pFitel->getFMCId(), pFitel->getFitelId(), cVecReq );
 
-    fBoardFW->ReadFitelBlockReg( cVecReq );
+    fFEDFW->ReadFitelBlockReg( cVecReq );
 
     DecodeFitelReg( cRegItem, pFitel->getFMCId(), pFitel->getFitelId(), cVecReq[0] );
 

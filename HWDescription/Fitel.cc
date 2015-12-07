@@ -16,7 +16,6 @@
 #include <iostream>
 #include <string.h>
 #include <iomanip>
-#include "Definition.h"
 
 
 
@@ -31,10 +30,10 @@ Fitel::Fitel( uint8_t pBeId, uint8_t pFMCId, uint8_t pFitelId, const std::string
 // Copy C'tor
 
 Fitel::Fitel( const Fitel& Fitelobj ) :
-    fBeId(pBeId),
-    fFMCId(pFMCId),
-    fFitelId( cbcobj.fFitelId ),
-    fRegMap( cbcobj.fRegMap )
+    fBeId(Fitelobj.fBeId),
+    fFMCId(Fitelobj.fFMCId),
+    fFitelId( Fitelobj.fFitelId ),
+    fRegMap( Fitelobj.fRegMap )
 {
 }
 
@@ -64,7 +63,6 @@ void Fitel::loadfRegMap( const std::string& filename )
             std::istringstream input( line );
             input >> fName >> fAddress_str >> fDefValue_str >> fValue_str;
 
-            fRegItem.fPage = strtoul( fPage_str.c_str(), 0, 16 );
             fRegItem.fDefValue = strtoul( fDefValue_str.c_str(), 0, 16 );
             fRegItem.fValue = strtoul( fValue_str.c_str(), 0, 16 );
 
@@ -167,6 +165,5 @@ bool FitelComparer::operator()( const Fitel& fitel1, const Fitel& fitel2 ) const
 
 bool RegItemComparer::operator()( const FitelRegPair& pRegItem1, const FitelRegPair& pRegItem2 ) const
 {
-    if ( pRegItem1.second.fPage != pRegItem2.second.fPage )
-        return pRegItem1.second.fAddress < pRegItem2.second.fAddress;
+    return pRegItem1.second.fAddress < pRegItem2.second.fAddress;
 }

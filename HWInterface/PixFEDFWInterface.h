@@ -168,10 +168,8 @@ private:
     void SelectDaqDDR( uint32_t pNthAcq );
 
     //I2C Methods
-
-    bool I2cCmdAckWait( uint32_t pAckVal, uint8_t pNcount = 1 );
-    void SendFitelI2cRequest( std::vector<uint32_t>& pVecReq, bool pWrite );
-    void ReadFitelI2cValues( std::vector<uint32_t>& pVecReq );
+    void i2cRelease(uint32_t pTries);
+    bool polli2cAcknowledge(uint32_t pTries);
 
     /*! Compute the size of an acquisition data block
      * \return Number of 32-bit words to be read at each iteration */

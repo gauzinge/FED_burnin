@@ -312,6 +312,57 @@ void PixFEDFWInterface::DecodeReg( FitelRegItem& pRegItem, uint8_t pFMCId, uint8
     //std::cout << "FMCID " << +(cFMCId) << " pFitelID " << +(pFitelId) << std::endl;
 }
 
+void PixFEDFWInterface::i2cRelease(uint32_t pTries)
+{
+    uint32_t cCounter = 0;
+    // release
+    WriteReg("pixfed_ctrl_regs.fitel_config_req", 0);
+    while (ReadReg("pixfed_stat_regs.fitel_config_ack") != 0)
+    {
+        if (cCounter > pTries)
+        {
+            std::cout << "Error, exceeded maximum number of tries for I2C release!" << std::endl;
+            break;
+        }
+        else
+        {
+            usleep(100);
+            cCounter++;
+        }
+    }
+}
+
+bool PixFEDFWInterface::polli2cAcknowledge(uint32_t pTries)
+{
+    bool cSuccess = false;
+    uint32_t cCounter = 0;
+    // wait for command acknowledge
+    while (ReadReg("pixfed_stat_regs.fitel_config_ack") == 0)
+    {
+        if (cCounter > pTries)
+        {
+            std::cout << "Error, polling for I2C command acknowledge timed out!" << std::endl;
+            break;
+
+        }
+        else
+        {
+            usleep(100);
+            cCounter++;
+        }
+    }
+
+    // check the value of that register
+    if (ReadReg("pixfed_stat_regs.fitel_config_ack") == 1)
+    {
+        cSuccess = true;
+    }
+    else if (ReadReg("pixfed_stat_regs.fitel_config_ack") == 3)
+    {
+        cSuccess = false;
+    }
+    return cSuccess;
+}
 
 bool PixFEDFWInterface::WriteFitelBlockReg(std::vector<uint32_t>& pVecReq)
 {
@@ -334,8 +385,7 @@ bool PixFEDFWInterface::WriteFitelBlockReg(std::vector<uint32_t>& pVecReq)
     }
 
     // release
-    WriteReg("pixfed_ctrl_regs.fitel_config_req", 0);
-    while (ReadReg("pixfed_stat_regs.fitel_config_ack") != 0) usleep(100);
+    i2cRelease(10);
     return cSuccess;
 }
 
@@ -362,8 +412,7 @@ bool PixFEDFWInterface::ReadFitelBlockReg(std::vector<uint32_t>& pVecReq)
     }
 
     // release
-    WriteReg("pixfed_ctrl_regs.fitel_config_req", 0);
-    while (ReadReg("pixfed_stat_regs.fitel_config_ack") != 0) usleep(100);
+    i2cRelease(10);
 
     // clear the vector & read the data from the fifo
     pVecReq = ReadBlockRegValue("fitel_config_fifo_rx", pVecReq.size());

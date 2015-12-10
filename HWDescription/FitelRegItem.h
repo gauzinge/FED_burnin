@@ -24,6 +24,7 @@ struct FitelRegItem
     uint8_t fAddress;
     uint8_t fDefValue;
     uint8_t fValue;
+    char fPermission;
 };
 
 #endif

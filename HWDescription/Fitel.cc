@@ -53,7 +53,7 @@ void Fitel::loadfRegMap( const std::string& filename )
 
     if ( file )
     {
-        std::string line, fName, fAddress_str, fDefValue_str, fValue_str;
+        std::string line, fName, fAddress_str, fDefValue_str, fValue_str, fPermission_str;
         FitelRegItem fRegItem;
 
         while ( getline( file, line ) )
@@ -61,11 +61,12 @@ void Fitel::loadfRegMap( const std::string& filename )
             if ( line.find_first_not_of( " \t" ) == std::string::npos ) continue;
             if ( line.at( 0 ) == '#' || line.at( 0 ) == '*' ) continue;
             std::istringstream input( line );
-            input >> fName >> fAddress_str >> fDefValue_str >> fValue_str;
+            input >> fName >> fAddress_str >> fDefValue_str >> fValue_str >> fPermission_str;
 
             fRegItem.fAddress = strtoul(fAddress_str.c_str(), 0, 16);
             fRegItem.fDefValue = strtoul( fDefValue_str.c_str(), 0, 16 );
             fRegItem.fValue = strtoul( fValue_str.c_str(), 0, 16 );
+            fRegItem.fPermission = fPermission_str.c_str()[0];
 
             //std::cout << fName << " "<< +fRegItem.fAddress << " " << +fRegItem.fDefValue << " " << +fRegItem.fValue << std::endl;
             fRegMap[fName] = fRegItem;

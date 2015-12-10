@@ -110,25 +110,27 @@ void PixFEDInterface::ConfigureFitel( const Fitel* pFitel, bool pVerifLoop )
 
         for ( cIt; cIt != cFitelRegMap.end(); cIt++ )
         {
-
-            EncodeFitelReg( cIt->second, pFitel->getFMCId(), pFitel->getFitelId(), cVecWrite );
-
-            if ( pVerifLoop )
+            if (cIt->second.fPermission == 'w')
             {
-                FitelRegItem cItem = cIt->second;
-                cItem.fValue = 0;
+                EncodeFitelReg( cIt->second, pFitel->getFMCId(), pFitel->getFitelId(), cVecWrite );
 
-                EncodeFitelReg( cItem, pFitel->getFMCId(), pFitel->getFitelId(), cVecRead );
-                std::cout << cIt->first << " " << std::hex << +cIt->second.fValue << " " << +cItem.fValue << std::endl;
-            }
+                if ( pVerifLoop )
+                {
+                    FitelRegItem cItem = cIt->second;
+                    cItem.fValue = 0;
+
+                    EncodeFitelReg( cItem, pFitel->getFMCId(), pFitel->getFitelId(), cVecRead );
+                }
 #ifdef COUNT_FLAG
-            fRegisterCount++;
+                fRegisterCount++;
 #endif
-            cCounter++;
+                cCounter++;
+
+            }
         }
 
         fFEDFW->WriteFitelBlockReg(  cVecWrite );
-        usleep(20000);
+        //usleep(20000);
 #ifdef COUNT_FLAG
         fTransactionCount++;
 #endif
@@ -138,12 +140,6 @@ void PixFEDInterface::ConfigureFitel( const Fitel* pFitel, bool pVerifLoop )
             uint8_t cFitelId = pFitel->getFitelId();
 
             fFEDFW->ReadFitelBlockReg( cVecRead );
-
-            //for ( int i = 0; i < cVecWrite.size(); i++ )
-            //{
-            //std::cout << "---<-FMC<-fi---------<-a-----<-v" << std::endl;
-            //std::cout << static_cast<std::bitset<32> >( cVecWrite.at( i ) ) << std::endl << static_cast<std::bitset<32> >( cVecRead.at( i ) ) << std::endl << std::endl;
-            //}
 
             // only if I have a mismatch will i decode word by word and compare
             if ( cVecWrite != cVecRead )
@@ -167,10 +163,6 @@ void PixFEDInterface::ConfigureFitel( const Fitel* pFitel, bool pVerifLoop )
                         DecodeFitelReg( cRegItemWrite, cFMCId, cFitelId, *cMismatchWord.first );
                         FitelRegItem cRegItemRead;
                         DecodeFitelReg( cRegItemRead, cFMCId, cFitelId, *cMismatchWord.second );
-
-                        // uint32_t index = std::distance( cVecWrite.end(), cMismatchWord.first );
-                        // std::advance( cIt, index );
-                        // std::string cMismatchName = cIt->first;
 
                         if ( cIterationCounter == 5 )
                         {
@@ -248,12 +240,6 @@ bool PixFEDInterface::WriteFitelReg(Fitel* pFitel, const std::string& pRegNode, 
         EncodeFitelReg( cRegItem, pFitel->getFMCId(), pFitel->getFitelId(), cVecRead );
 
         fFEDFW->ReadFitelBlockReg( cVecRead );
-
-        // for ( int i = 0; i < cVecWrite.size(); i++ )
-        // {
-        //  std::cout << "           <-idpaaaaaaaavvvvvvvv" << std::endl;
-        //  std::cout << static_cast<std::bitset<32> >( cVecWrite.at( i ) ) << std::endl << static_cast<std::bitset<32> >( cVecRead.at( i ) ) << std::endl << std::endl;
-        // }
 
         bool cAllgood = false;
 

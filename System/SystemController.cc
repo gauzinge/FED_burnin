@@ -103,9 +103,10 @@ void SystemController::parseHWxml( const std::string& pFilename, std::ostream& o
         // the connection ID is not used but built in RegManager constructor!
 
         // Iterate the BeBoardRegister Nodes
-        for ( pugi::xml_node cBeBoardRegNode = cBeBoardNode.child( "Register" ); cBeBoardRegNode/* != cBeBoardNode.child( "Module" )*/; cBeBoardRegNode = cBeBoardRegNode.next_sibling() )
+        for ( pugi::xml_node cBeBoardRegNode = cBeBoardNode.child( "Register" ); cBeBoardRegNode; cBeBoardRegNode = cBeBoardRegNode.next_sibling() )
         {
-            os << BOLDCYAN << "|" << "_____" << cBeBoardRegNode.name() << "  " << cBeBoardRegNode.first_attribute().name() << " :" << cBeBoardRegNode.attribute( "name" ).value() << " " << BOLDRED << atoi(cBeBoardRegNode.first_child().value()) << RESET << std:: endl;
+            std::string nodename = cBeBoardRegNode.name();
+            if (nodename == "Register") os << BOLDCYAN << "|" << "----" << cBeBoardRegNode.name() << "  " << cBeBoardRegNode.first_attribute().name() << " :" << cBeBoardRegNode.attribute( "name" ).value() << " " << BOLDRED << atoi(cBeBoardRegNode.first_child().value()) << RESET << std:: endl;
             cPixFED->setReg( std::string( cBeBoardRegNode.attribute( "name" ).value() ), atoi( cBeBoardRegNode.first_child().value() ) );
         }
 
@@ -169,6 +170,17 @@ void SystemController::parseSettingsxml( const std::string & pFilename, std::ost
         os << "Error description : " << result.description() << std::endl;
         return;
     }
+
+    for (int i = 0; i < 80; i++ )
+        os << "*";
+    os << "\n";
+    for (int j = 0; j < 40; j++ )
+        os << " ";
+    os << BOLDRED << "SETTINGS: " << RESET << std::endl;
+    for (int i = 0; i < 80; i++ )
+        os << "*";
+    std::cout << std::endl;
+
     for ( pugi::xml_node nSettings = doc.child( "Settings" ); nSettings; nSettings = nSettings.next_sibling() )
     {
         for ( pugi::xml_node nSetting = nSettings.child( "Setting" ); nSetting; nSetting = nSetting.next_sibling() )

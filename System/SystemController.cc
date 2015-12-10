@@ -101,6 +101,8 @@ void SystemController::parseHWxml( const std::string& pFilename, std::ostream& o
         PixFED* cPixFED = new PixFED( cBeId );
 
         // the connection ID is not used but built in RegManager constructor!
+        pugi::xml_node cBeBoardConnectionNode = cBeBoardNode.child("connection");
+        std::cout << BOLDBLUE <<  "|" << "----" << "Board Id: " << BOLDYELLOW << cBeBoardConnectionNode.attribute("id").value() << BOLDBLUE << " URI: " << BOLDYELLOW << cBeBoardConnectionNode.attribute("uri").value() << BOLDBLUE << " Address Table: " << BOLDYELLOW << cBeBoardConnectionNode.attribute("address_table").value() << RESET << std::endl;
 
         // Iterate the BeBoardRegister Nodes
         for ( pugi::xml_node cBeBoardRegNode = cBeBoardNode.child( "Register" ); cBeBoardRegNode; cBeBoardRegNode = cBeBoardRegNode.next_sibling() )
@@ -132,8 +134,10 @@ void SystemController::parseHWxml( const std::string& pFilename, std::ostream& o
         }
 
         fPixFEDVector.push_back(cPixFED);
-        PixFEDFWInterface* cTmpFWInterface = new PixFEDFWInterface(doc.child("HwDescription").child("Connections").attribute("name").value(), cBeId);
+
+        PixFEDFWInterface* cTmpFWInterface = new PixFEDFWInterface(cBeBoardConnectionNode.attribute( "id" ).value(), cBeBoardConnectionNode.attribute( "uri" ).value(), cBeBoardConnectionNode.attribute("address_table").value() );
         //////////////////////////////////
+
         auto cSetting = fSettingsMap.find("NTBM");
         uint32_t cNTBM = (cSetting != std::end(fSettingsMap)) ? cSetting->second : 8;
         if (cSetting == std::end(fSettingsMap)) std::cout << "Settings Map not yet initialized!, reverting to default value (8)" << std::endl;

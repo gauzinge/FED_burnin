@@ -24,7 +24,12 @@ PixFEDFWInterface::PixFEDFWInterface( const char* puHalConfigFileName, uint32_t 
     //fData( nullptr )
 {
 }
-
+//Constructor, makes the board map
+PixFEDFWInterface::PixFEDFWInterface( const char* pId, const char* pUri, const char* pAddressTable ) :
+    RegManager( pId, pUri, pAddressTable ),
+    fNumAcq( 0 )
+{
+}
 /////////////////////////////////////////////
 // CONFIG / START / STOP METHODS
 ////////////////////////////////////////////

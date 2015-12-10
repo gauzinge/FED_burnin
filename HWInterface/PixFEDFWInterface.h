@@ -62,6 +62,12 @@ public:
     * \param pFileHandler : pointer to file handler for saving Raw Data*/
     PixFEDFWInterface( const char* puHalConfigFileName, uint32_t pBoardId );
     /*!
+    * \brief Constructor of the PixFEDFWInterface class
+    * \param pId : identifier string
+    * \param pUri : URI string
+    * \param pAddressTable: address table string*/
+    PixFEDFWInterface( const char* pId, const char* pUri, const char* pAddressTable );
+    /*!
     * \brief Destructor of the PixFEDFWInterface class
     */
     ~PixFEDFWInterface()

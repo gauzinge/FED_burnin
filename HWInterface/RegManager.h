@@ -98,6 +98,13 @@ public:
      */
     RegManager( const char* puHalConfigFileName, uint32_t pBoardId );
     /*!
+    * \brief Constructor of the RegManager class
+    * \param pId : id in the connections node
+    * \param pUri: URI string for uHAL
+    * \param pAddressTable: address table path
+    */
+    RegManager( const char* pId, const char* pUri, const char* pAddressTable );
+    /*!
      * \brief Destructor of the RegManager class
      */
     virtual ~RegManager();

@@ -39,6 +39,24 @@ fDeactiveThread( false )
 
 }
 
+RegManager::RegManager( const char* pId, const char* pUri, const char* pAddressTable ) :
+    fThread( [ = ]
+{
+    StackWriteTimeOut();
+} ),
+fDeactiveThread( false )
+{
+    // Loging settings
+    uhal::disableLogging();
+    //uhal::setLogLevelTo(uhal::Error()); //Raise the log level
+
+    uhal::ConnectionManager cm( "file://HWInterface/dummy.xml" ); // Get connection
+
+    fBoard = new uhal::HwInterface( cm.getDevice( pId, pUri, pAddressTable ) );
+
+    fThread.detach();
+
+}
 
 RegManager::~RegManager()
 {

@@ -152,12 +152,12 @@ public:
     * \brief Write register blocks of a Fitel
     * \param pVecReq : Block of words to write
     */
-    void WriteFitelBlockReg( std::vector<uint32_t>& pVecReq );
+    bool WriteFitelBlockReg( std::vector<uint32_t>& pVecReq );
     /*!
     * \brief Read register blocks of a Fitel
     * \param pVecReq : Vector to stack the read words
     */
-    void ReadFitelBlockReg( std::vector<uint32_t>& pVecReq );
+    bool ReadFitelBlockReg( std::vector<uint32_t>& pVecReq );
 
 private:
     void getFEDNetworkParameters();
@@ -169,23 +169,8 @@ private:
 
     //I2C Methods
 
-    /*!
-     * \brief Wait for the I2C command acknowledgement
-     * \param pAckVal : Expected status of acknowledgement, 1/0 -> true/false
-     * \param pNcount : Number of registers at stake
-     * \return boolean confirming the acknowledgement
-     */
     bool I2cCmdAckWait( uint32_t pAckVal, uint8_t pNcount = 1 );
-    /*!
-     * \brief Send request to r/w blocks via I2C
-     * \param pVecReq : Block of words to send
-     * \param pWrite : 1/0 -> Write/Read
-     */
     void SendFitelI2cRequest( std::vector<uint32_t>& pVecReq, bool pWrite );
-    /*!
-     * \brief Read blocks from SRAM via I2C
-     * \param pVecReq : Vector to stack the read words
-     */
     void ReadFitelI2cValues( std::vector<uint32_t>& pVecReq );
 
     /*! Compute the size of an acquisition data block

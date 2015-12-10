@@ -119,6 +119,7 @@ void PixFEDInterface::ConfigureFitel( const Fitel* pFitel, bool pVerifLoop )
                 cItem.fValue = 0;
 
                 EncodeFitelReg( cItem, pFitel->getFMCId(), pFitel->getFitelId(), cVecRead );
+                std::cout << cIt->first << " " << std::hex << +cIt->second.fValue << " " << +cItem.fValue << std::endl;
             }
 #ifdef COUNT_FLAG
             fRegisterCount++;
@@ -127,7 +128,7 @@ void PixFEDInterface::ConfigureFitel( const Fitel* pFitel, bool pVerifLoop )
         }
 
         fFEDFW->WriteFitelBlockReg(  cVecWrite );
-
+        usleep(20000);
 #ifdef COUNT_FLAG
         fTransactionCount++;
 #endif
@@ -138,12 +139,11 @@ void PixFEDInterface::ConfigureFitel( const Fitel* pFitel, bool pVerifLoop )
 
             fFEDFW->ReadFitelBlockReg( cVecRead );
 
-
-            // for ( int i = 0; i < cVecWrite.size(); i++ )
-            // {
-            //  std::cout << "         feididpaaaaaaaavvvvvvvv" << std::endl;
-            //  std::cout << static_cast<std::bitset<32> >( cVecWrite.at( i ) ) << std::endl << static_cast<std::bitset<32> >( cVecRead.at( i ) ) << std::endl << std::endl;
-            // }
+            //for ( int i = 0; i < cVecWrite.size(); i++ )
+            //{
+            //std::cout << "---<-FMC<-fi---------<-a-----<-v" << std::endl;
+            //std::cout << static_cast<std::bitset<32> >( cVecWrite.at( i ) ) << std::endl << static_cast<std::bitset<32> >( cVecRead.at( i ) ) << std::endl << std::endl;
+            //}
 
             // only if I have a mismatch will i decode word by word and compare
             if ( cVecWrite != cVecRead )
@@ -161,6 +161,8 @@ void PixFEDInterface::ConfigureFitel( const Fitel* pFitel, bool pVerifLoop )
 
                     while ( cMismatchWord.first != cVecWrite.end() )
                     {
+
+
                         FitelRegItem cRegItemWrite;
                         DecodeFitelReg( cRegItemWrite, cFMCId, cFitelId, *cMismatchWord.first );
                         FitelRegItem cRegItemRead;
@@ -172,15 +174,15 @@ void PixFEDInterface::ConfigureFitel( const Fitel* pFitel, bool pVerifLoop )
 
                         if ( cIterationCounter == 5 )
                         {
-                            std::cout << RED << "\nERROR !!!\nReadback value not the same after 5 Iteration for Register @ Address: " << int( cRegItemWrite.fAddress ) << "\n" << std::hex << "Written Value : 0x" << int( cRegItemWrite.fValue ) << "\nReadback Value : 0x" << int( cRegItemRead.fValue ) << std::dec << std::endl;
+                            std::cout << RED << "\nERROR !!!\nReadback value not the same after 5 Iteration for Register @ Address: 0x" << std::hex << int( cRegItemWrite.fAddress ) << "\n" << "Written Value : 0x" << int( cRegItemWrite.fValue ) << "\nReadback Value : 0x" << int( cRegItemRead.fValue ) << std::dec << std::endl;
                             std::cout << "Fitel Id : " << int( pFitel->getFitelId() ) << RESET << std::endl << std::endl;
                             std::cout << BOLDRED << "Failed to write register in " << cIterationCounter << " trys! Giving up!" << RESET << std::endl;
+                            std::cout << "---<-FMC<-fi---------<-a-----<-v" << std::endl;
+                            std::cout << static_cast<std::bitset<32> >( *cMismatchWord.first ) << std::endl << static_cast<std::bitset<32> >( *cMismatchWord.second ) << std::endl << std::endl;
                         }
 
                         cMismatchWord = std::mismatch( ++cMismatchWord.first, cVecWrite.end(), ++cMismatchWord.second );
-                        // mypause();
 
-                        // cWrite_again.push_back( *cMismatchWord.first );
                         EncodeFitelReg( cRegItemWrite, cFMCId, cFitelId, cWrite_again );
                         cRegItemRead.fValue = 0;
                         EncodeFitelReg( cRegItemRead, cFMCId, cFitelId, cRead_again );
@@ -191,7 +193,11 @@ void PixFEDInterface::ConfigureFitel( const Fitel* pFitel, bool pVerifLoop )
 
                     if ( cWrite_again != cRead_again )
                     {
-                        if ( cIterationCounter == 5 ) break;
+                        if ( cIterationCounter == 5 )
+                        {
+                            std::cout << "Failed to configure FITEL in " << cIterationCounter << " Iterations!" << std::endl;
+                            break;
+                        }
                         cVecWrite.clear();
                         cVecWrite = cWrite_again;
                         cVecRead.clear();

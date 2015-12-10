@@ -128,13 +128,10 @@
     <node id="eui_b2" address="0x0000001f" mask="0x00ff0000" permission="r" />
     <node id="eui_b1" address="0x0000001f" mask="0x0000ff00" permission="r" />
     <node id="eui_b0" address="0x0000001f" mask="0x000000ff" permission="r" />
-   
     <!-- ICAP MEMORY SPACE -->
-    
     <node id="icap" address="0x00000200" mask="0xffffffff" permission="rw" />
     <!-- IPHC CMS Ph1 Pixel FED FW Address Table -->
     <!-- according to user_logic.vhd of fc7_basic projecd -->
-    
     <!-- STATUS REGISTER MAPPING from pixfed_stat_reg: STATUS & FLAGS -->
     <node id="pixfed_stat_regs">
         <!-- USER ASCII CODE -->
@@ -200,8 +197,8 @@
         <node id="TBM_MASK_3" address="0x40010006" mask="0xffffffff" />
     </node>
     <!-- MISC -->
-    <node id="fitel_config_fifo_tx" address="0x40100000" mask="0xffffffff" permission="rw" />
-    <node id="fitel_config_fifo_rx" address="0x40100001" mask="0xffffffff" permission="r" />
+    <node id="fitel_config_fifo_tx" address="0x40100000" mode="non-incremental" size="512" permission="rw" />
+    <node id="fitel_config_fifo_rx" address="0x40100001" mode="non-incremental" size="512" permission="r" />
     <node id="DDR0" address="0x60000000" mode="block" size="0x01000000" permission="rw" />
     <node id="DDR1" address="0x61000000" mode="block" size="0x01000000" permission="rw" />
 </node>

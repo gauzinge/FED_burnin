@@ -63,9 +63,11 @@ void Fitel::loadfRegMap( const std::string& filename )
             std::istringstream input( line );
             input >> fName >> fAddress_str >> fDefValue_str >> fValue_str;
 
+            fRegItem.fAddress = strtoul(fAddress_str.c_str(), 0, 16);
             fRegItem.fDefValue = strtoul( fDefValue_str.c_str(), 0, 16 );
             fRegItem.fValue = strtoul( fValue_str.c_str(), 0, 16 );
 
+            //std::cout << fName << " "<< +fRegItem.fAddress << " " << +fRegItem.fDefValue << " " << +fRegItem.fValue << std::endl;
             fRegMap[fName] = fRegItem;
         }
 

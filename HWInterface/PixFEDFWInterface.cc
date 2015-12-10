@@ -138,10 +138,10 @@ bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED )
 
     cVecReg.clear();
 
-    cVecReg.push_back( {"pixfed_ctrl_regs.PC_CONFIG_OK", 1} );
     cVecReg.push_back({"pixfed_ctrl_regs.fitel_i2c_cmd_reset", 0});
     cVecReg.push_back({"pixfed_ctrl_regs.fitel_config_req", 0});
     cVecReg.push_back({"pixfed_ctrl_regs.fitel_i2c_addr", 0x4d});
+    cVecReg.push_back( {"pixfed_ctrl_regs.PC_CONFIG_OK", 1} );
     WriteStackReg( cVecReg );
 
     cVecReg.clear();
@@ -309,105 +309,66 @@ void PixFEDFWInterface::DecodeReg( FitelRegItem& pRegItem, uint8_t pFMCId, uint8
     pFitelId = (  pWord & 0x00f00000   ) >> 20;
     pRegItem.fAddress = ( pWord & 0x0000ff00 ) >> 8;
     pRegItem.fValue = pWord & 0x000000ff;
-    std::cout << "FMCID " << +(cFMCId) << " pFitelID " << +(pFitelId) << std::endl;
+    //std::cout << "FMCID " << +(cFMCId) << " pFitelID " << +(pFitelId) << std::endl;
 }
 
 
-bool PixFEDFWInterface::I2cCmdAckWait( uint32_t pAckVal, uint8_t pNcount )
+bool PixFEDFWInterface::WriteFitelBlockReg(std::vector<uint32_t>& pVecReq)
 {
-    unsigned int cWait( 100 );
+    bool cSuccess = false;
+    // write the encoded registers in the tx fifo
+    WriteBlockReg("fitel_config_fifo_tx", pVecReq);
+    // sent an I2C write request
+    WriteReg("pixfed_ctrl_regs.fitel_config_req", 1);
 
-    if ( pAckVal )
-        cWait = pNcount * 500;
+    // wait for command acknowledge
+    while (ReadReg("pixfed_stat_regs.fitel_config_ack") == 0) usleep(100);
 
-
-    usleep( cWait );
-
-    uhal::ValWord<uint32_t> cVal;
-    uint32_t cLoop = 0;
-
-    do
+    if (ReadReg("pixfed_stat_regs.fitel_config_ack") == 1)
     {
-        cVal = ReadReg( "pixfed_stat_regs.fitel_config_ack" );
-        if ( cVal != pAckVal )
-        {
-            std::cout << "Waiting for the I2c command acknowledge to be " << pAckVal << " for " << pNcount << " registers." << std::endl;
-            usleep( cWait );
-        }
-
+        cSuccess = true;
     }
-    while ( cVal != pAckVal && ++cLoop < MAX_NB_LOOP );
-
-    if ( cLoop >= MAX_NB_LOOP )
+    else if (ReadReg("pixfed_stat_regs.fitel_config_ack") == 3)
     {
-        std::cout << "Warning: time out in I2C acknowledge loop (" << pAckVal << ")" << std::endl;
-        return false;
+        cSuccess = false;
     }
 
-    return true;
-}
-
-void PixFEDFWInterface::SendFitelI2cRequest( std::vector<uint32_t>& pVecReq, bool pWrite )
-{
-    // fill encoded vector to txfifo
-    WriteBlockReg( "fitel_config_fifo_tx", pVecReq );
-
-    // 1 to write, 3 to read
-    WriteReg( "pixfed_ctrl_regs.fitel_config_req", pWrite ? 1 : 3 );
-
-    pVecReq.pop_back();
-
-    if ( I2cCmdAckWait( ( uint32_t )1, pVecReq.size() ) == 0 )
-        throw Exception( "FitelInterface: I2cCmdAckWait 1 failed." );
-
+    // release
     WriteReg("pixfed_ctrl_regs.fitel_config_req", 0);
-
-    if ( I2cCmdAckWait( ( uint32_t )0, pVecReq.size() ) == 0 )
-        throw Exception( "FitelInterface: I2cCmdAckWait 0 failed." );
-
+    while (ReadReg("pixfed_stat_regs.fitel_config_ack") != 0) usleep(100);
+    return cSuccess;
 }
 
-void PixFEDFWInterface::ReadFitelI2cValues( std::vector<uint32_t>& pVecReq )
+bool PixFEDFWInterface::ReadFitelBlockReg(std::vector<uint32_t>& pVecReq)
 {
+    bool cSuccess = false;
+    //uint32_t cVecSize = pVecReq.size();
 
-    WriteReg( "pixfed_ctrl_regs.fitel_config_req", 3 );
+    // write the encoded registers in the tx fifo
+    WriteBlockReg("fitel_config_fifo_tx", pVecReq);
+    // sent an I2C write request
+    WriteReg("pixfed_ctrl_regs.fitel_config_req", 3);
 
-    pVecReq = ReadBlockRegValue( "fitel_config_fifo_rx", pVecReq.size() );
+    // wait for command acknowledge
+    while (ReadReg("pixfed_stat_regs.fitel_config_ack") == 0) usleep(100);
 
-    WriteReg( "pixfed_ctrl_regs.fitel_config_req", 0 );
+    if (ReadReg("pixfed_stat_regs.fitel_config_ack") == 1)
+    {
+        cSuccess = true;
+    }
+    else if (ReadReg("pixfed_stat_regs.fitel_config_ack") == 3)
+    {
+        cSuccess = false;
+    }
 
+    // release
+    WriteReg("pixfed_ctrl_regs.fitel_config_req", 0);
+    while (ReadReg("pixfed_stat_regs.fitel_config_ack") != 0) usleep(100);
+
+    // clear the vector & read the data from the fifo
+    pVecReq = ReadBlockRegValue("fitel_config_fifo_rx", pVecReq.size());
+    return cSuccess;
 }
-
-
-void PixFEDFWInterface::WriteFitelBlockReg( std::vector<uint32_t>& pVecReq )
-{
-    try
-    {
-        SendFitelI2cRequest( pVecReq, true );
-    }
-
-    catch ( Exception& except )
-    {
-        throw except;
-    }
-}
-
-void PixFEDFWInterface::ReadFitelBlockReg( std::vector<uint32_t>& pVecReq )
-{
-    try
-    {
-        SendFitelI2cRequest( pVecReq, false );
-    }
-
-    catch ( Exception& except )
-    {
-        throw except;
-    }
-
-    ReadFitelI2cValues( pVecReq );
-}
-
-
 
 /////////////////////////////////////////////
 // FIRMWARE METHODS
@@ -449,3 +410,103 @@ void PixFEDFWInterface::checkIfUploading()
     if ( !fpgaConfig )
         fpgaConfig = new CtaFpgaConfig( this );
 }
+
+
+
+//bool PixFEDFWInterface::I2cCmdAckWait( uint32_t pAckVal, uint8_t pNcount )
+//{
+//unsigned int cWait( 100 );
+
+//if ( pAckVal )
+//cWait = pNcount * 500;
+
+
+//usleep( cWait );
+
+//uhal::ValWord<uint32_t> cVal;
+//uint32_t cLoop = 0;
+
+//do
+//{
+//cVal = ReadReg( "pixfed_stat_regs.fitel_config_ack" );
+//if ( cVal != pAckVal )
+//{
+//std::cout << "Waiting for the I2c command acknowledge to be " << pAckVal << " for " << pNcount << " registers." << std::endl;
+//usleep( cWait );
+//}
+//else if (cVal == 0b11) std::cout << "The I2C transaction failed - the value of pixfed_stat_regs.fitel_config_ack is 3" << std::endl;
+//cLoop++;
+
+//}
+//while ( cVal != pAckVal && ++cLoop < MAX_NB_LOOP );
+
+//if ( cLoop >= MAX_NB_LOOP )
+//{
+//std::cout << "Warning: time out in I2C acknowledge loop (" << pAckVal << ")" << std::endl;
+//return false;
+//}
+//return true;
+//}
+
+//void PixFEDFWInterface::SendFitelI2cRequest( std::vector<uint32_t>& pVecReq, bool pWrite )
+//{
+//// fill encoded vector to txfifo
+//WriteBlockReg( "fitel_config_fifo_tx", pVecReq );
+//// 1 to write, 3 to read
+//if ( pWrite )
+//{
+//WriteReg( "pixfed_ctrl_regs.fitel_config_req", 1 );
+//}
+//else
+//{
+//WriteReg( "pixfed_ctrl_regs.fitel_config_req", 3 );
+//}
+////pVecReq.pop_back();
+
+//if ( I2cCmdAckWait( ( uint32_t )1, pVecReq.size() ) == 0 )
+//throw Exception( "FitelInterface: I2cCmdAckWait 1 failed." );
+
+//WriteReg("pixfed_ctrl_regs.fitel_config_req", 0);
+
+//if ( I2cCmdAckWait( ( uint32_t )0, pVecReq.size() ) == 0 )
+//throw Exception( "FitelInterface: I2cCmdAckWait 0 failed." );
+//}
+
+//void PixFEDFWInterface::ReadFitelI2cValues( std::vector<uint32_t>& pVecReq )
+//{
+////pVecReq.clear();
+////WriteReg( "pixfed_ctrl_regs.fitel_config_req", 3 );
+//pVecReq = ReadBlockRegValue( "fitel_config_fifo_rx", pVecReq.size() );
+
+//WriteReg( "pixfed_ctrl_regs.fitel_config_req", 0 );
+//if ( I2cCmdAckWait( ( uint32_t )0, pVecReq.size() ) == 0 )
+//throw Exception( "FitelInterface: I2cCmdAckWait 0 failed." );
+//}
+
+
+//void PixFEDFWInterface::WriteFitelBlockReg( std::vector<uint32_t>& pVecReq )
+//{
+//try
+//{
+//SendFitelI2cRequest( pVecReq, true );
+//}
+
+//catch ( Exception& except )
+//{
+//throw except;
+//}
+//}
+
+//void PixFEDFWInterface::ReadFitelBlockReg( std::vector<uint32_t>& pVecReq )
+//{
+//try
+//{
+//SendFitelI2cRequest( pVecReq, false );
+//}
+
+//catch ( Exception& except )
+//{
+//throw except;
+//}
+//ReadFitelI2cValues( pVecReq );
+//}

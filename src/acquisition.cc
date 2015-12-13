@@ -4,10 +4,14 @@
 #include "../HWDescription/PixFED.h"
 #include "../HWInterface/PixFEDInterface.h"
 #include "../System/SystemController.h"
-
+#include "../Utils/Data.h"
 
 int main(int argc, char* argv[] )
 {
+    int tbm_index_error_ctr = 0;
+    int tbm_core_error_ctr = 0;
+    int payload_error_ctr = 0;
+
     uhal::setLogLevelTo(uhal::Debug());
 
     // instantiate System Controller
@@ -36,13 +40,24 @@ int main(int argc, char* argv[] )
     while ( iAcq < cNAcq)
     {
         std::cout << std::endl << BOLDRED << "Acquisition: " << iAcq << RESET << std::endl;
+        Data cData;
         for (auto& cFED : cSystemController.fPixFEDVector)
         {
             std::cout << BOLDGREEN << "Data for FED " << +cFED->getBeId() << RESET << std::endl;
-            cSystemController.fFEDInterface->ReadData(cFED);
-
+            cData.add(iAcq, cSystemController.fFEDInterface->ReadData(cFED));
         }
         iAcq++;
+        if (iAcq % 1000 == 0)
+        {
+            cData.check();
+            tbm_index_error_ctr += cData.getTBM_index_errors();
+            tbm_core_error_ctr += cData.getTBM_core_errors();
+            payload_error_ctr += cData.getPayload_errors();
+            std::cout << "ERROR summary: " << std::endl
+                      << "TBM index errors: " << tbm_index_error_ctr << std::endl
+                      << "TBM core errors:  " << tbm_core_error_ctr << std::endl
+                      << "Payload errors:   " << payload_error_ctr << std::endl;
+        }
     }
     for (auto& cFED : cSystemController.fPixFEDVector)
     {

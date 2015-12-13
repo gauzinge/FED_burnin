@@ -1,97 +1,49 @@
-/*
+#ifndef _Data_h__
+#define _Data_h__
 
-    \file                          Data.h
-    \brief                         Data handling from DAQ
-    \author                        Nicolas PIERRE
-    \version                       1.0
-    \date                          10/07/14
-    Support :                      mail to : nicolas.pierre@icloud.com
+#include <string>
+#include <vector>
 
- */
-
-#ifndef __DATA_H__
-#define __DATA_H__
-
-#include <uhal/uhal.hpp>
-#include <memory>
-#include <ios>
-#include <istream>
-//#include "../Utils/Event.h"
-//#include "../HWDescription/BeBoard.h"
-//#include "../HWDescription/Definition.h"
-
-
-using namespace Ph2_HwDescription;
-namespace Ph2_HwInterface
-{
-
-/*!
- * \class Data
- * \brief Data buffer class for CBC data
- */
 class Data
 {
-private:
-    uint32_t fNevents;              /*! Number of Events<*/
-    uint32_t fCurrentEvent;         /*! Current EventNumber in use <*/
-    uint32_t fNCbc  ;               /*! Number of CBCs in the setup <*/
-    uint32_t fEventSize  ;          /*! Size of 1 Event <*/
-
-    std::vector<Event*> fEventList;
-
-private:
-
 public:
-    /*!
-     * \brief Constructor of the Data class
-     * \param pNbCbc
-     */
-    Data( ) :  fCurrentEvent( 0 ), fEventSize( 0 )
+    //C'tor
+    Data()
     {
-    }
-    /*!
-     * \brief Copy Constructor of the Data class
-     */
-    Data( const Data& pData );
-    /*!
-     * \brief Destructor of the Data class
-     */
+        fData.clear();
+        fTBM_core_error_ctr = fTBM_index_error_ctr = fPayload_error_ctr = 0;
+    };
+    // D'tor
     ~Data()
     {
-        for ( auto pevt : fEventList )
-            delete pevt;
-        fEventList.clear();
-    }
-    /*!
-     * \brief Set the data in the data map
-     * \param *pBoard : pointer to Boat
-     * \param *pData : Data from the Cbc
-     * \param pNevents : The number of events in this acquisiton
-     */
-    void Set( const BeBoard* pBoard, const std::vector<uint32_t>& pData, uint32_t pNevents, bool swapBytes = true );
-    /*!
-     * \brief Reset the data structure
-     */
-    void Reset();
-    /*!
-     * \brief Get the next Event
-     * \param pBoard: pointer to BeBoard
-     * \return Next Event
-     */
-    // cannot be const as fCurrentEvent is incremented
-    const Event* GetNextEvent( const BeBoard* pBoard )
+        fData.clear();
+    };
+    // for checking
+    void add(int pEventCounter, std::vector<uint32_t> pData);
+    void clear();
+    void check();
+    // get error counters
+    int getTBM_index_erors()
     {
-        return ( ( fCurrentEvent >= fEventList.size() ) ? nullptr : fEventList.at( fCurrentEvent++ ) );
-    }
-    const Event* GetEvent( const BeBoard* pBoard, int i ) const
+        return fTBM_index_error_ctr;
+    };
+    int getTBM_core_errors()
     {
-        return ( ( i >= fEventList.size() ) ? nullptr : fEventList.at( i ) );
-    }
-    const std::vector<Event*>& GetEvents( const BeBoard* pBoard ) const
+        return fTBM_core_error_ctr;
+    };
+    int getPayload_errors()
     {
-        return fEventList;
-    }
+        return fPayload_error_ctr;
+    };
+
+private:
+    std::vector<uint32_t> fData;
+    int fBoardCounter;
+    int fEventCounter;
+
+    int fTBM_index_error_ctr;
+    int fTBM_core_error_ctr;
+    int fPayload_error_ctr;
 };
 
-}
 #endif

@@ -1,90 +1,59 @@
-/*
+#include "Data.h"
 
-    FileName :                     Data.cc
-    Content :                      Data handling from DAQ
-    Programmer :                   Nicolas PIERRE
-    Version :                      1.0
-    Date of creation :             10/07/14
-    Support :                      mail to : nicolas.pierre@icloud.com
 
- */
-
-#include "../Utils/Data.h"
-#include <iostream>
-
-namespace Ph2_HwInterface
+void Data::add(int pEventCounter, std::vector<uint32_t> pData)
 {
-	//Data Class
-
-	// copy constructor
-	Data::Data( const Data& pD ) :
-
-		// Initialise( pD.fNevents );
-		fNevents( pD.fNevents ),
-		fCurrentEvent( pD.fCurrentEvent ),
-		fNCbc( pD.fNCbc ),
-		fEventSize( pD.fEventSize )
-	{
-	}
-
-
-	void Data::Set( const BeBoard* pBoard, const std::vector<uint32_t>& pData, uint32_t pNevents, bool swapBytes )
-	{
-		Reset();
-		std::vector<uint8_t> flist;
-		for ( auto word : pData )
-		{
-			if ( swapBytes )
-			{
-				flist.push_back( ( word >> 24 ) & 0xFF );
-				flist.push_back( ( word >> 16 ) & 0xFF );
-				flist.push_back( ( word >>  8 ) & 0xFF );
-				flist.push_back( word  & 0xFF );
-			}
-			else
-			{
-				flist.push_back( word  & 0xFF );
-				flist.push_back( ( word >>  8 ) & 0xFF );
-				flist.push_back( ( word >> 16 ) & 0xFF );
-				flist.push_back( ( word >> 24 ) & 0xFF );
-			}
-		}
-
-		// initialize the buffer data array and the buffer size (one 32 bit word is 4 char!)
-		fNevents = static_cast<uint32_t>( pNevents );
-		fEventSize = static_cast<uint32_t>( flist.size() / fNevents );
-		fNCbc = ( fEventSize - ( EVENT_HEADER_TDC_SIZE_CHAR ) ) / ( CBC_EVENT_SIZE_CHAR );
-
-#ifdef __CBCDAQ_DEV__
-		std::cout << "Initializing list with " << flist.size() << ", i.e 4 * " << pData.size()
-				  << " chars containing data from "
-				  << fNevents << "  Events with an eventbuffer size of " << fEventSize << " and " << fNCbc
-				  << " CBCs each! " << EVENT_HEADER_TDC_SIZE_CHAR << " " << CBC_EVENT_SIZE_CHAR << std::endl;
-#endif
-
-		// Fill fEventList
-		std::vector<uint8_t> lvec;
-		for ( auto i = 0; i < flist.size(); ++i )
-		{
-			// std::cout << std::bitset<8>(flist.at(i)) << " ";
-			// if((i+1)%4 == 0 && i != 0) std::cout << std::endl;
-			// if(i%78 == 0 && i != 0) std::cout << std::endl << std::endl;
-
-			lvec.push_back( flist[i] );
-			if ( i > 0 && ( ( i + 1 ) % fEventSize ) == 0 )
-			{
-				fEventList.push_back( new Event( pBoard, fNCbc, lvec ) );
-				lvec.clear();
-			}
-		}
-	}
-
-	void Data::Reset()
-	{
-		for ( auto& pevt : fEventList )
-			delete pevt;
-		fEventList.clear();
-		fCurrentEvent = 0;
-	}
+    fData.insert(fData.end(), pData.begin(), pData.end());
+    fBoardCounter++;
+    fEventCounter = pEventCounter;
 }
 
+void Data::clear()
+{
+    fBoardCounter = 0;
+    fEventCounter = 0;
+    fData.clear();
+}
+
+void Data::check()
+{
+    // Data format
+    // 36 bit word in 2 32 bit words
+    // only 8 LSB of the first word used for header
+    // 2 MSB of 2nd 32 bit word unused
+    // 29-24: 6 bit TBM index (0-48)
+    // 23:22 unused
+    // 21:20 TMB core
+    // 19:16 unused
+    // 15:0 payload 0xaaaa or 0x5555
+
+    // check that the number of words / vec.size() is even!
+    if (fData.size() % 2 != 0) std::cout << "Warning, odd number of words in the data vector for " << fBoardCounter << " , something is not right!" << std::endl;
+
+    // next break the stuff up in blocks of 2x32 bit words
+    for (int i = 0; i < fData.size() / 2; i++)
+    {
+        int index = 2 * i;
+        uint16_t header = fData.at(index) & 0x0000000F;
+        uint16_t tbm_index = (fData.at(index + 1) & 0x3F000000) >> 24;
+        uint16_t tbm_core = (fData.at(index + 1) & 0x00300000) >> 20;
+        uint16_t payload = (fData.at(index + 1) & 0x000000FF);
+
+        //now for each set of words check that the value is within permissible range
+        if ((tbm_index == 0) || (tbm_index > 48))
+        {
+            std::cout << "ERROR: TBM index not within permissible range!" << std::endl;
+            fTBM_index_error_ctr++;
+        }
+        if (!(tbm_core == 1 || tbm_core == 2 ))
+        {
+            std::cout  << "ERROR: TBM core not within permissible range!" << std::endl;
+            fTBM_core_error_ctr++;
+        }
+        if (!(payload == 0xaaaa || payload == 0x5555))
+        {
+            std::cout  << "ERROR: payload does not match the expected patterns" << std::endl;
+            fPayload_error_ctr++;
+        }
+    }
+}

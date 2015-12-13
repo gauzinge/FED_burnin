@@ -264,6 +264,7 @@ uint32_t PixFEDFWInterface::ReadData( PixFED* pPixFED )
         std::cout << cWord << std::dec << std::endl;
     }
     fNthAcq++;
+    return cData;
 }
 
 uint32_t PixFEDFWInterface::computeBlockSize( )

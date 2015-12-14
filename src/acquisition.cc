@@ -1,3 +1,4 @@
+#include <ctime>
 #include <cstring>
 #include "uhal/uhal.hpp"
 #include "../Utils/Utilities.h"
@@ -11,6 +12,10 @@ int main(int argc, char* argv[] )
     int tbm_index_error_ctr = 0;
     int tbm_core_error_ctr = 0;
     int payload_error_ctr = 0;
+
+    // for logging
+    std::ofstream logger;
+    logger.open("logfile.txt");
 
     uhal::setLogLevelTo(uhal::Debug());
 
@@ -53,10 +58,15 @@ int main(int argc, char* argv[] )
         tbm_index_error_ctr += cData.getTBM_index_errors();
         tbm_core_error_ctr += cData.getTBM_core_errors();
         payload_error_ctr += cData.getPayload_errors();
-        std::cout << BOLDRED << "Acquisition: " << BOLDYELLOW << iAcq << BLUE << " ERROR summary: "
-                  << " TBM index errors: " << tbm_index_error_ctr
-                  << " TBM core errors:  " << tbm_core_error_ctr
-                  << " Payload errors:   " << payload_error_ctr << "\r" <<  RESET;
+        std::stringstream output;
+        std::time_t result = std::time(nullptr);
+        output <<  BOLDRED << " Acquisition: " << BOLDYELLOW << iAcq << BLUE << " ERROR summary: "
+               << " TBM index errors: " << tbm_index_error_ctr
+               << " TBM core errors:  " << tbm_core_error_ctr
+               << " Payload errors:   " << payload_error_ctr << " " << RESET;
+        std::cout << output.str() << "\r";
+        logger << output.str() << " " << std::asctime(std::localtime(&result));
+        logger.flush();
         //}
     }
     std::cout << std::endl << "Finished recording " << iAcq << " events!" << std::endl;
@@ -65,4 +75,5 @@ int main(int argc, char* argv[] )
         cSystemController.fFEDInterface->Stop(cFED);
         //std::cout << "Finished reading Data!" << std::endl;
     }
+    logger.close();
 }

@@ -219,7 +219,7 @@ void PixFEDFWInterface::Resume()
     WriteReg( "pixfed_ctrl_regs.INT_TRIGGER_EN", 1 );
 }
 
-uint32_t PixFEDFWInterface::ReadData( PixFED* pPixFED )
+std::vector<uint32_t> PixFEDFWInterface::ReadData( PixFED* pPixFED )
 {
 
     std::chrono::milliseconds cWait( 10 );
@@ -227,7 +227,7 @@ uint32_t PixFEDFWInterface::ReadData( PixFED* pPixFED )
     // first find which DDR bank to read
 
     SelectDaqDDR( fNthAcq );
-    std::cout << "Querying " << fStrDDR << " for FULL condition!" << std::endl;
+    //std::cout << "Querying " << fStrDDR << " for FULL condition!" << std::endl;
 
     uhal::ValWord<uint32_t> cVal;
     do
@@ -236,12 +236,12 @@ uint32_t PixFEDFWInterface::ReadData( PixFED* pPixFED )
         if ( cVal == 0 ) std::this_thread::sleep_for( cWait );
     }
     while ( cVal == 0 );
-    std::cout << fStrDDR << " full: " << ReadReg( fStrFull ) << std::endl;
+    //std::cout << fStrDDR << " full: " << ReadReg( fStrFull ) << std::endl;
 
     // DDR control: 0 = ipbus, 1 = user
     WriteReg( fStrDDRControl, 0 );
     std::this_thread::sleep_for( cWait );
-    std::cout << "Starting block read of " << fStrDDR << std::endl;
+    //std::cout << "Starting block read of " << fStrDDR << std::endl;
 
     std::vector<uint32_t> cData = ReadBlockRegValue( fStrDDR, fBlockSize );
     WriteReg( fStrDDRControl , 1 );
@@ -255,14 +255,13 @@ uint32_t PixFEDFWInterface::ReadData( PixFED* pPixFED )
     WriteReg( fStrReadout, 0 );
 
     //now I need to do something with the Data that I read into cData
-    //if (fData) delete fData;
-    //fData = new Data();
-    //fData->Set(pPixFED, cData, )
-    for ( auto& cWord : cData )
-    {
-        std::cout << std::hex << std::setw(8) << std::setfill('0');
-        std::cout << cWord << std::dec << std::endl;
-    }
+
+    //for ( auto& cWord : cData )
+    //{
+    //std::cout << std::hex << std::setw(8) << std::setfill('0');
+    //std::cout << cWord << std::dec << std::endl;
+    //}
+
     fNthAcq++;
     return cData;
 }

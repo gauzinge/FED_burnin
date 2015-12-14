@@ -365,10 +365,10 @@ void PixFEDInterface::Resume( PixFED* pFED )
 }
 
 
-uint32_t PixFEDInterface::ReadData( PixFED* pFED )
+std::vector<uint32_t> PixFEDInterface::ReadData( PixFED* pFED )
 {
     setBoard( pFED->getBeId() );
-    fFEDFW->ReadData( pFED );
+    return fFEDFW->ReadData( pFED );
 }
 
 // const Event* PixFEDInterface::GetNextEvent( const PixFED* pFED )

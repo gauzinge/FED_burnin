@@ -20,6 +20,6 @@
     </PixFED>
 </HwDescription>
 <Settings>
-    <Setting name="NTBM">8</Setting>
-    <Setting name="NAcq">0</Setting>
+    <Setting name="NTBM">48</Setting>
+    <Setting name="NAcq">2000</Setting>
 </Settings>

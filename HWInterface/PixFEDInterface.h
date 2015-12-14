@@ -162,7 +162,7 @@ public:
      * \param pBreakTrigger : if true, enable the break trigger
      * \return cNPackets: the number of packets read
      */
-    uint32_t ReadData( PixFED* pFED );
+    std::vector<uint32_t> ReadData( PixFED* pFED );
     /*!
      * \brief Get next event from data buffer
      * \param pFED

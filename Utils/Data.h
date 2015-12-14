@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 class Data
 {
@@ -23,7 +24,7 @@ public:
     void clear();
     void check();
     // get error counters
-    int getTBM_index_erors()
+    int getTBM_index_errors()
     {
         return fTBM_index_error_ctr;
     };

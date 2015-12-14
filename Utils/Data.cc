@@ -37,8 +37,9 @@ void Data::check()
         uint16_t header = fData.at(index) & 0x0000000F;
         uint16_t tbm_index = (fData.at(index + 1) & 0x3F000000) >> 24;
         uint16_t tbm_core = (fData.at(index + 1) & 0x00300000) >> 20;
-        uint16_t payload = (fData.at(index + 1) & 0x000000FF);
+        uint16_t payload = (fData.at(index + 1) & 0x0000FFFF);
 
+        //std::cout << " TBM index " << tbm_index << " core " << tbm_core << " payload " << std::hex << payload << std::dec << std::endl;
         //now for each set of words check that the value is within permissible range
         if ((tbm_index == 0) || (tbm_index > 48))
         {

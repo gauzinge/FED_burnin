@@ -1,4 +1,4 @@
-Objs                    = Exception.o Utilities.o argvparser.o 
+Objs                    = Exception.o Utilities.o argvparser.o Data.o
 CC              = gcc
 CXX             = g++
 CCFlags         = -g -O1 -w -Wall -pedantic -fPIC -Wcpp

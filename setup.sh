@@ -19,7 +19,7 @@ export BOOST_INCLUDE=/opt/cactus/include
 #export QTROOTSYSDIR=/usr/local/qtRoot/root
 
 #ROOT
-source /usr/local/bin/thisroot.sh
+#source /usr/local/bin/thisroot.sh
 
 #FED Burnin
 export BASE_DIR=$(pwd)

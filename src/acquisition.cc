@@ -31,7 +31,7 @@ int main(int argc, char* argv[] )
     // configure the HW
     cSystemController.ConfigureHw(std::cout );
     auto cSetting = cSystemController.fSettingsMap.find("NAcq");
-    uint32_t cNAcq = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 10;
+    int cNAcq = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 10;
 
     // get the board info of all boards and start the acquistion
     for (auto& cFED : cSystemController.fPixFEDVector)
@@ -42,7 +42,8 @@ int main(int argc, char* argv[] )
 
     // loop over the number of acquisitions
     uint32_t iAcq = 0;
-    while ( iAcq < cNAcq)
+    bool running = true;
+    while ( running )
     {
         //std::cout << std::endl << BOLDRED << "Acquisition: " << iAcq << RESET << "\r";
         Data cData;
@@ -52,6 +53,11 @@ int main(int argc, char* argv[] )
             cData.add(iAcq, cSystemController.fFEDInterface->ReadData(cFED));
         }
         iAcq++;
+        if (iAcq < cNAcq && cNAcq > 0 )running = true;
+        else if (cNAcq == 0 ) running = true;
+        else running = false;
+
+
         //if (iAcq % 1000 == 0)
         //{
         cData.check();

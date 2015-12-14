@@ -56,7 +56,7 @@ int main(int argc, char* argv[] )
         std::cout << BOLDRED << "Acquisition: " << BOLDYELLOW << iAcq << BLUE << " ERROR summary: "
                   << " TBM index errors: " << tbm_index_error_ctr
                   << " TBM core errors:  " << tbm_core_error_ctr
-                  << " Payload errors:   " << payload_error_ctr << RESET << "\r";
+                  << " Payload errors:   " << payload_error_ctr << "\r" <<  RESET;
         //}
     }
     for (auto& cFED : cSystemController.fPixFEDVector)

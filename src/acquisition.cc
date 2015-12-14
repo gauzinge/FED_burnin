@@ -59,6 +59,7 @@ int main(int argc, char* argv[] )
                   << " Payload errors:   " << payload_error_ctr << "\r" <<  RESET;
         //}
     }
+    std::cout << std::endl << "Finished recording " << iAcq << " events!" << std::endl;
     for (auto& cFED : cSystemController.fPixFEDVector)
     {
         cSystemController.fFEDInterface->Stop(cFED);

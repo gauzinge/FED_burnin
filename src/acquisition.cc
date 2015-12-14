@@ -66,8 +66,9 @@ int main(int argc, char* argv[] )
                << " Payload errors:   " << payload_error_ctr << " " << RESET;
         std::cout << output.str() << "\r";
         logger << output.str() << " " << std::asctime(std::localtime(&result));
-        logger.flush();
-        //}
+        logger.close();
+        logger.open("logfile.txt", std::ofstream::app);
+        ////}
     }
     std::cout << std::endl << "Finished recording " << iAcq << " events!" << std::endl;
     for (auto& cFED : cSystemController.fPixFEDVector)

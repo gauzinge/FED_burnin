@@ -13,6 +13,9 @@ int main(int argc, char* argv[] )
     int tbm_core_error_ctr = 0;
     int payload_error_ctr = 0;
 
+    const char* cHWFile = argv[1];
+    std::cout << "HW Description File: " << cHWFile << std::endl;
+
     // for logging
     time_t rawtime;
     struct tm * timeinfo;
@@ -35,10 +38,10 @@ int main(int argc, char* argv[] )
     SystemController cSystemController;
 
     // initialize map of settings so I can know the proper number of acquisitions and TBMs
-    cSystemController.InitializeSettings("settings/HWDescription.xml", std::cout);
+    cSystemController.InitializeSettings(cHWFile, std::cout);
 
     // initialize HWdescription from XML, beware, settings have to be read first
-    cSystemController.InitializeHw("settings/HWDescription.xml", std::cout);
+    cSystemController.InitializeHw(cHWFile, std::cout);
 
     // configure the HW
     cSystemController.ConfigureHw(std::cout );

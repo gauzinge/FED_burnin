@@ -14,9 +14,21 @@ int main(int argc, char* argv[] )
     int payload_error_ctr = 0;
 
     // for logging
-    std::ofstream logger;
-    logger.open("logfile.txt");
+    time_t rawtime;
+    struct tm * timeinfo;
+    char buffer[80];
 
+    time (&rawtime);
+    timeinfo = localtime(&rawtime);
+
+    strftime(buffer, 80, "%d-%m-%Y_%I:%M:%S", timeinfo);
+
+    std::ofstream logger;
+    std::string logfilename = "logfile_";
+    logfilename += buffer;
+    logfilename += ".txt";
+    logger.open(logfilename);
+    std::cout << "Dumping log to: " << logfilename << std::endl;
     uhal::setLogLevelTo(uhal::Debug());
 
     // instantiate System Controller
@@ -58,23 +70,23 @@ int main(int argc, char* argv[] )
         else running = false;
 
 
-        //if (iAcq % 1000 == 0)
-        //{
-        cData.check();
-        tbm_index_error_ctr += cData.getTBM_index_errors();
-        tbm_core_error_ctr += cData.getTBM_core_errors();
-        payload_error_ctr += cData.getPayload_errors();
-        std::stringstream output;
-        std::time_t result = std::time(nullptr);
-        output <<  BOLDRED << " Acquisition: " << BOLDYELLOW << iAcq << BLUE << " ERROR summary: "
-               << " TBM index errors: " << tbm_index_error_ctr
-               << " TBM core errors:  " << tbm_core_error_ctr
-               << " Payload errors:   " << payload_error_ctr << " " << RESET;
-        std::cout << output.str() << "\r";
-        logger << output.str() << " " << std::asctime(std::localtime(&result));
-        logger.close();
-        logger.open("logfile.txt", std::ofstream::app);
-        ////}
+        if (iAcq % 100 == 0)
+        {
+            cData.check();
+            tbm_index_error_ctr += cData.getTBM_index_errors();
+            tbm_core_error_ctr += cData.getTBM_core_errors();
+            payload_error_ctr += cData.getPayload_errors();
+            std::stringstream output;
+            std::time_t result = std::time(nullptr);
+            output <<  BOLDRED << " Acquisition: " << BOLDYELLOW << iAcq << BLUE << " ERROR summary: "
+                   << " TBM index errors: " << tbm_index_error_ctr
+                   << " TBM core errors:  " << tbm_core_error_ctr
+                   << " Payload errors:   " << payload_error_ctr << " " << RESET;
+            std::cout << output.str() << "\r";
+            logger << output.str() << " " << std::asctime(std::localtime(&result));
+            logger.close();
+            logger.open(logfilename, std::ofstream::app);
+        }
     }
     std::cout << std::endl << "Finished recording " << iAcq << " events!" << std::endl;
     for (auto& cFED : cSystemController.fPixFEDVector)

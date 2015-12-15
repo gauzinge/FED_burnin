@@ -78,10 +78,10 @@ int main(int argc, char* argv[] )
             payload_error_ctr += cData.getPayload_errors();
             std::stringstream output;
             std::time_t result = std::time(nullptr);
-            output <<  BOLDRED << " Acquisition: " << BOLDYELLOW << iAcq << BLUE << " ERROR summary: "
+            output <<  " Acquisition: " <<  iAcq << " ERROR summary: "
                    << " TBM index errors: " << tbm_index_error_ctr
                    << " TBM core errors:  " << tbm_core_error_ctr
-                   << " Payload errors:   " << payload_error_ctr << " " << RESET;
+                   << " Payload errors:   " << payload_error_ctr << " ";
             std::cout << output.str() << "\r";
             logger << output.str() << " " << std::asctime(std::localtime(&result));
             logger.close();

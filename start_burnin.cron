@@ -4,11 +4,12 @@
 #   or you can experience problems
 /bin/sleep 5
 # Ensure the environment is available
-source /home/USERNAME/.bashrc
+source /home/fectest/.bashrc
 # Create a new tmux session named burnin...
 /usr/bin/tmux new-session -d -s burnin
 # ...and control the tmux session (initially ensure the environment
 #   is available, then run commands)
-/usr/bin/tmux send-keys -t burnin "source /home/USERNAME/.bashrc" C-m
-/usr/bin/tmux send-keys -t burnin "source /home/USERNAME/FED_testing/FED_burnin/setup.sh" C-m
-/usr/bin/tmux send-keys -t burnin "/home/USERNAME/FED_testing/FED_burnin/run.sh" C-m
+/usr/bin/tmux send-keys -t burnin "source /home/fectest/.bashrc" C-m
+/usr/bin/tmux send-keys -t burnin "cd /home/fectest/FED_testing/FED_burnin/" C-m
+/usr/bin/tmux send-keys -t burnin "source /home/fectest/FED_testing/FED_burnin/setup.sh" C-m
+/usr/bin/tmux send-keys -t burnin "/home/fectest/FED_testing/FED_burnin/run.sh" C-m

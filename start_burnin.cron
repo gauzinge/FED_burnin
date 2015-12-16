@@ -6,9 +6,7 @@
 # Ensure the environment is available
 source /home/fectest/.bashrc
 # Create a new tmux session named burnin...
-/usr/bin/tmux new-session -d -s burnin
-# ...and control the tmux session (initially ensure the environment
-#   is available, then run commands)
+/usr/bin/tmux new-session -s burnin -n -d
 /usr/bin/tmux send-keys -t burnin "source /home/fectest/.bashrc" C-m
 /usr/bin/tmux send-keys -t burnin "cd /home/fectest/FED_testing/FED_burnin/" C-m
 /usr/bin/tmux send-keys -t burnin "source /home/fectest/FED_testing/FED_burnin/setup.sh" C-m

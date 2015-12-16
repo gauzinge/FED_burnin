@@ -24,5 +24,5 @@ export BOOST_INCLUDE=/opt/cactus/include
 #FED Burnin
 export BASE_DIR=$(pwd)
 
-export PATH=$QTDIR/bin:$BASE_DIR/bin:$PATH
-export LD_LIBRARY_PATH=/opt/cactus/lib:$QTROOTSYSDIR/lib:$QTDIR/lib:$BASE_DIR/lib:${LD_LIBRARY_PATH}
+export PATH=$CACTUSBIN:$BASE_DIR/bin:$PATH
+export LD_LIBRARY_PATH=$CACTUSLIB:$QTROOTSYSDIR/lib:$QTDIR/lib:$BASE_DIR/lib:${LD_LIBRARY_PATH}

@@ -73,7 +73,7 @@ int main(int argc, char* argv[] )
         else running = false;
 
 
-        if (iAcq % 100 == 0)
+        if (iAcq % 1000 == 0)
         {
             cData.check();
             tbm_index_error_ctr += cData.getTBM_index_errors();

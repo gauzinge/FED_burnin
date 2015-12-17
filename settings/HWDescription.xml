@@ -1,43 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <HwDescription>
     <PixFED Id="0" boardType="CTA">
-        <connection id="board0" uri="chtcp-2.0://cmsuppixch:10203?target=192.168.000.21:50001" address_table="file://settings/address_table.xml" />
-        <!-- Trigger -->
-        <Register name="pixfed_ctrl_regs.TRIGGER_SEL">0</Register>
-        <Register name="pixfed_ctrl_regs.INT_TRIGGER_FREQ_SEL">5</Register>
-        <!-- TBM MASK -->
-        <Register name="pixfed_ctrl_regs.TBM_MASK_1">0b00000000</Register>
-        <Register name="pixfed_ctrl_regs.TBM_MASK_2">0b00000000</Register>
-        <Register name="pixfed_ctrl_regs.TBM_MASK_3">0b00000000</Register>
-        <!--ACQUISITION -->
-        <!--<Register name="pixfed_ctrl_regs.PACKET_NB">10</Register>-->
-        <Register name="pixfed_ctrl_regs.data_type">2</Register>
-        <!--<Fitel_Files path="./settings/" />-->
-        <!--<Fitel FMC="0" Id="0" file="FMC0_Fitel0.txt" />-->
-        <!--<Fitel FMC="0" Id="1" file="FMC0_Fitel1.txt" />-->
-        <!--<Fitel FMC="1" Id="0" file="FMC1_Fitel0.txt" />-->
-        <!--<Fitel FMC="1" Id="1" file="FMC1_Fitel1.txt" />-->
-    </PixFED>
-    <PixFED Id="1" boardType="CTA">
-        <connection id="board1" uri="chtcp-2.0://cmsuppixch:10203?target=192.168.000.22:50001" address_table="file://settings/address_table.xml" />
-        <!-- Trigger -->
-        <Register name="pixfed_ctrl_regs.TRIGGER_SEL">0</Register>
-        <Register name="pixfed_ctrl_regs.INT_TRIGGER_FREQ_SEL">5</Register>
-        <!-- TBM MASK -->
-        <Register name="pixfed_ctrl_regs.TBM_MASK_1">0b00000000</Register>
-        <Register name="pixfed_ctrl_regs.TBM_MASK_2">0b00000000</Register>
-        <Register name="pixfed_ctrl_regs.TBM_MASK_3">0b00000000</Register>
-        <!--ACQUISITION -->
-        <!--<Register name="pixfed_ctrl_regs.PACKET_NB">10</Register>-->
-        <Register name="pixfed_ctrl_regs.data_type">2</Register>
-        <!--<Fitel_Files path="./settings/" />-->
-        <!--<Fitel FMC="0" Id="0" file="FMC0_Fitel0.txt" />-->
-        <!--<Fitel FMC="0" Id="1" file="FMC0_Fitel1.txt" />-->
-        <!--<Fitel FMC="1" Id="0" file="FMC1_Fitel0.txt" />-->
-        <!--<Fitel FMC="1" Id="1" file="FMC1_Fitel1.txt" />-->
-    </PixFED>
-    <PixFED Id="2" boardType="CTA">
-        <connection id="board2" uri="chtcp-2.0://cmsuppixch:10203?target=192.168.000.23:50001" address_table="file://settings/address_table.xml" />
+        <connection id="board0" uri="chtcp-2.0://cmsuppixch:10203?target=192.168.000.11:50001" address_table="file://settings/address_table.xml" />
         <!-- Trigger -->
         <Register name="pixfed_ctrl_regs.TRIGGER_SEL">0</Register>
         <Register name="pixfed_ctrl_regs.INT_TRIGGER_FREQ_SEL">5</Register>

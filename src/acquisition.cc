@@ -24,7 +24,7 @@ int main(int argc, char* argv[] )
     time (&rawtime);
     timeinfo = localtime(&rawtime);
 
-    strftime(buffer, 80, "%d-%m-%Y_%I:%M:%S", timeinfo);
+    strftime(buffer, 80, "%d-%m-%Y_%H:%M:%S", timeinfo);
 
     std::ofstream logger;
     std::string logfilename = "logfile_";

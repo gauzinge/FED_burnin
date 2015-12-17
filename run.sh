@@ -28,7 +28,10 @@ cd $BASE_DIR
 export DIR=$(pwd)
 echo 'Basedir: ' $BASE_DIR
 
-until $BASE_DIR/src/run $BASE_DIR/settings/FEDburnin.xml ; do
+echo "Running burnin SW in a tmux session - please disconnect via <Ctrl-b> <d> and check the consoledump.txt file for the current running session"
+
+until $BASE_DIR/src/run $BASE_DIR/settings/FEDburnin.xml > $BASE_DIR/consoledump.txt ; do
     echo "src/run crashed with exit code $?. Respawning..." >&2
-    sleep 5
+    echo "Restarting burnin code"
+    sleep 60
 done

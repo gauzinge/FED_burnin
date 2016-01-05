@@ -88,16 +88,36 @@ public:
     * \brief Get the board type
     */
     std::string getBoardType();
+
     /*!
     * \brief Get the board infos
     */
     void getBoardInfo();
 
+    // Methods for management of FMCs
+    /*!
+     * \brief Disable FMC power
+     */
+    void disableFMCs();
 
     /*!
-     * \brief Configure the board with its Config File
-     * \param pPixFED
+     * \brief enable FMC power
      */
+    void enableFMCs();
+
+    /*!
+     * \brief: find correct phases for incoming data stream
+     */
+    void findPhases(uint32_t pScopeFIFOCh = 0);
+
+    std::vector<uint32_t> readTransparentFIFO();
+
+    void readSpyFIFO();
+    void readFIFO1();
+    /*!
+    * \brief Configure the board with its Config File
+    * \param pPixFED
+    */
     bool ConfigureBoard( const PixFED* pPixFED );
 
     /*!
@@ -180,6 +200,8 @@ private:
     /*! Compute the size of an acquisition data block
      * \return Number of 32-bit words to be read at each iteration */
     uint32_t computeBlockSize();
+
+    void prettyprintFIFO1( const std::vector<uint32_t>& pFifoVec, const std::vector<uint32_t>& pMarkerVec);
 
     // FPGA CONFIG METHODS
 public:

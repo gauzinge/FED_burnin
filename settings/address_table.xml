@@ -211,6 +211,7 @@
         <node id="decode_reset" address="0x40030000" mask="0x00000001" permission="w" />
         <node id="decode_reg_reset" address="0x40030000" mask="0x00000002" permission="w" />
         <node id="idel_ctrl_reset" address="0x40030000" mask="0x00000003" permission="w" />
+        <node id="initialize_swap" address="0x40030000" mask="0x00000008" permission="w" />
         <node id="idel_individual_ctrl" address="0x40030001" mask="0xffffffff" permission="w" />
         <node id="fifo_config" address="0x40030031" permission="rw" >
             <node id="overflow_value" mask="0x000fffff" />

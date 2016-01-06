@@ -88,38 +88,40 @@ public:
     * \brief Get the board type
     */
     std::string getBoardType();
-
     /*!
     * \brief Get the board infos
     */
     void getBoardInfo();
-
-    // Methods for management of FMCs
-    /*!
-     * \brief Disable FMC power
-     */
-    void disableFMCs();
-
-    /*!
-     * \brief enable FMC power
-     */
-    void enableFMCs();
-
-    /*!
-     * \brief: find correct phases for incoming data stream
-     */
-    void findPhases(uint32_t pScopeFIFOCh = 0);
-
-    std::vector<uint32_t> readTransparentFIFO();
-
-    void readSpyFIFO();
-    void readFIFO1();
     /*!
     * \brief Configure the board with its Config File
     * \param pPixFED
     */
     bool ConfigureBoard( const PixFED* pPixFED );
-
+    // Methods for management of FMCs
+    /*!
+     * \brief Disable FMC power
+     */
+    void disableFMCs();
+    /*!
+     * \brief enable FMC power
+     */
+    void enableFMCs();
+    /*!
+     * \brief: find correct phases for incoming data stream
+     */
+    void findPhases(uint32_t pScopeFIFOCh = 0);
+    /*!
+     * \brief: read the bistream FIFO of the PixFED
+     */
+    std::vector<uint32_t> readTransparentFIFO();
+    /*!
+     * \brief: read the contents of the SpyFifo for TBM cores A & B
+     */
+    std::vector<uint32_t> readSpyFIFO();
+    /*!
+     * \brief: read the contents of FIFO 1 for TBM cores A & B
+     */
+    std::string readFIFO1();
     /*!
      * \brief Start a DAQ
      */
@@ -201,7 +203,7 @@ private:
      * \return Number of 32-bit words to be read at each iteration */
     uint32_t computeBlockSize();
 
-    void prettyprintFIFO1( const std::vector<uint32_t>& pFifoVec, const std::vector<uint32_t>& pMarkerVec);
+    void prettyprintFIFO1( const std::vector<uint32_t>& pFifoVec, const std::vector<uint32_t>& pMarkerVec, std::ostream& os = std::cout);
 
     // FPGA CONFIG METHODS
 public:

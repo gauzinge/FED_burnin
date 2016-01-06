@@ -83,6 +83,13 @@ public:
     * \return ValVector block values of the register
     */
     virtual uhal::ValVector<uint32_t> ReadBlockReg( const std::string& pRegNode, const uint32_t& pBlocksize );
+    /** \brief Read a block of values at a given address
+     * \param uAddr 32-bit base-address
+     * \param pBlocksize: Size in 32 bit words of the block to read
+     * \param bNonInc true if Write mode is non-incremental
+    * \return ValVector block values of the register
+     */
+    //virtual uhal::ValVector<uint32_t> ReadBlockAtAddress(uint32_t uAddr, const uint32_t& pBlocksize, bool bNonInc = false);
     /*!
     * \brief Time Out for sending the register/value stack in the writting.
     * \brief It has only to be set in a detached thread from the one you're working on

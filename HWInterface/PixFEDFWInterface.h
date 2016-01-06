@@ -14,11 +14,9 @@
 #include <boost/thread.hpp>
 #include <uhal/uhal.hpp>
 #include "RegManager.h"
-// #include "../Utils/Event.h"
-//#include "../Utils/Data.h"
 #include "../Utils/Utilities.h"
 #include "../Utils/Exception.h"
-// #include "../HWDescription/Definition.h"
+#include "../Utils/ConsoleColor.h"
 #include "../HWDescription/PixFED.h"
 #include "CtaFpgaConfig.h"
 

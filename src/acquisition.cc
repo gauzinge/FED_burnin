@@ -1,5 +1,6 @@
 #include <ctime>
 #include <cstring>
+#include <sstream>
 #include "uhal/uhal.hpp"
 #include "../Utils/Utilities.h"
 #include "../HWDescription/PixFED.h"
@@ -48,54 +49,78 @@ int main(int argc, char* argv[] )
     auto cSetting = cSystemController.fSettingsMap.find("NAcq");
     int cNAcq = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 10;
 
-    // get the board info of all boards and start the acquistion
-    for (auto& cFED : cSystemController.fPixFEDVector)
-    {
-        cSystemController.fFEDInterface->getBoardInfo(cFED);
-        cSystemController.fFEDInterface->Start(cFED);
-    }
+    std::string userInput = "";
+    
+    while( userInput != "q" &&  userInput != "quit")
+      {
+	std::cout << "Please choose a operation:" << std::endl;
+	std::cout << "\t [i] for board info" << std::endl;
+	std::cout << "\t [a] for data acquisition" << std::endl;
+	std::cout << "\t [q] to to quit" << std::endl;
 
-    // loop over the number of acquisitions
-    uint32_t iAcq = 0;
-    bool running = true;
-    while ( running )
-    {
-        //std::cout << std::endl << BOLDRED << "Acquisition: " << iAcq << RESET << "\r";
-        Data cData;
-        for (auto& cFED : cSystemController.fPixFEDVector)
-        {
-            //std::cout << BOLDGREEN << "Data for FED " << +cFED->getBeId() << RESET << std::endl;
-            cData.add(iAcq, cSystemController.fFEDInterface->ReadData(cFED));
-        }
-        iAcq++;
-        if (iAcq < cNAcq && cNAcq > 0 )running = true;
-        else if (cNAcq == 0 ) running = true;
-        else running = false;
+	getline(std::cin,userInput);
+
+	std::cout << "You entred: " << userInput << std::endl;
+
+	if(userInput.length() != 1 && userInput != "quit")
+	  {
+	    std::cout << "Invalid command! Try again" << std::endl;
+	  }
+	else if(userInput == "i")
+	  {
+	    // get the board info of all boards and start the acquistion
+	    for (auto& cFED : cSystemController.fPixFEDVector)
+	      {
+		cSystemController.fFEDInterface->getBoardInfo(cFED);
+		cSystemController.fFEDInterface->Start(cFED);
+	      }
+	  }
+	else if(userInput == "a")
+	  {
+
+	    // loop over the number of acquisitions
+	    uint32_t iAcq = 0;
+	    bool running = true;
+	    while ( running )
+	      {
+		//std::cout << std::endl << BOLDRED << "Acquisition: " << iAcq << RESET << "\r";
+		Data cData;
+		for (auto& cFED : cSystemController.fPixFEDVector)
+		  {
+		    //std::cout << BOLDGREEN << "Data for FED " << +cFED->getBeId() << RESET << std::endl;
+		    cData.add(iAcq, cSystemController.fFEDInterface->ReadData(cFED));
+		  }
+		iAcq++;
+		if (iAcq < cNAcq && cNAcq > 0 )running = true;
+		else if (cNAcq == 0 ) running = true;
+		else running = false;
 
 
-        if (iAcq % 1000 == 0)
-        {
-            cData.check();
-            tbm_index_error_ctr += cData.getTBM_index_errors();
-            tbm_core_error_ctr += cData.getTBM_core_errors();
-            payload_error_ctr += cData.getPayload_errors();
-            std::stringstream output;
-            std::time_t result = std::time(nullptr);
-            output <<  " Acquisition: " <<  iAcq << " ERROR summary: "
-                   << " TBM index errors: " << tbm_index_error_ctr
-                   << " TBM core errors:  " << tbm_core_error_ctr
-                   << " Payload errors:   " << payload_error_ctr << " ";
-            std::cout << output.str() << "\r";
-            logger << output.str() << " " << std::asctime(std::localtime(&result));
-            logger.close();
-            logger.open(logfilename, std::ofstream::app);
-        }
-    }
-    std::cout << std::endl << "Finished recording " << iAcq << " events!" << std::endl;
-    for (auto& cFED : cSystemController.fPixFEDVector)
-    {
-        cSystemController.fFEDInterface->Stop(cFED);
-        //std::cout << "Finished reading Data!" << std::endl;
-    }
-    logger.close();
+		if (iAcq % 1000 == 0)
+		  {
+		    cData.check();
+		    tbm_index_error_ctr += cData.getTBM_index_errors();
+		    tbm_core_error_ctr += cData.getTBM_core_errors();
+		    payload_error_ctr += cData.getPayload_errors();
+		    std::stringstream output;
+		    std::time_t result = std::time(nullptr);
+		    output <<  " Acquisition: " <<  iAcq << " ERROR summary: "
+			   << " TBM index errors: " << tbm_index_error_ctr
+			   << " TBM core errors:  " << tbm_core_error_ctr
+			   << " Payload errors:   " << payload_error_ctr << " ";
+		    std::cout << output.str() << "\r";
+		    logger << output.str() << " " << std::asctime(std::localtime(&result));
+		    logger.close();
+		    logger.open(logfilename, std::ofstream::app);
+		  }
+	      }
+	    std::cout << std::endl << "Finished recording " << iAcq << " events!" << std::endl;
+	    for (auto& cFED : cSystemController.fPixFEDVector)
+	      {
+		cSystemController.fFEDInterface->Stop(cFED);
+		//std::cout << "Finished reading Data!" << std::endl;
+	      }
+	    logger.close();
+	  }
+      }
 }

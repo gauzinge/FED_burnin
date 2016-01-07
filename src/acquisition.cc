@@ -51,17 +51,80 @@ int main(int argc, char* argv[] )
 
     std::string userInput = "";
     
+    std::vector<std::string> validUserInputs;
+    // board info
+    validUserInputs.push_back("i");      
+    validUserInputs.push_back("info");   
+    // quit/end program
+    validUserInputs.push_back("q");      
+    validUserInputs.push_back("quit");   
+    // start DAQ
+    validUserInputs.push_back("s");      
+    validUserInputs.push_back("start");  
+    // stop DAQ
+    validUserInputs.push_back("x");      
+    validUserInputs.push_back("stop");      
+    // pause DAQ
+    validUserInputs.push_back("p");      
+    validUserInputs.push_back("pause");
+    // resume DAQ
+    validUserInputs.push_back("r");      
+    validUserInputs.push_back("resume");
+    // acquisition loop 
+    validUserInputs.push_back("a");      
+    // (re)configure FED
+    validUserInputs.push_back("c");      
+    validUserInputs.push_back("conf");
+    validUserInputs.push_back("configure");
+    // find phases
+    validUserInputs.push_back("findPhase");
+    // read data
+    validUserInputs.push_back("read");
+    // read transparent FIFO
+    validUserInputs.push_back("trans");
+    // read spy FIFO
+    validUserInputs.push_back("spy");
+    // read FIFO1
+    validUserInputs.push_back("fifo1");
+    validUserInputs.push_back("one");
+    // dump all FIFOs
+    validUserInputs.push_back("dumpallfifo");
+    // flash PROM
+    validUserInputs.push_back("flash");
+    // Jump to FPGA Config
+    validUserInputs.push_back("fpgaconf");
+
+
     while( userInput != "q" &&  userInput != "quit")
       {
-	std::cout << "Please choose a operation:" << std::endl;
-	std::cout << "\t [i] for board info" << std::endl;
+	std::cout << "Please choose an operation:" << std::endl;
+	std::cout << "\t [i/info] for board info" << std::endl;
+	//DAQ control
+	std::cout << "DAQ control:" << std::endl;
+	std::cout << "\t [s/start] to start DAQ on all FEDs" << std::endl;
+	std::cout << "\t [x/stop] to stop DAQ on all FEDs" << std::endl;
+	std::cout << "\t [p/pause] to pause DAQ on all FEDs" << std::endl;
+	std::cout << "\t [r/resume] to resume DAQ on all FEDs" << std::endl;
+	std::cout << "\t [read] to read data from DAQ" << std::endl;
 	std::cout << "\t [a] for data acquisition" << std::endl;
-	std::cout << "\t [q] to to quit" << std::endl;
+	//DAQ config
+	std::cout << "DAQ configuration" << std::endl;
+	std::cout << "\t [c/conf] to re-load configuration from disk" << std::endl;
+	std::cout << "\t [flash] to execute phase finding" << std::endl;
+	std::cout << "\t [fpgaconf] to execute phase finding" << std::endl;
+	//DQM
+	std::cout << "\t [trans] to dump transparent buffer data" << std::endl;
+	std::cout << "\t [spy] to dump spy FIFO data" << std::endl;
+	std::cout << "\t [fifo1] to dump FIFO1 data" << std::endl;
+	std::cout << "\t [dumpallfifo] to dump all three FIFOs" << std::endl;
+
+	std::cout << "\t [q/quit] to to quit" << std::endl;
 
 	getline(std::cin,userInput);
 
 	std::cout << "You entred: " << userInput << std::endl;
-
+	//sanitize input
+	//if invalid input do nothing and show promt again
 	if(userInput.length() != 1 && userInput != "quit")
 	  {
 	    std::cout << "Invalid command! Try again" << std::endl;
@@ -72,11 +135,35 @@ int main(int argc, char* argv[] )
 	    for (auto& cFED : cSystemController.fPixFEDVector)
 	      {
 		cSystemController.fFEDInterface->getBoardInfo(cFED);
+	      }
+	  }
+	else if(userInput == "s")
+	  {
+	    for (auto& cFED : cSystemController.fPixFEDVector)
+	      {
 		cSystemController.fFEDInterface->Start(cFED);
+	      }
+	  }
+	else if(userInput == "x")
+	  {
+	    for (auto& cFED : cSystemController.fPixFEDVector)
+	      {
+		cSystemController.fFEDInterface->Stop(cFED);
+	      }
+	  }
+	else if(userInput == "p")
+	  {
+	    for (auto& cFED : cSystemController.fPixFEDVector)
+	      {
+		cSystemController.fFEDInterface->Pause(cFED);
 	      }
 	  }
 	else if(userInput == "a")
 	  {
+	    for (auto& cFED : cSystemController.fPixFEDVector)
+	      {
+		cSystemController.fFEDInterface->Start(cFED);
+	      }
 
 	    // loop over the number of acquisitions
 	    uint32_t iAcq = 0;

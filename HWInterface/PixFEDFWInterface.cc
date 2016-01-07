@@ -178,7 +178,7 @@ void PixFEDFWInterface::findPhases(uint32_t pScopeFIFOCh)
     std::this_thread::sleep_for( cWait );
 
     std::cout <<  "Phase finding Results: " << std::endl
-              << "CTRL_RDY    CNTVAL_Hi   CNTVAL_Lo   pattern:        S H1 L1 H0 L0 W R" << std::endl;
+              << BOLDGREEN << "CTRL_RDY    CNTVAL_Hi   CNTVAL_Lo   pattern:        S H1 L1 H0 L0 W R" << RESET << std::endl;
 
     uint32_t cNChannel = 12;
     std::vector<uint32_t> cReadValues = ReadBlockRegValue( "idel_individual_stat", cNChannel * 4 );
@@ -190,11 +190,11 @@ void PixFEDFWInterface::findPhases(uint32_t pScopeFIFOCh)
         //uhal::ValWord<uint32_t> cReadValues.at( ( Channel * 4 ) + 1 ) = ReadAtAddress( 0x400200001 + (cChannel * 4 ) + 1);
         //uhal::ValWord<uint32_t> cReadValues.at( (cChannel * 4 ) + 2 ) = ReadAtAddress( 0x400200001 + (cChannel * 4 ) + 2);
 
-        std::cout << "Fibre: " <<  cChannel + 1 << "    " <<
+        std::cout << GREEN << "Fibre: " <<  cChannel + 1 << RESET << "    " <<
                   std::bitset<1>( (cReadValues.at( (cChannel * 4 ) + 0 ) >> 10 ) & 0x1 )   << "    " <<
                   ((cReadValues.at( (cChannel * 4 ) + 0 ) >> 5  ) & 0x1f )  << "    " <<
                   ((cReadValues.at( (cChannel * 4 ) + 0 )       ) & 0x1f ) << "    " <<
-                  std::bitset<32>( cReadValues.at( (cChannel * 4 ) + 1 )) << "    " <<
+                  BLUE << std::bitset<32>( cReadValues.at( (cChannel * 4 ) + 1 )) << RESET << "    " <<
                   std::bitset<1>( (cReadValues.at( (cChannel * 4 ) + 2 ) >> 31 ) & 0x1 )  << " " <<
                   ((cReadValues.at( (cChannel * 4 ) + 2 ) >> 23 ) & 0x1f)  << " " <<
                   ((cReadValues.at( (cChannel * 4 ) + 2 ) >> 18 ) & 0x1f)  << " " <<
@@ -241,10 +241,10 @@ void PixFEDFWInterface::findPhases(uint32_t pScopeFIFOCh)
 std::vector<uint32_t> PixFEDFWInterface::readTransparentFIFO()
 {
     std::vector<uint32_t> cFifoVec = ReadBlockRegValue( "fifo.bit_stream", 32 );
-    std::cout <<  "Transparent FIFO: " << std::endl;
+    std::cout << BOLDBLUE <<  "Transparent FIFO: " << RESET << std::endl;
 
     for (auto& cWord : cFifoVec)
-        std::cout << std::bitset<32>(cWord) << std::endl;
+        std::cout << GREEN << std::bitset<30>(cWord) << RESET << std::endl;
 
     return cFifoVec;
 }
@@ -254,12 +254,12 @@ std::vector<uint32_t> PixFEDFWInterface::readSpyFIFO()
     std::vector<uint32_t> cSpyA;
     std::vector<uint32_t> cSpyB;
 
-    cSpyA = ReadBlockRegValue( "fifo.spy_A", 90 );
-    cSpyB = ReadBlockRegValue( "fifo.spy_B", 90 );
+    cSpyA = ReadBlockRegValue( "fifo.spy_A", 4096 );
+    cSpyB = ReadBlockRegValue( "fifo.spy_B", 4096 );
 
     uint32_t cMask = 0xf0;
 
-    std::cout << "TBM_SPY FIFO A: " << std::endl;
+    std::cout << BOLDBLUE << "TBM_SPY FIFO A: " << RESET << std::endl;
     int cCounter = 0;
     for (auto& cWord : cSpyA )
     {
@@ -272,7 +272,7 @@ std::vector<uint32_t> PixFEDFWInterface::readSpyFIFO()
         cCounter++;
     }
 
-    std::cout << "TBM_SPY FIFO B: " << std::endl;
+    std::cout << BOLDBLUE << "TBM_SPY FIFO B: " << RESET << std::endl;
     cCounter = 0;
     for (auto& cWord : cSpyB )
     {
@@ -300,16 +300,17 @@ std::string PixFEDFWInterface::readFIFO1()
     std::vector<uint32_t> cMarkerA;
     std::vector<uint32_t> cMarkerB;
 
-    cFifo1A = ReadBlockRegValue("fifo.spy_1_A", 32);
-    cMarkerA = ReadBlockRegValue("fifo.spy_1_A_marker", 32);
-
+    cFifo1A = ReadBlockRegValue("fifo.spy_1_A", 2048);
+    cMarkerA = ReadBlockRegValue("fifo.spy_1_A_marker", 2048);
+    cFifo1B = ReadBlockRegValue("fifo.spy_1_B", 2048);
+    cMarkerB = ReadBlockRegValue("fifo.spy_1_B_marker", 2048);
     // pass cFIFO1Str as ostream to prettyPrint for later FileIo
-    std::cout << "FIFO 1 Channel A: " << std::endl;
+    std::cout << BOLDBLUE <<  "FIFO 1 Channel A: " << RESET << std::endl;
     cFIFO1Str << "FIFO 1 Channel A: " << std::endl;
     prettyprintFIFO1(cFifo1A, cMarkerA);
     prettyprintFIFO1(cFifo1A, cMarkerA, cFIFO1Str);
 
-    std::cout << "FIFO 1 Channel B: " << std::endl;
+    std::cout << BOLDBLUE << "FIFO 1 Channel B: " << RESET << std::endl;
     cFIFO1Str << "FIFO 1 Channel B: " << std::endl;
     prettyprintFIFO1(cFifo1B, cMarkerB);
     prettyprintFIFO1(cFifo1B, cMarkerB, cFIFO1Str);
@@ -326,12 +327,12 @@ void PixFEDFWInterface::prettyprintFIFO1( const std::vector<uint32_t>& pFifoVec,
         if (pMarkerVec.at(cIndex) == 8)
         {
             // Event Header
-            os << "Header: " << "CH: " << ( (pFifoVec.at(cIndex) >> 26) & 0x3f ) << " ID: " <<  ( (pFifoVec.at(cIndex) >> 21) & 0x1f ) << " TBM_H: " <<  ( (pFifoVec.at(cIndex) >> 9) & 0xff ) << " EVT Nr: " <<  ( (pFifoVec.at(cIndex)) & 0xff ) << std::endl;
+            os << RED << "Header: " << "CH: " << ( (pFifoVec.at(cIndex) >> 26) & 0x3f ) << " ID: " <<  ( (pFifoVec.at(cIndex) >> 21) & 0x1f ) << " TBM_H: " <<  ( (pFifoVec.at(cIndex) >> 9) & 0xff ) << " EVT Nr: " <<  ( (pFifoVec.at(cIndex)) & 0xff ) << RESET << std::endl;
         }
 
         if (pMarkerVec.at(cIndex) == 12)
         {
-            os << "ROC Header: " << "CH: " << ( (pFifoVec.at(cIndex) >> 26) & 0x3f  ) << " ROC Nr: " <<  ( (pFifoVec.at(cIndex) >> 21) & 0x1f ) << " Status: " << (  (pFifoVec.at(cIndex)) & 0xff ) << std::endl;
+            os << GREEN << "ROC Header: " << "CH: " << ( (pFifoVec.at(cIndex) >> 26) & 0x3f  ) << " ROC Nr: " <<  ( (pFifoVec.at(cIndex) >> 21) & 0x1f ) << " Status: " << (  (pFifoVec.at(cIndex)) & 0xff ) << RESET << std::endl;
         }
 
         if (pMarkerVec.at(cIndex) == 1)
@@ -341,14 +342,14 @@ void PixFEDFWInterface::prettyprintFIFO1( const std::vector<uint32_t>& pFifoVec,
 
         if (pMarkerVec.at(cIndex) == 4)
         {
-            // Event Header
-            os  << "Trailer: " << "CH: " << ( (pFifoVec.at(cIndex) >> 26) & 0x3f ) << " ID: " <<  ( (pFifoVec.at(cIndex) >> 21) & 0x1f ) << " TBM_T2: " <<  ( (pFifoVec.at(cIndex) >> 12) & 0xff ) << " TBM_T1: " <<  ( (pFifoVec.at(cIndex)) & 0xff ) << std::endl;
+            // TBM Trailer
+            os  << BLUE << "Trailer: " << "CH: " << ( (pFifoVec.at(cIndex) >> 26) & 0x3f ) << " ID: " <<  ( (pFifoVec.at(cIndex) >> 21) & 0x1f ) << " TBM_T2: " <<  ( (pFifoVec.at(cIndex) >> 12) & 0xff ) << " TBM_T1: " <<  ( (pFifoVec.at(cIndex)) & 0xff ) << RESET << std::endl;
         }
 
         if (pMarkerVec.at(cIndex) == 6)
         {
-            // Event Header
-            os  << "Event Trailer: " << "CH: " << ( (pFifoVec.at(cIndex) >> 26) & 0x3f ) << " ID: " <<  ( (pFifoVec.at(cIndex) >> 21) & 0x1f ) << " marker: " <<  ( (pFifoVec.at(cIndex)) & 0x1fffff ) << std::endl;
+            // Event Trailer
+            os  << RED << "Event Trailer: " << "CH: " << ( (pFifoVec.at(cIndex) >> 26) & 0x3f ) << " ID: " <<  ( (pFifoVec.at(cIndex) >> 21) & 0x1f ) << " marker: " <<  ( (pFifoVec.at(cIndex)) & 0x1fffff ) << RESET << std::endl;
         }
     }
     os << "----------------------------------------------------------------------------------" << std::endl;

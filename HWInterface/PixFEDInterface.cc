@@ -413,16 +413,22 @@ void PixFEDInterface::JumpToFpgaConfig( PixFED* pFED, const std::string& strConf
     fFEDFW->JumpToFpgaConfig( strConfig );
 }
 
-// const FpgaConfig* PixFEDInterface::getConfiguringFpga( PixFED* pFED )
-// {
-//  setBoard( pFED->getBeId() );
-//  return fFEDFW->getConfiguringFpga();
-// }
+const FpgaConfig* PixFEDInterface::getConfiguringFpga( PixFED* pFED )
+{
+    setBoard( pFED->getBeId() );
+    return fFEDFW->getConfiguringFpga();
+}
 
 std::vector<std::string> PixFEDInterface::getFpgaConfigList( PixFED* pFED )
 {
     setBoard( pFED->getBeId() );
     return fFEDFW->getFpgaConfigList();
+}
+
+void PixFEDInterface::DownloadFpgaConfig( PixFED* pFED, const std::string& strConfig, const std::string& strDest)
+{
+    setBoard( pFED->getBeId() );
+    fFEDFW->DownloadFpgaConfig( strConfig, strDest );
 }
 
 void PixFEDInterface::DeleteFpgaConfig( PixFED* pFED, const std::string& strId )

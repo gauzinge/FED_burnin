@@ -22,7 +22,7 @@ RootLibraryPaths = $(RootLibraryDirs:%=-L%)
 ExternalObjects= $(LibraryPaths) -lpthread  -lcactus_extern_pugixml -lcactus_uhal_log -lcactus_uhal_grammars -lcactus_uhal_uhal \
 				 -lboost_system -lPh1_Interface -lPh1_Description -lPh1_System -lPh1_Utils
 
-binaries=print run
+binaries=print run fpgaconfig
 
 
 all: clean $(binaries)
@@ -40,7 +40,9 @@ run: acquisition.cc
 	$(CXX) -std=c++11 $(CCFlags) -o $@ $< $(IncludePaths) $(ExternalObjects)
 	cp $@ ../bin
 
-.PHONY: clean
+fpgaconfig: fpgaconfig.cc
+	$(CXX) -std=c++11 $(CCFlags) -o $@ $< $(IncludePaths) $(ExternalObjects)
+	cp $@ ../bin
 
 clean:
 	rm -f $(binaries) *.o

@@ -130,6 +130,14 @@
     <node id="eui_b0" address="0x0000001f" mask="0x000000ff" permission="r" />
     <!-- ICAP MEMORY SPACE -->
     <node id="icap" address="0x00000200" mask="0xffffffff" permission="rw" />
+
+    <node id="buf_cta" address="0x0000400" class="MmcPipeInterface" description="UC link buffer test register" size="0x3" tags="slave">
+      <node id="FPGAtoMMCcounters" address="0x0"/>
+      <node id="MMCtoFPGAcounters" address="0x1"/>
+      <node id="FIFO" address="0x2" mode="non-incremental" size="512" />
+  	</node>
+
+
     <!-- IPHC CMS Ph1 Pixel FED FW Address Table -->
     <!-- according to user_logic.vhd of fc7_basic projecd -->
     <!-- STATUS REGISTER MAPPING from pixfed_stat_reg: STATUS & FLAGS -->

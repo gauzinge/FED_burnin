@@ -15,35 +15,35 @@ using namespace CommandLineProcessing;
 using namespace std;
 
 
-void verifyImageName( const string& strImage, const vector<string>& lstNames)
-{
-    if (lstNames.empty())
-    {
-        if (strImage.compare("1") != 0 && strImage.compare("2") != 0)
-        {
-            cout << "Error, invalid image name, should be 1 (golden) or 2 (user)" << endl;
-            exit(1);
-        }
-    }
-    else
-    {
-        bool bFound = false;
-        for (int iName = 0; iName < lstNames.size(); iName++)
-        {
-            if (!strImage.compare(lstNames[iName]))
-            {
-                bFound = true;
-                break;
-            }
-            else cout << strImage << "!=" << lstNames[iName] << endl;
-        }
-        if (!bFound)
-        {
-            cout << "Error, this image name: " << strImage << " is not available on SD card" << endl;
-            exit(1);
-        }
-    }
-}
+//void verifyImageName( const string& strImage, const vector<string>& lstNames)
+//{
+//if (lstNames.empty())
+//{
+//if (strImage.compare("1") != 0 && strImage.compare("2") != 0)
+//{
+//cout << "Error, invalid image name, should be 1 (golden) or 2 (user)" << endl;
+//exit(1);
+//}
+//}
+//else
+//{
+//bool bFound = false;
+//for (int iName = 0; iName < lstNames.size(); iName++)
+//{
+//if (!strImage.compare(lstNames[iName]))
+//{
+//bFound = true;
+//break;
+//}
+//else cout << strImage << "!=" << lstNames[iName] << endl;
+//}
+//if (!bFound)
+//{
+//cout << "Error, this image name: " << strImage << " is not available on SD card" << endl;
+//exit(1);
+//}
+//}
+//}
 
 int main( int argc, char* argv[] )
 {

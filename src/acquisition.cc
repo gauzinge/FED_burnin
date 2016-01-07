@@ -73,7 +73,7 @@ int main(int argc, char* argv[] )
         else running = false;
 
 
-        if (iAcq % 1000 == 0)
+        if (iAcq % 100 == 0)
         {
             cData.check();
             tbm_index_error_ctr += cData.getTBM_index_errors();
@@ -98,4 +98,15 @@ int main(int argc, char* argv[] )
         //std::cout << "Finished reading Data!" << std::endl;
     }
     logger.close();
+
+    // re-load the golden image
+    for (auto& cFED : cSystemController.fPixFEDVector)
+    {
+        std::string cImageName = "GoldenImage.bin";
+        std::vector<std::string> cImageList = cSystemController.fFEDInterface->getFpgaConfigList(cFED);
+        verifyImageName(cImageName, cImageList);
+        cSystemController.fFEDInterface->JumpToFpgaConfig(cFED, cImageName);
+        std::cout << "Re-loading golden CTA image for FED " << +cFED->getBeId() << std::endl;
+    }
+    exit(0);
 }

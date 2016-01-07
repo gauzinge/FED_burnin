@@ -4,7 +4,7 @@
         <connection id="board0" uri="chtcp-2.0://cmsuppixch:10203?target=192.168.000.11:50001" address_table="file://settings/address_table.xml" />
         <!-- Trigger -->
         <Register name="pixfed_ctrl_regs.TRIGGER_SEL">0</Register>
-        <Register name="pixfed_ctrl_regs.INT_TRIGGER_FREQ_SEL">5</Register>
+        <Register name="pixfed_ctrl_regs.INT_TRIGGER_FREQ_SEL">8</Register>
         <!-- TBM MASK -->
         <Register name="pixfed_ctrl_regs.TBM_MASK_1">0b00000000</Register>
         <Register name="pixfed_ctrl_regs.TBM_MASK_2">0b00000000</Register>
@@ -22,5 +22,5 @@
 <Settings>
     <Setting name="NTBM">48</Setting>
     <!--if set to 0, loop will run forever-->
-    <Setting name="NAcq">1</Setting>
+    <Setting name="NAcq">101</Setting>
 </Settings>

@@ -332,7 +332,13 @@ void PixFEDInterface::getBoardInfo( const PixFED* pFED )
 
 void PixFEDInterface::ConfigureFED( const PixFED* pFED )
 {
+    //before I can configure the FED FW, I need to load it to the CTA which runs the golden Image as default!
     setBoard( pFED->getBeId() );
+    std::string cImageName = "PixFEDImage.bin";
+    std::vector<std::string> cImageList = fFEDFW->getFpgaConfigList();
+    verifyImageName(cImageName, cImageList);
+    fFEDFW->JumpToFpgaConfig(cImageName);
+    std::cout << "Successfully loaded FW on FED " << +pFED->getBeId() << std::endl;
     fFEDFW->ConfigureBoard( pFED );
 }
 

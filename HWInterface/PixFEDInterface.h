@@ -12,6 +12,7 @@
 
 #include "PixFEDFWInterface.h"
 #include "../Utils/ConsoleColor.h"
+#include "../Utils/Utilities.h"
 #include "../HWDescription/Fitel.h"
 #include "../HWDescription/PixFED.h"
 

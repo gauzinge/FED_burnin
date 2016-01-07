@@ -1,6 +1,6 @@
 /*
 
-    \file                          Utilities.h
+    \file                           Utilities.h
     \brief                         Some objects that might come in handy
     \author                        Nicolas PIERRE
     \version                       1.0
@@ -19,6 +19,8 @@
 #include <istream>
 #include <limits>
 #include <iostream>
+#include <vector>
+#include <string>
 
 /*!
  * \brief Get time took since the start
@@ -53,5 +55,11 @@ double MyErf( double* x, double* par );
  * \return converted integer
  */
 uint32_t convertAnyInt( const char* pRegValue );
+/*!
+ * \brief: verify if image is part of list
+ * \param strImage: Image Name
+ * \param lstName: List of Images
+ * */
+void verifyImageName( const std::string& strImage, const std::vector<std::string>& lstNames);
 
 #endif

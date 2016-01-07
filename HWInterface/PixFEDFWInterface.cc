@@ -706,6 +706,12 @@ void PixFEDFWInterface::DeleteFpgaConfig( const std::string & strId )
     fpgaConfig->deleteFirmwareImage( strId );
 }
 
+void PixFEDFWInterface::DownloadFpgaConfig( const std::string& strConfig, const std::string& strDest)
+{
+    checkIfUploading();
+    fpgaConfig->runDownload( strConfig, strDest.c_str());
+}
+
 void PixFEDFWInterface::checkIfUploading()
 {
     if ( fpgaConfig && fpgaConfig->getUploadingFpga() > 0 )

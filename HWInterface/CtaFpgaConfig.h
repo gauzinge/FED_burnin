@@ -32,10 +32,16 @@ public:
      * \param pstrFile absolute path to the .bit file
      */
     void runUpload(const std::string& strConfig, const char* pstrFile) throw (std::string);
+    /*! \brief Launch the firmware download in a separate thread
+     * \param strConfig FPGA configuration name
+     * \param pstrFile absolute path to the .bin file
+     */
+    void runDownload(const std::string& strConfig, const char* pstrFile) throw (std::string);
     /*! \brief Jump to an FPGA configuration
      * \param strConfig FPGA configuration name
      */
     void jumpToImage( const std::string& strImage);
+    void downloadImage( const std::string& strImage, const std::string& strDestFile);
     /*! \brief Get the list of available FPGA configuration (or firmware images)*/
     std::vector<std::string> getFirmwareImageNames();
     /*! \brief Delete one Fpga configuration (or firmware image)*/

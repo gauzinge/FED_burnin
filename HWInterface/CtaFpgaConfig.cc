@@ -52,8 +52,16 @@ void CtaFpgaConfig::runUpload(const std::string& strImage, const char* szFile) t
 
 void CtaFpgaConfig::dumpFromFileIntoSD(const std::string& strImage, const char* pstrFile)
 {
-    fc7::XilinxBitFile bitFile(pstrFile);
-    lNode.FileToSD(strImage, bitFile, &progressValue, &progressString);
+    if (string(pstrFile).compare(string(pstrFile).length() - 4, 4, ".bit") == 0)
+    {
+        fc7::XilinxBitFile bitFile(pstrFile);
+        lNode.FileToSD(strImage, bitFile, &progressValue, &progressString);
+    }
+    else
+    {
+        fc7::XilinxBinFile binFile(pstrFile);
+        lNode.FileToSD(strImage, binFile, &progressValue, &progressString);
+    }
     progressValue = 100;
     lNode.RebootFPGA(strImage, SECURE_MODE_PASSWORD);
 }
@@ -61,6 +69,53 @@ void CtaFpgaConfig::dumpFromFileIntoSD(const std::string& strImage, const char* 
 void CtaFpgaConfig::jumpToImage( const std::string& strImage)
 {
     lNode.RebootFPGA(strImage, SECURE_MODE_PASSWORD);
+}
+
+void CtaFpgaConfig::runDownload(const std::string& strImage, const char* szFile) throw (std::string)
+{
+    vector<string> lstNames = lNode.ListFilesOnSD();
+    for (int iName = 0; iName < lstNames.size(); iName++)
+    {
+        if (!strImage.compare(lstNames[iName]))
+            numUploadingFpga = iName + 1;
+        break;
+    }
+    progressValue = 0;
+    progressString = "Downloading configuration";
+    boost::thread(&CtaFpgaConfig::downloadImage, this, strImage, szFile);
+}
+
+void CtaFpgaConfig::downloadImage( const std::string& strImage, const std::string& strDestFile)
+{
+    fc7::Firmware bitStream1 = lNode.FileFromSD(strImage, &progressValue, 0);
+    progressString = "Checking download";
+    fc7::Firmware bitStream2 = lNode.FileFromSD(strImage, &progressValue, 33);
+    fc7::Firmware bitStream3("empty");
+    ofstream oFile;
+    oFile.open(strDestFile, ios::out | ios::binary);
+
+//for (const auto& uVal:bitStream.Bitstream())
+    for (size_t idx = 0 ; idx < bitStream1.Bitstream().size(); idx++)
+    {
+        if (bitStream1.Bitstream()[idx] != bitStream2.Bitstream()[idx])
+        {
+            if (bitStream3.Bitstream().empty())
+            {
+                progressString = "Errors found, checking again";
+                bitStream3 = lNode.FileFromSD(strImage, &progressValue, 66);
+            }
+            if (bitStream1.Bitstream()[idx] == bitStream3.Bitstream()[idx])
+                oFile << (char)bitStream1.Bitstream()[idx];
+            else if (bitStream2.Bitstream()[idx] == bitStream3.Bitstream()[idx])
+                oFile << (char)bitStream2.Bitstream()[idx];
+            else
+                throw fc7::CorruptedFile();
+        }
+        else
+            oFile << (char)bitStream1.Bitstream()[idx];
+    }
+    oFile.close();
+    progressValue = 100;
 }
 
 std::vector<std::string>  CtaFpgaConfig::getFirmwareImageNames()

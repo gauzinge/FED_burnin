@@ -12,6 +12,7 @@
 
 #include "PixFEDFWInterface.h"
 #include "../Utils/ConsoleColor.h"
+#include "../Utils/Utilities.h"
 #include "../HWDescription/Fitel.h"
 #include "../HWDescription/PixFED.h"
 
@@ -220,6 +221,7 @@ public:
     * \param numConfig FPGA configuration number
     */
     void JumpToFpgaConfig( PixFED* pFED, const std::string& strConfig );
+    void DownloadFpgaConfig( PixFED* pFED, const std::string& strConfig, const std::string& strDest);
     /*! \brief Current FPGA configuration
      * \param pFED pointer to a board description
      * \return const pointer to an FPGA uploading process. NULL means that no upload is been processed.

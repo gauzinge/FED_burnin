@@ -63,96 +63,100 @@ int main( int argc, char* argv[] )
     //cSystemController.ConfigureHw( std::cout);
 
     //TODO: fix me and introduce a loop
-    PixFED* pBoard = cSystemController.fPixFEDVector.at(0);
-    vector<string> lstNames = cSystemController.fFEDInterface->getFpgaConfigList(pBoard);
-    std::string cFWFile;
-    std::string strImage("1");
-    if (cmd.foundOption("list"))
+    //PixFED* pBoard = cSystemController.fPixFEDVector.at(0);
+    for ( auto& pBoard : cSystemController.fPixFEDVector )
     {
-        std::cout << lstNames.size() << " firmware images on SD card:" << std::endl;
-        for (auto &name : lstNames)
-            std::cout << " - " << name << std::endl;
-
-        exit(0);
-    }
-    else if (cmd.foundOption("file"))
-    {
-        cFWFile = cmd.optionValue("file");
-        if (lstNames.size() == 0 && cFWFile.find(".mcs") == std::string::npos)
+        vector<string> lstNames = cSystemController.fFEDInterface->getFpgaConfigList(pBoard);
+        std::string cFWFile;
+        std::string strImage("1");
+        if (cmd.foundOption("list"))
         {
-            std::cout << "Error, the specified file is not a .mcs file" << std::endl;
-            exit(1);
-        }
-        else if (lstNames.size() > 0 && cFWFile.compare(cFWFile.length() - 4, 4, ".bit") && cFWFile.compare(cFWFile.length() - 4, 4, ".bin"))
-        {
-            std::cout << "Error, the specified file is neither a .bit nor a .bin file" << std::endl;
-            exit(1);
-        }
-    }
-    else if (cmd.foundOption("delete") && !lstNames.empty())
-    {
-        strImage = cmd.optionValue("delete");
-        verifyImageName(strImage, lstNames);
-        cSystemController.fFEDInterface->DeleteFpgaConfig(pBoard, strImage);
-        std::cout << "Firmware image: " << strImage << " deleted from SD card" << std::endl;
-        exit(0);
-    }
-    else if (!cmd.foundOption("image"))
-    {
-        cFWFile = "";
-        std::cout << "Error, no FW image specified" << std::endl;
-        exit(1);
-    }
+            std::cout << lstNames.size() << " firmware images on SD card:" << std::endl;
+            for (auto &name : lstNames)
+                std::cout << " - " << name << std::endl;
 
-    if (cmd.foundOption("image"))
-    {
-        strImage = cmd.optionValue("image");
-        if (!cmd.foundOption("file"))
+            exit(0);
+        }
+        else if (cmd.foundOption("file"))
+        {
+            cFWFile = cmd.optionValue("file");
+            if (lstNames.size() == 0 && cFWFile.find(".mcs") == std::string::npos)
+            {
+                std::cout << "Error, the specified file is not a .mcs file" << std::endl;
+                exit(1);
+            }
+            else if (lstNames.size() > 0 && cFWFile.compare(cFWFile.length() - 4, 4, ".bit") && cFWFile.compare(cFWFile.length() - 4, 4, ".bin"))
+            {
+                std::cout << "Error, the specified file is neither a .bit nor a .bin file" << std::endl;
+                exit(1);
+            }
+        }
+        else if (cmd.foundOption("delete") && !lstNames.empty())
+        {
+            strImage = cmd.optionValue("delete");
             verifyImageName(strImage, lstNames);
-    }
-    else if (!lstNames.empty())
-        strImage = "GoldenImage.bin";
-
-    Timer t;
-    t.start();
-
-
-    t.stop();
-    t.show( "Time to Initialize/configure the system: " );
-
-    if (!cmd.foundOption("file") && !cmd.foundOption("download"))
-    {
-        cSystemController.fFEDInterface->JumpToFpgaConfig(pBoard, strImage);
-        exit(0);
-    }
-
-    bool cDone = 0;
-
-
-    if (cmd.foundOption("download"))
-        cSystemController.fFEDInterface->DownloadFpgaConfig(pBoard, strImage, cmd.optionValue("download"));
-    else
-        cSystemController.fFEDInterface->FlashProm(pBoard, strImage, cFWFile.c_str());
-
-    uint32_t progress;
-
-    while (cDone == 0)
-    {
-        progress = cSystemController.fFEDInterface->getConfiguringFpga(pBoard)->getProgressValue();
-
-        if (progress == 100)
-        {
-            cDone = 1;
-            std::cout << "\n 100% Done" << std::endl;
+            cSystemController.fFEDInterface->DeleteFpgaConfig(pBoard, strImage);
+            std::cout << "Firmware image: " << strImage << " deleted from SD card" << std::endl;
+            exit(0);
         }
+        else if (!cmd.foundOption("image"))
+        {
+            cFWFile = "";
+            std::cout << "Error, no FW image specified" << std::endl;
+            exit(1);
+        }
+
+        if (cmd.foundOption("image"))
+        {
+            strImage = cmd.optionValue("image");
+            if (!cmd.foundOption("file"))
+                verifyImageName(strImage, lstNames);
+        }
+        else if (!lstNames.empty())
+            strImage = "GoldenImage.bin";
+
+        Timer t;
+        t.start();
+
+
+        t.stop();
+        t.show( "Time to Initialize/configure the system: " );
+
+        if (!cmd.foundOption("file") && !cmd.foundOption("download"))
+        {
+            cSystemController.fFEDInterface->JumpToFpgaConfig(pBoard, strImage);
+            exit(0);
+        }
+
+        bool cDone = 0;
+
+
+        if (cmd.foundOption("download"))
+            cSystemController.fFEDInterface->DownloadFpgaConfig(pBoard, strImage, cmd.optionValue("download"));
         else
+            cSystemController.fFEDInterface->FlashProm(pBoard, strImage, cFWFile.c_str());
+
+        uint32_t progress;
+
+        while (cDone == 0)
         {
-            std::cout << progress << "%  " << cSystemController.fFEDInterface->getConfiguringFpga(pBoard)->getProgressString() << "                 \r" << flush;
-            sleep(1);
+            progress = cSystemController.fFEDInterface->getConfiguringFpga(pBoard)->getProgressValue();
+
+            if (progress == 100)
+            {
+                cDone = 1;
+                std::cout << "\n 100% Done" << std::endl;
+            }
+            else
+            {
+                std::cout << progress << "%  " << cSystemController.fFEDInterface->getConfiguringFpga(pBoard)->getProgressString() << "                 \r" << flush;
+                sleep(1);
+            }
         }
+
+
+        t.stop();
+        t.show( "Time elapsed:" );
+
     }
-
-
-    t.stop();
-    t.show( "Time elapsed:" );
 }

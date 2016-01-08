@@ -99,9 +99,10 @@ void verifyImageName( const std::string& strImage, const std::vector<std::string
             if (!strImage.compare(lstNames[iName]))
             {
                 bFound = true;
+                std::cout << "Found Image " << strImage << " in list of image names on this SD card!" << std::endl;
                 break;
             }
-            else std::cout << strImage << "!=" << lstNames[iName] << std::endl;
+            //else std::cout << strImage << "!=" << lstNames[iName] << std::endl;
         }
         if (!bFound)
         {

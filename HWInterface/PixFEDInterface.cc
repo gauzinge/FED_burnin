@@ -344,7 +344,13 @@ void PixFEDInterface::disableFMCs( const PixFED* pFED )
 
 void PixFEDInterface::ConfigureFED( const PixFED* pFED )
 {
+    //before I can configure the FED FW, I need to load it to the CTA which runs the golden Image as default!
     setBoard( pFED->getBeId() );
+    std::string cImageName = "PixFEDImage.bin";
+    std::vector<std::string> cImageList = fFEDFW->getFpgaConfigList();
+    verifyImageName(cImageName, cImageList);
+    fFEDFW->JumpToFpgaConfig(cImageName);
+    std::cout << "Successfully loaded FW on FED " << +pFED->getBeId() << std::endl;
     fFEDFW->ConfigureBoard( pFED );
 }
 
@@ -445,16 +451,22 @@ void PixFEDInterface::JumpToFpgaConfig( PixFED* pFED, const std::string& strConf
     fFEDFW->JumpToFpgaConfig( strConfig );
 }
 
-// const FpgaConfig* PixFEDInterface::getConfiguringFpga( PixFED* pFED )
-// {
-//  setBoard( pFED->getBeId() );
-//  return fFEDFW->getConfiguringFpga();
-// }
+const FpgaConfig* PixFEDInterface::getConfiguringFpga( PixFED* pFED )
+{
+    setBoard( pFED->getBeId() );
+    return fFEDFW->getConfiguringFpga();
+}
 
 std::vector<std::string> PixFEDInterface::getFpgaConfigList( PixFED* pFED )
 {
     setBoard( pFED->getBeId() );
     return fFEDFW->getFpgaConfigList();
+}
+
+void PixFEDInterface::DownloadFpgaConfig( PixFED* pFED, const std::string& strConfig, const std::string& strDest)
+{
+    setBoard( pFED->getBeId() );
+    fFEDFW->DownloadFpgaConfig( strConfig, strDest );
 }
 
 void PixFEDInterface::DeleteFpgaConfig( PixFED* pFED, const std::string& strId )

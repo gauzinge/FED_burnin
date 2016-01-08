@@ -2,5 +2,6 @@
 bin/
 src/run
 src/clt
+src/fpgaconfig
 logifle*
 *.txt

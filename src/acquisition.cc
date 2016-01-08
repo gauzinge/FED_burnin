@@ -8,6 +8,22 @@
 #include "../System/SystemController.h"
 #include "../Utils/Data.h"
 
+bool checkInput(std::string userInput, std::vector<std::string> validInput){
+
+  for ( auto& s : validInput)
+    {
+      if( s.compare(userInput) == 0)
+	{
+	  // we have a valid input
+	  return true;
+	}
+    }
+  // the user input does not match any valid input string
+  return false;
+}
+
+
+
 int main(int argc, char* argv[] )
 {
     int tbm_index_error_ctr = 0;
@@ -115,7 +131,7 @@ int main(int argc, char* argv[] )
 	//DQM
 	std::cout << "\t [trans] to dump transparent buffer data" << std::endl;
 	std::cout << "\t [spy] to dump spy FIFO data" << std::endl;
-	std::cout << "\t [fifo1] to dump FIFO1 data" << std::endl;
+	std::cout << "\t [fifo1/one] to dump FIFO1 data" << std::endl;
 	std::cout << "\t [dumpallfifo] to dump all three FIFOs" << std::endl;
 
 	std::cout << "\t [q/quit] to to quit" << std::endl;
@@ -124,39 +140,56 @@ int main(int argc, char* argv[] )
 
 	std::cout << "You entred: " << userInput << std::endl;
 	//sanitize input
+
+
 	//if invalid input do nothing and show promt again
-	if(userInput.length() != 1 && userInput != "quit")
+	if(!checkInput(userInput,validUserInputs))
 	  {
-	    std::cout << "Invalid command! Try again" << std::endl;
+	    std::cout << userInput <<" is an invalid command! Try again" << std::endl;
 	  }
 	else if(userInput == "i")
 	  {
-	    // get the board info of all boards and start the acquistion
+	    // get the board INFO of all boards and start the acquistion
 	    for (auto& cFED : cSystemController.fPixFEDVector)
 	      {
 		cSystemController.fFEDInterface->getBoardInfo(cFED);
 	      }
 	  }
-	else if(userInput == "s")
+	else if(userInput == "s" || userInput == "start")
 	  {
+	    // START DAQ on all FEDs
 	    for (auto& cFED : cSystemController.fPixFEDVector)
 	      {
 		cSystemController.fFEDInterface->Start(cFED);
 	      }
 	  }
-	else if(userInput == "x")
+	else if(userInput == "x" || userInput == "stop")
 	  {
+	    // STOP DAQ on all FEDs
 	    for (auto& cFED : cSystemController.fPixFEDVector)
 	      {
 		cSystemController.fFEDInterface->Stop(cFED);
 	      }
 	  }
-	else if(userInput == "p")
+	else if(userInput == "p" || userInput == "pause")
 	  {
+	    // PAUSE DAQ on all FEDs
 	    for (auto& cFED : cSystemController.fPixFEDVector)
 	      {
 		cSystemController.fFEDInterface->Pause(cFED);
 	      }
+	  }
+	else if(userInput == "r" || userInput == "resume")
+	  {
+	    // RESUME DAQ on all FEDs
+	    for (auto& cFED : cSystemController.fPixFEDVector)
+	      {
+		cSystemController.fFEDInterface->Resume(cFED);
+	      }
+	  }
+	else if(userInput == "read")
+	  {
+	    // READ data from DAQ
 	  }
 	else if(userInput == "a")
 	  {
@@ -209,5 +242,57 @@ int main(int argc, char* argv[] )
 	      }
 	    logger.close();
 	  }
+	else if(userInput == "c" || userInput == "conf" || userInput == "configure" )
+	  {
+	    // CONFIGURE DAQ
+
+	    // we delete the old settings
+	    cSystemController.fPixFEDVector.clear();
+	    //do these have to go as well?
+	    cSystemController.fSettingsMap.clear();
+	    cSystemController.fFWMap.clear();
+	    
+	    // load new settings
+	    // initialize map of settings so I can know the proper number of acquisitions and TBMs
+	    cSystemController.InitializeSettings(cHWFile, std::cout);
+	    
+	    // initialize HWdescription from XML, beware, settings have to be read first
+	    cSystemController.InitializeHw(cHWFile, std::cout);
+	    
+	    // configure the HW
+	    cSystemController.ConfigureHw(std::cout );
+	    auto cSetting = cSystemController.fSettingsMap.find("NAcq");
+	    int cNAcq = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 10;
+
+	  }
+	else if(userInput == "flash" )
+	  {
+	    // FLASH FPGA
+	  }
+	else if(userInput == "fpgaconf" )
+	  {
+	    // jump to an FPGA configuration
+	  }
+	else if(userInput == "trans")
+	  {
+	    // TRANSPARENT buffer dump
+	  }
+	else if(userInput == "spy")
+	  {
+	    // SPY FIFO dump
+	  }
+	else if(userInput == "fifo1" || userInput == "one")
+	  {
+	    // FIFO1 dump
+	  }
+	else if(userInput == "dumpallfifo")
+	  {
+	    // dump all FIFOs and transparent buffer
+	  }
+	else if(userInput == "q" || userInput == "quit")
+	  {
+	    // QUIT/END program
+	  }
+
       }
 }

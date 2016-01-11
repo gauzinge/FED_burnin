@@ -129,12 +129,39 @@ public:
      * \param pFED
      */
     void getBoardInfo( const PixFED* pFED );
-
+    /*!
+     * \brief: enable FMCs
+     */
+    void enableFMCs( const PixFED* pFED );
+    /*!
+     * \brief: disable FMCs
+     */
+    void disableFMCs( const PixFED* pFED );
     /*!
      * \brief Configure the board with its Config File
      * \param pFED
      */
     void ConfigureFED( const PixFED* pFED );
+    /*!
+     * \brief: find Phases for input data stream
+     * \param: pScopeFIFOCh: channel for Phase Stability monitoring
+     */
+    void findPhases( const PixFED* pFED, uint32_t pScopeFIFOCh = 0 );
+    /*!
+     * \brief: read transparent Fifo
+     * \return: vector of 32 bit words with FIFO content
+     */
+    std::vector<uint32_t> readTransparentFIFO( const PixFED* pFED );
+    /*!
+     * \brief: read contents of the Spy Fifo
+     * \return: concanated Fifos for TBM cores A (1) & B(1)
+     */
+    std::vector<uint32_t> readSpyFIFO( const PixFED* pFED );
+    /*!
+     * \brief: read contents of FIFO1
+     * \return string of the FIFO1 console dump
+     */
+    std::string readFIFO1( const PixFED* pFED );
     /*!
      * \brief Start a DAQ
      * \param pFED

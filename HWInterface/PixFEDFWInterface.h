@@ -14,11 +14,9 @@
 #include <boost/thread.hpp>
 #include <uhal/uhal.hpp>
 #include "RegManager.h"
-// #include "../Utils/Event.h"
-//#include "../Utils/Data.h"
 #include "../Utils/Utilities.h"
 #include "../Utils/Exception.h"
-// #include "../HWDescription/Definition.h"
+#include "../Utils/ConsoleColor.h"
 #include "../HWDescription/PixFED.h"
 #include "CtaFpgaConfig.h"
 
@@ -92,14 +90,36 @@ public:
     * \brief Get the board infos
     */
     void getBoardInfo();
-
-
     /*!
-     * \brief Configure the board with its Config File
-     * \param pPixFED
-     */
+    * \brief Configure the board with its Config File
+    * \param pPixFED
+    */
     bool ConfigureBoard( const PixFED* pPixFED );
-
+    // Methods for management of FMCs
+    /*!
+     * \brief Disable FMC power
+     */
+    void disableFMCs();
+    /*!
+     * \brief enable FMC power
+     */
+    void enableFMCs();
+    /*!
+     * \brief: find correct phases for incoming data stream
+     */
+    void findPhases(uint32_t pScopeFIFOCh = 0);
+    /*!
+     * \brief: read the bistream FIFO of the PixFED
+     */
+    std::vector<uint32_t> readTransparentFIFO();
+    /*!
+     * \brief: read the contents of the SpyFifo for TBM cores A & B
+     */
+    std::vector<uint32_t> readSpyFIFO();
+    /*!
+     * \brief: read the contents of FIFO 1 for TBM cores A & B
+     */
+    std::string readFIFO1();
     /*!
      * \brief Start a DAQ
      */
@@ -180,6 +200,8 @@ private:
     /*! Compute the size of an acquisition data block
      * \return Number of 32-bit words to be read at each iteration */
     uint32_t computeBlockSize();
+
+    void prettyprintFIFO1( const std::vector<uint32_t>& pFifoVec, const std::vector<uint32_t>& pMarkerVec, std::ostream& os = std::cout);
 
     // FPGA CONFIG METHODS
 public:

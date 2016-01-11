@@ -314,20 +314,32 @@ uint8_t PixFEDInterface::ReadFitelReg( Fitel* pFitel, const std::string& pRegNod
     return cRegItem.fValue;
 }
 
-///////////////
-// PixFED  Methods
-//////////////
-
 std::vector<uint32_t> PixFEDInterface::ReadBlockBoardReg( PixFED* pFED, const std::string& pRegNode, uint32_t pSize )
 {
     setBoard( pFED->getBeId() );
     return fFEDFW->ReadBlockRegValue( pRegNode, pSize );
 }
 
+///////////////
+// Startup  Methods
+//////////////
+
 void PixFEDInterface::getBoardInfo( const PixFED* pFED )
 {
     setBoard( pFED->getBeId() );
     fFEDFW->getBoardInfo();
+}
+
+void PixFEDInterface::enableFMCs( const PixFED* pFED )
+{
+    setBoard( pFED->getBeId() );
+    fFEDFW->enableFMCs();
+}
+
+void PixFEDInterface::disableFMCs( const PixFED* pFED )
+{
+    setBoard( pFED->getBeId() );
+    fFEDFW->disableFMCs();
 }
 
 void PixFEDInterface::ConfigureFED( const PixFED* pFED )
@@ -342,6 +354,38 @@ void PixFEDInterface::ConfigureFED( const PixFED* pFED )
     fFEDFW->ConfigureBoard( pFED );
 }
 
+///////////////
+// Setup  Methods
+//////////////
+
+void PixFEDInterface::findPhases( const PixFED* pFED, uint32_t pScopeFIFOCh )
+{
+    setBoard( pFED->getBeId() );
+    fFEDFW->findPhases(pScopeFIFOCh);
+}
+
+
+std::vector<uint32_t> PixFEDInterface::readTransparentFIFO( const PixFED* pFED )
+{
+    setBoard( pFED->getBeId() );
+    return fFEDFW->readTransparentFIFO();
+}
+
+std::vector<uint32_t> PixFEDInterface::readSpyFIFO( const PixFED* pFED )
+{
+    setBoard( pFED->getBeId() );
+    return fFEDFW->readSpyFIFO();
+}
+
+std::string PixFEDInterface::readFIFO1( const PixFED* pFED )
+{
+    setBoard( pFED->getBeId() );
+    return fFEDFW->readFIFO1();
+}
+
+///////////////
+// Readout  Methods
+//////////////
 
 void PixFEDInterface::Start( PixFED* pFED )
 {
@@ -377,22 +421,10 @@ std::vector<uint32_t> PixFEDInterface::ReadData( PixFED* pFED )
     return fFEDFW->ReadData( pFED );
 }
 
-// const Event* PixFEDInterface::GetNextEvent( const PixFED* pFED )
-// {
-//  setBoard( pFED->getBeId() );
-//  fFEDFW->GetNextEvent( pFED );
-// }
 
-// const Event* PixFEDInterface::GetEvent( const PixFED* pFED, int i )
-// {
-//  setBoard( pFED->getBeId() );
-//  return fFEDFW->GetEvent( pFED, i );
-// }
-// const std::vector<Event*>& PixFEDInterface::GetEvents( const PixFED* pFED )
-// {
-//  setBoard( pFED->getBeId() );
-//  return fFEDFW->GetEvents( pFED );
-// }
+///////////////
+// Auxillary  Methods
+//////////////
 
 const uhal::Node& PixFEDInterface::getUhalNode( const PixFED* pFED, const std::string& pStrPath )
 {

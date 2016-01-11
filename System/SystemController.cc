@@ -95,7 +95,7 @@ void SystemController::parseHWxml( const std::string& pFilename, std::ostream& o
     for ( pugi::xml_node cBeBoardNode = doc.child( "HwDescription" ).child( "PixFED" ); cBeBoardNode; cBeBoardNode = cBeBoardNode.next_sibling() )
     {
 
-        os << BOLDCYAN << cBeBoardNode.name() << "  " << cBeBoardNode.first_attribute().name() << " :" << cBeBoardNode.attribute( "Id" ).value() << RESET << std:: endl;
+        os << BOLDCYAN << cBeBoardNode.name() << "  " << cBeBoardNode.first_attribute().name() << " :" << cBeBoardNode.attribute( "Id" ).value() << RESET << std::endl;
 
         cBeId = cBeBoardNode.attribute( "Id" ).as_int();
         PixFED* cPixFED = new PixFED( cBeId );

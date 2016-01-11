@@ -1,8 +1,17 @@
 #!/bin/bash
-echo 'creating lib!'
-mkdir lib
-echo 'creating bin!'
-mkdir bin
+if [ ! -d "lib" ]
+then
+    echo 'creating lib!'
+    mkdir lib
+fi
+
+if [ ! -d "bin" ]
+then
+    echo 'creating bin!'
+    mkdir bin
+fi
+
+
 #CACTUS
 export CACTUSBIN=/opt/cactus/bin
 export CACTUSLIB=/opt/cactus/lib

@@ -23,7 +23,7 @@ void Amc13Controller::ConfigureAmc13( std::ostream& os )
 {
     os << BOLDGREEN << "Configuring Amc13!" << RESET << std::endl;
     // no need to pass the Amc13 memory description as there is only 1, I just keep it for reference and update accordingly!
-    //fAmc13Interface->ConfigureAmc13();
+    fAmc13Interface->ConfigureAmc13();
 }
 
 void Amc13Controller::parseAmc13xml(const std::string& pFilename, std::ostream& os)
@@ -99,9 +99,10 @@ void Amc13Controller::parseAmc13xml(const std::string& pFilename, std::ostream& 
             fAmc13->addBGO( parseBGO( cBGOnode, std::cout ) );
         }
 
-        // now instantiate the AMC13Interface
+        // now instantiate the AMC13Interface & provide it with the correct HWDescription object so I don't need to pass it around all the time!
         if ( fAmc13Interface != nullptr ) delete fAmc13Interface;
         fAmc13Interface = new Amc13Interface(cUri1, cAddressT1, cUri2, cAddressT2);
+        fAmc13Interface->setAmc13Description(fAmc13);
     }
     os << "\n";
 }

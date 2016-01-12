@@ -18,7 +18,7 @@ public:
     void InitializeAmc13( const std::string& pFilename, std::ostream& os = std::cout );
     void ConfigureAmc13( std::ostream& os = std::cout );
 
-protected:
+public:
 
     Amc13Interface* fAmc13Interface;
     Amc13Description* fAmc13;

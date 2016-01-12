@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <HwDescription>
-    <AMC13 blup="0">
+    <AMC13>
         <connection id="T1" uri="chtcp-2.0://cmsuppixch:10203?target=192.168.000.157:50001" address_table="file://settings/AMC13XG_T1.xml" />
         <connection id="T2" uri="chtcp-2.0://cmsuppixch:10203?target=192.168.000.156:50001" address_table="file://settings/AMC13XG_T2.xml" />
         <AMCmask enable="1,2,3,4" />

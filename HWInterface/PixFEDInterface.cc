@@ -24,7 +24,11 @@ PixFEDInterface::PixFEDInterface( const PixFEDFWMap& pFWMap ) :
 
 PixFEDInterface::~PixFEDInterface()
 {
-
+    //std::string cImageName = "GoldenImage.bin";
+    //std::vector<std::string> cImageList = fFEDFW->getFpgaConfigList();
+    //verifyImageName(cImageName, cImageList);
+    //fFEDFW->JumpToFpgaConfig(cImageName);
+    //std::cout << "Successfully loaded golden FW on FED " << +pFED->getBeId() << std::endl;
 }
 
 void PixFEDInterface::setBoard( uint16_t pBoardIdentifier )

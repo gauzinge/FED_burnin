@@ -37,7 +37,7 @@ public:
 
     void setAMCMask(const std::vector<int>& pMask);
 
-private:
+public:
     RegMap fT1map;
     RegMap fT2map;
     std::vector<int> fAMCMask;

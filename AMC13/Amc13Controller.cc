@@ -72,7 +72,6 @@ void Amc13Controller::parseAmc13xml(const std::string& pFilename, std::ostream& 
             }
             else if ( std::string(Amc13Connection.attribute( "id" ).value()) == "T2" )
             {
-
                 cUri2 = std::string(Amc13Connection.attribute( "uri" ).value());
                 cAddressT2 = std::string(Amc13Connection.attribute( "address_table" ).value());
             }
@@ -86,13 +85,9 @@ void Amc13Controller::parseAmc13xml(const std::string& pFilename, std::ostream& 
 
             os << BOLDCYAN << "|" << "----" << Amc13RegNode.name() << "  " << Amc13RegNode.attribute( "tounge" ).name() << " : " << Amc13RegNode.attribute( "tounge" ).value() << " - name: " << regname << " " << BOLDRED << atoi(Amc13RegNode.first_child().value()) << RESET << std:: endl;
             if ( std::string(Amc13RegNode.attribute("tounge").value()) == "T1" )
-            {
                 fAmc13->setReg(1 ,  regname, convertAnyInt( Amc13RegNode.first_child().value() ) );
-            }
             else if ( std::string(Amc13RegNode.attribute("tounge").value()) == "T2" )
-            {
                 fAmc13->setReg(2 ,  regname, convertAnyInt( Amc13RegNode.first_child().value() ) );
-            }
         }
 
         // now get all the properties and add to the Amc13Description object

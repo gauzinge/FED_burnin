@@ -17,7 +17,7 @@ class Amc13Description
 {
 public:
     Amc13Description();
-    ~Amc13Description() {}
+    ~Amc13Description();
 
     uint32_t getReg(int pTounge, std::string& pReg);
     void setReg(int pTounge, std::string& pReg, uint32_t pValue);

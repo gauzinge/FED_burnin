@@ -38,7 +38,7 @@ void SystemController::InitializeSettings( const std::string& pFilename, std::os
 void SystemController::ConfigureHw( std::ostream& os )
 {
     // write some code
-    std::cout << BOLDGREEN <<  "Configuring FEDs: " << RESET << std::endl;
+    os << BOLDGREEN <<  "Configuring FEDs: " << RESET << std::endl;
     for (auto& cFED : fPixFEDVector)
     {
         fFEDInterface->ConfigureFED(cFED);
@@ -48,12 +48,12 @@ void SystemController::ConfigureHw( std::ostream& os )
             for (auto& cFitel : cFED->fFitelVector)
             {
                 fFEDInterface->ConfigureFitel(cFitel, true);
-                std::cout << "Configured Fitel Rx " << +cFitel->getFitelId() << " on FMC " << +cFitel->getFMCId() << std::endl;
+                os << "Configured Fitel Rx " << +cFitel->getFitelId() << " on FMC " << +cFitel->getFMCId() << std::endl;
             }
         }
-        std::cout << "Configured FED " << +cFED->getBeId() << std::endl;
+        os << "Configured FED " << +cFED->getBeId() << std::endl;
     }
-    std::cout << BOLDGREEN << "All FEDs successfully configured!" << RESET << std::endl;
+    os << BOLDGREEN << "All FEDs successfully configured!" << RESET << std::endl;
 }
 
 // void SystemController::Run( BeBoard* pBeBoard, uint32_t pNthAcq )

@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
 <HwDescription>
-    <AMC13>
+    <AMC13 blup="0">
         <connection id="T1" uri="chtcp-2.0://cmsuppixch:10203?target=192.168.000.157:50001" address_table="file://settings/AMC13XG_T1.xml" />
         <connection id="T2" uri="chtcp-2.0://cmsuppixch:10203?target=192.168.000.156:50001" address_table="file://settings/AMC13XG_T2.xml" />
-        <AMCmask enable="1,2,3,4,5,6,7,8,9,10,,12" />
+        <AMCmask enable="1,2,3,4" />
         <Register tounge="T1" name="test.test">0</Register>
         <BGO channel="15" enable="1" prescale="0" bx="100" />
         <Trigger type="1" rate="100" rules="0" />

@@ -1,4 +1,4 @@
-Objs            = Amc13Description.o Amc13Interface.o Amc13Parser.o
+Objs            = Amc13Description.o Amc13Interface.o Amc13Controller.o
 CC              = gcc
 CXX             = g++
 CCFlags         = -g -O1 -w -Wall -pedantic -fPIC -Wcpp
@@ -11,10 +11,12 @@ IncludePaths            = $(IncludeDirs:%=-I%)
 LibraryDirs = /opt/cactus/lib ../ ../lib
 LibraryPaths = $(LibraryDirs:%=-L%)
 
-#ExternalObjects = $(LibraryPaths) -lPh2_Interface -lPh2_Description
+ExternalObjects = $(LibraryPaths) -lcactus_amc13_amc13 
+
+.PHONY: clean
 
 %.o: %.cc %.h
-	$(CXX) -std=c++11  $(DevFlags) $(CCFlags) $(UserCCFlags) $(CCDefines) $(IncludePaths) -c -o $@ $<
+	$(CXX) -std=c++11  $(DevFlags) $(CCFlags) $(UserCCFlags) $(CCDefines) $(IncludePaths) $(ExternalObjects) -c -o $@ $<
 
 all: $(Objs)
 	$(CC) -std=c++11 -shared -o libPh1_Amc13.so $(Objs)

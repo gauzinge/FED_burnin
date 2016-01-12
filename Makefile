@@ -1,30 +1,28 @@
-#AMC13Flag = -D__AMC13__
-#ExternalObjects = 
 AMC13DIR=/opt/cactus/include/amc13
 
-all: Utils HWDescription HWInterface System src
-amc13: AMC13 Utils HWDescription HWInterface System src
+ifneq ("$(wildcard $(AMC13DIR))","")
+	SUBDIRS = AMC13 Utils HWDescription HWInterface System src
+	AMC13INSTALLED = yes
+else
+	SUBDIRS = Utils HWDescription HWInterface System src
+	AMC13INSTALLED = no
+endif
 
-#ifneq ("$(wildcard $(AMC13DIR))","")
-#all: $(binariesAMC13)
-#@echo yup
-#else
-#@echo nope
-#all: $(binaries)
-#endif
+.PHONY: print subdirs $(SUBDIRS) clean
 
-HWDescription::
+subdirs: print $(SUBDIRS)
+
+$(SUBDIRS):
 	$(MAKE) -C $@
-Utils::
-	$(MAKE) -C $@
-HWInterface::
-	$(MAKE) -C $@
-AMC13::
-	$(MAKE) -C $@
-System::
-	$(MAKE) -C $@ 
-src::
-	$(MAKE) -C $@ 
+
+print:
+	@echo '*****************************'
+	@echo 'Amc13 SW installed:' $(AMC13INSTALLED)
+	@echo '*****************************'
+
+System: HWDescription HWInterface Utils
+
+src: System
 
 clean:
 	(cd System; make clean)

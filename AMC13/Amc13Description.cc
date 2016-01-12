@@ -1,5 +1,24 @@
 #include "Amc13Description.h"
 
+Amc13Description::Amc13Description()
+{
+    fTrigger = nullptr;
+    fT1map.clear();
+    fT2map.clear();
+    fAMCMask.clear();
+    fBGOs.clear();
+}
+
+Amc13Description::~Amc13Description()
+{
+    delete fTrigger;
+    for (auto& cBGO : fBGOs) delete cBGO;
+    fBGOs.clear();
+    fAMCMask.clear();
+    fT1map.clear();
+    fT2map.clear();
+}
+
 uint32_t Amc13Description::getReg( int pTounge, std::string& pReg )
 {
     RegMap cMap = (pTounge == 1) ? fT1map : fT2map;

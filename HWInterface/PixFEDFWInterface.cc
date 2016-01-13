@@ -162,7 +162,7 @@ void PixFEDFWInterface::findPhases(uint32_t pScopeFIFOCh)
     cValVec.clear();
 
     // some additional configuration
-    cVecReg.push_back( { "fe_ctrl_regs.fifo_config.overflow_value", 0x300c0 }); // set 192val
+    cVecReg.push_back( { "fe_ctrl_regs.fifo_config.overflow_value", 0x700e0}); // set 192val
     cVecReg.push_back( { "fe_ctrl_regs.fifo_config.channel_of_interest", pScopeFIFOCh} ); // set channel for scope FIFO
     WriteStackReg(cVecReg);
     cVecReg.clear();
@@ -173,6 +173,7 @@ void PixFEDFWInterface::findPhases(uint32_t pScopeFIFOCh)
     std::chrono::milliseconds cWait( 6000 );
     std::this_thread::sleep_for( cWait );
 
+    //here I might do the print loop again as Helmut does it in the latest version of the PixFED python script
     WriteReg("fe_ctrl_regs.initialize_swap", 0);
 
     std::this_thread::sleep_for( cWait );
@@ -237,6 +238,8 @@ void PixFEDFWInterface::findPhases(uint32_t pScopeFIFOCh)
     WriteStackReg(cVecReg);
     cVecReg.clear();
 }
+
+// helmut does a reg reset 1 while he queries for the Fifos inside a loop
 
 std::vector<uint32_t> PixFEDFWInterface::readTransparentFIFO()
 {

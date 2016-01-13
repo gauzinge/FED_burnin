@@ -102,8 +102,12 @@ void Amc13Controller::parseAmc13xml(const std::string& pFilename, std::ostream& 
         //now just parse the TTC Simulator Node!
         for (pugi::xml_node cBGOnode = cAmc13node.child( "TTCSimulator" ); cBGOnode; cBGOnode = cBGOnode.next_sibling("TTCSimulator"))
         {
-            fAmc13->setTTCSimulator(bool(cBGOnode.first_child().value()));
-            os << BOLDCYAN << "|" << "----" << cBGOnode.name() << "  " << cBGOnode.first_child().value() << RESET << std::endl;
+            int cTTCSimulator = convertAnyInt(cBGOnode.first_child().value());
+            bool cTTCSim;
+            if (cTTCSimulator == 0 ) cTTCSim = false;
+            else cTTCSim = true;
+            fAmc13->setTTCSimulator(cTTCSim);
+            os << BOLDCYAN << "|" << "----" << cBGOnode.name() << "  " << cTTCSimulator << RESET << std::endl;
 
             // now instantiate the AMC13Interface & provide it with the correct HWDescription object so I don't need to pass it around all the time!
             if ( fAmc13Interface != nullptr ) delete fAmc13Interface;

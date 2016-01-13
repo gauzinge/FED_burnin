@@ -26,9 +26,6 @@ public:
     void StopL1A();
     void BurstL1A();
 
-    // Start / Stop Run Mode for BGOs
-    void StartRun();
-    void StopRun();
     //void SendBGO();
     void EnableBGO(int pChan);
     void DisableBGO(int pChan);

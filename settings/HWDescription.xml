@@ -7,7 +7,7 @@
         <!--<Register tounge="T1" name="test.test">0</Register>-->
         <BGO command="15" repeat="1" prescale="0" bx="100" />
         <Trigger local="1" mode="1" rate="100" burst="100" rules="0" />
-        <TTCSimulator>1</TTCSimulator>
+        <TTCSimulator>0</TTCSimulator>
     </AMC13>
     <PixFED Id="0" boardType="CTA">
         <connection id="board0" uri="chtcp-2.0://cmsuppixch:10203?target=192.168.000.11:50001" address_table="file://settings/address_table.xml" />

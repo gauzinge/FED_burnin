@@ -44,13 +44,13 @@ void Amc13Interface::ConfigureAmc13()
     fAMC13->AMCInputEnable( cMask );
 
     //now configure the BGOs, loop through the list, get the properties and call the function
-    int cIndex = 1;
+    int cIndex = 0;
     for (auto& cBGO : fDescription->fBGOs )
     {
-        fAMC13->configureBGOShort(cIndex, uint8_t(cBGO->fCommand), uint16_t(cBGO->fBX), uint16_t(cBGO->fPrescale), cBGO->fRepeat);
-        fAMC13->enableBGO(cIndex);
-        cIndex++;
+        //fAMC13->configureBGOShort(cIndex, uint8_t(cBGO->fCommand), uint16_t(cBGO->fBX), uint16_t(cBGO->fPrescale), cBGO->fRepeat);
+        //fAMC13->enableBGO(cIndex);
         std::cout << "Configured & enabling BGO Channel " << cIndex << " : Command: " << cBGO->fCommand << " BX: " << cBGO->fBX << " Prescale: " << cBGO->fPrescale << " Repetetive: " << cBGO->fRepeat << std::endl;
+        cIndex++;
     }
 
     // now configure the Trigger
@@ -73,15 +73,6 @@ void Amc13Interface::ConfigureAmc13()
     std::cout << GREEN << "AMC13 successfully configured!" << RESET << std::endl;
 }
 
-void Amc13Interface::StartRun()
-{
-    fAMC13->startRun();
-}
-
-void Amc13Interface::StopRun()
-{
-    fAMC13->endRun();
-}
 
 void Amc13Interface::StartL1A()
 {

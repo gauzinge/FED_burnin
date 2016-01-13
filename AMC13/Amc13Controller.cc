@@ -99,10 +99,17 @@ void Amc13Controller::parseAmc13xml(const std::string& pFilename, std::ostream& 
             fAmc13->addBGO( parseBGO( cBGOnode, std::cout ) );
         }
 
-        // now instantiate the AMC13Interface & provide it with the correct HWDescription object so I don't need to pass it around all the time!
-        if ( fAmc13Interface != nullptr ) delete fAmc13Interface;
-        fAmc13Interface = new Amc13Interface(cUri1, cAddressT1, cUri2, cAddressT2);
-        fAmc13Interface->setAmc13Description(fAmc13);
+        //now just parse the TTC Simulator Node!
+        for (pugi::xml_node cBGOnode = cAmc13node.child( "TTCSimulator" ); cBGOnode; cBGOnode = cBGOnode.next_sibling("TTCSimulator"))
+        {
+            fAmc13->setTTCSimulator(bool(cBGOnode.first_child().value()));
+            os << BOLDCYAN << "|" << "----" << cBGOnode.name() << "  " << cBGOnode.first_child().value() << RESET << std::endl;
+
+            // now instantiate the AMC13Interface & provide it with the correct HWDescription object so I don't need to pass it around all the time!
+            if ( fAmc13Interface != nullptr ) delete fAmc13Interface;
+            fAmc13Interface = new Amc13Interface(cUri1, cAddressT1, cUri2, cAddressT2);
+            fAmc13Interface->setAmc13Description(fAmc13);
+        }
     }
     os << "\n";
 }
@@ -134,8 +141,8 @@ BGO* Amc13Controller::parseBGO(pugi::xml_node pNode,  std::ostream & os)
     BGO* cBGO = nullptr;
     if ( std::string(pNode.name()) == "BGO")
     {
-        cBGO = new BGO( atoi(pNode.attribute( "channel" ).value()), bool(pNode.attribute( "enable" ).value()), atoi(pNode.attribute( "prescale" ).value() ), atoi(pNode.attribute( "bx" ).value()) );
-        os <<  BOLDCYAN << "|" << "----" << "BGO : channel " << cBGO->fChannel << " status[" << cBGO->fStatus << "] Prescale " << cBGO->fPrescale << " start BX " << cBGO->fBX << RESET << std::endl;
+        cBGO = new BGO( atoi(pNode.attribute( "command" ).value()), bool(pNode.attribute( "repeat" ).value()), atoi(pNode.attribute( "prescale" ).value() ), atoi(pNode.attribute( "bx" ).value()) );
+        os <<  BOLDCYAN << "|" << "----" << "BGO : command " << cBGO->fCommand << " repeat " << cBGO->fRepeat << " Prescale " << cBGO->fPrescale << " start BX " << cBGO->fBX << RESET << std::endl;
     }
     return cBGO;
 }
@@ -145,8 +152,8 @@ Trigger* Amc13Controller::parseTrigger( pugi::xml_node pNode, std::ostream & os 
     Trigger* cTrg = nullptr;
     if ( std::string(pNode.name()) == "Trigger" )
     {
-        cTrg = new Trigger( atoi(pNode.attribute( "type" ).value()), atoi( pNode.attribute( "rate" ).value()), atoi( pNode.attribute( "rules" ).value() ) );
-        os <<  BOLDGREEN << "|" << "----" << "Trigger Config : Type " << cTrg->fType << " Rate " << cTrg->fRate << " Rules " << cTrg->fRules << RESET << std::endl;
+        cTrg = new Trigger(bool(pNode.attribute("local").value()), atoi(pNode.attribute( "mode" ).value()), atoi( pNode.attribute( "rate" ).value()), atoi( pNode.attribute( "burst" ).value()), atoi( pNode.attribute( "rules" ).value() ) );
+        os <<  BOLDGREEN << "|" << "----" << "Trigger Config : Local " << cTrg->fLocal  << " Mode " << cTrg->fMode << " Rate " << cTrg->fRate << " Burst " << cTrg->fBurst << " Rules " << cTrg->fRules << RESET << std::endl;
 
     }
     return cTrg;

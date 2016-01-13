@@ -40,14 +40,14 @@ void Amc13Description::setAMCMask(const std::vector<int>& pMask)
     fAMCMask = pMask;
 }
 
-void Amc13Description::setTrigger(int pType, int pRate, int pRules)
+void Amc13Description::setTrigger(bool pLocal, int pMode, int pRate, int pBurst, int pRules)
 {
     if (fTrigger != nullptr)
     {
         std::cout << "Warning, overwriting another Trigger object!" << std::endl;
         delete fTrigger;
     }
-    fTrigger = new Trigger(pType, pRate, pRules);
+    fTrigger = new Trigger(pLocal, pMode, pRate, pBurst, pRules);
 }
 
 void Amc13Description::setTrigger( Trigger* pTrigger )
@@ -65,13 +65,17 @@ Trigger* Amc13Description::getTrigger()
     return fTrigger;
 }
 
-void Amc13Description::addBGO(int pChannel, bool pStatus, int pPrescale, int pBX)
+void Amc13Description::setTTCSimulator(bool pSimulate)
+{
+    fSimulate = pSimulate;
+}
+void Amc13Description::addBGO(int pCommand, bool pRepeat, int pPrescale, int pBX)
 {
     int cSize = fBGOs.size();
     if (cSize > 4) std::cout << "Warning, AMC13XG only supports 4 user-defined BGOs - adding this one will have no effect!" << std::endl;
     else
     {
-        BGO* cBGO = new BGO(pChannel, pStatus, pPrescale, pBX);
+        BGO* cBGO = new BGO(pCommand, pRepeat, pPrescale, pBX);
         fBGOs.push_back(cBGO);
     }
 }

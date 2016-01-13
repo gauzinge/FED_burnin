@@ -24,6 +24,9 @@
          <node id="ORN" address="0x00000000" permission="w" description="reset orbit number" parameters="Table=Actions;Row=Resets;Column=OrN;Status=0" mask="0x00001000"/>
          <node id="SDRAM" address="0x00000000" permission="w" description="reset ddr3 memory controller" parameters="Table=Actions;Row=Resets;Column=SDRAM;Status=0" mask="0x00000020"/>
       </node>
+      <node id="TTC">
+         <node id="SINGLE_COMMAND" address="0x00000000" permission="w" description="Send single command if enabled by bit 30 in reg 0x24-0x27" mask="0x00000100"/>
+      </node>
    </node>
    <node id="CONF">
       <node id="AMC">
@@ -84,15 +87,25 @@
       <node id="EVB">
          <node id="ENABLE_DAQLSC" address="0x00000001" permission="rw" description="'1' enables DAQLSC" parameters="Table=2_Control;Row=Reg_1;Column=DAQ;Status=1" mask="0x00000002"/>
          <node id="ENABLE_MASKED_EVN" address="0x00000002" permission="rw" description="If set to '1', bit 22-19 determine which events will be saved" parameters="Table=2_Control;Row=Reg_1;Column=EnaMaskedEvn;Status=0" mask="0x00800000"/>
-         <node id="FLUSH_ON_RESYNC" address="0x00000001" permission="rw" description="if '1', send all data to downstream when ttc reset is receivedn if '0', flush all data when ttc reset is received." parameters="Table=2_Control;Row=Reg_1;Column=ResyncFlush;Status=1;Show=nz" mask="0x00002000"/>
+         <node id="MON_FULL_OVERWRITE" address="0x00000001" permission="rw" description="If '1', overwrite old events in monitor buffer when full" parameters="Table=2_Control;Row=Reg_1;Column=MonOverwrite;Status=1;Show=nz" mask="0x00002000"/>
          <node id="MON_FULL_STOP_EVB" address="0x00000001" permission="rw" description="if '1', monitor buffer full will stop event builder" parameters="Table=2_Control;Row=Reg_1;Column=MonBP;Status=1;Show=nz" mask="0x00004000"/>
          <node id="SELECT_MASKED_EVN" address="0x00000002" permission="rw" description="Value n=0..15, save events with EvN low (20-n) bits '0'" parameters="Table=2_Control;Row=Reg_2;Column=SelMaskedEvn;Status=0" mask="0x00780000"/>
          <node id="SET_MON_PRESCALE" address="0x00000002" permission="w" description="scale factor( = contents + 1). Note: if bit 18 is set to '1', these bits are ignored." parameters="Table=2_Control;Row=Reg_2;Column=Prescale;Status=0" mask="0x0000ffff"/>
+         <node id="STOP_ON_CRC_ERR" address="0x00000002" permission="rw" description="If '1', stop monitor buffer write on AMC CRC error" parameters="Table=2_Control;Row=Reg_2;Column=StopOnCRC;Status=2" mask="0x80000000"/>
       </node>
       <node id="ID">
          <node id="EVT_STAT" address="0x00000007" permission="rw" description="CMS evt_stat for output data" parameters="Table=1_Config;Row=Output;Column=EvtStat;Status=0" mask="0x000ff000"/>
          <node id="EVT_TY" address="0x00000007" permission="rw" description="CMS evt_ty for output data" parameters="Table=1_Config;Row=Output;Column=EvtTyp;Status=0" mask="0x00f00000"/>
-         <node id="FED_ID" address="0x00000004" permission="rw" description="SLINK ID(bits 15-14 always '0')" parameters="Table=1_Config;Row=Output;Column=FED;Status=1" mask="0xffff0000"/>
+         <node id="FED_ID" address="0x00000004" permission="rw" description="SLINK ID(bits 15-14 always '0')" parameters="Table=0_Board;Row=Output;Column=FED;Status=1" mask="0xffff0000"/>
+         <node id="SFP0">
+            <node id="SOURCE_ID" address="0x00000007" permission="" description="CMS Source ID for SFP0 output data" parameters="Table=1_Config;Row=_3;Column=SrcID;Status=1" mask="0x00000fff"/>
+         </node>
+         <node id="SFP1">
+            <node id="SOURCE_ID" address="0x00000011" permission="" description="CMS Source ID for SFP1 output data" parameters="Table=1_Config;Row=_3;Column=SrcID;Status=1" mask="0x00000fff"/>
+         </node>
+         <node id="SFP2">
+            <node id="SOURCE_ID" address="0x00000012" permission="" description="CMS Source ID for SFP2 output data" parameters="Table=1_Config;Row=_3;Column=SrcID;Status=1" mask="0x00000fff"/>
+         </node>
          <node id="SOURCE_ID" address="0x00000007" permission="rw" description="CMS Source ID for output data" parameters="Table=1_Config;Row=Output;Column=SrcID;Status=1" mask="0x00000fff"/>
       </node>
       <node id="LOCAL_TRIG">
@@ -458,6 +471,7 @@
             <node id="BX" address="0x00000024" permission="rw" description="Starting BX for BGO channel 0" parameters="Table=TTC_BGO;Row=Starting_BX;Column=BGO0;Status=1;Show=nz" mask="0x0fff0000"/>
             <node id="COMMAND" address="0x00000020" permission="rw" description="Short or long TTC command for BGO channel 0" parameters="Table=TTC_BGO;Row=Command;Column=BGO0;Status=1;Show=nz"/>
             <node id="ENABLE" address="0x00000024" permission="rw" description="Enable BGO channel 0" parameters="Table=TTC_BGO;Row=Enable;Column=BGO0;Status=1;Show=nz" mask="0x20000000"/>
+            <node id="ENABLE_SINGLE" address="0x00000024" permission="rw" description="'1' for single command only" parameters="Table=TTC_BGO;Row=Single;Column=BGO0;Status=1;Show=nz" mask="0x40000000"/>
             <node id="LONG_CMD" address="0x00000024" permission="rw" description="'1' for long command on BGO channel 0" parameters="Table=TTC_BGO;Row=Long_Command;Column=BGO0;Status=1;Show=nz" mask="0x10000000"/>
             <node id="ORBIT_PRESCALE" address="0x00000024" permission="rw" description="Orbit prescale-1 for BGO channel 0" parameters="Table=TTC_BGO;Row=Orbit_Prescale;Column=BGO0;Status=1;Show=nz" mask="0x0000ffff"/>
          </node>
@@ -465,6 +479,7 @@
             <node id="BX" address="0x00000025" permission="rw" description="Starting BX for BGO channel 1" parameters="Table=TTC_BGO;Row=Starting_BX;Column=BGO1;Status=1;Show=nz" mask="0x0fff0000"/>
             <node id="COMMAND" address="0x00000021" permission="rw" description="Short or long TTC command for BGO channel 1" parameters="Table=TTC_BGO;Row=Command;Column=BGO1;Status=1;Show=nz"/>
             <node id="ENABLE" address="0x00000025" permission="rw" description="Enable BGO channel 1" parameters="Table=TTC_BGO;Row=Enable;Column=BGO1;Status=1;Show=nz" mask="0x20000000"/>
+            <node id="ENABLE_SINGLE" address="0x00000025" permission="rw" description="'1' for single command only" parameters="Table=TTC_BGO;Row=Single;Column=BGO1;Status=1;Show=nz" mask="0x40000000"/>
             <node id="LONG_CMD" address="0x00000025" permission="rw" description="'1' for long command on BGO channel 1" parameters="Table=TTC_BGO;Row=Long_Command;Column=BGO1;Status=1;Show=nz" mask="0x10000000"/>
             <node id="ORBIT_PRESCALE" address="0x00000025" permission="rw" description="Orbit prescale-1 for BGO channel 1" parameters="Table=TTC_BGO;Row=Orbit_Prescale;Column=BGO1;Status=1;Show=nz" mask="0x0000ffff"/>
          </node>
@@ -472,6 +487,7 @@
             <node id="BX" address="0x00000026" permission="rw" description="Starting BX for BGO channel 2" parameters="Table=TTC_BGO;Row=Starting_BX;Column=BGO2;Status=1;Show=nz" mask="0x0fff0000"/>
             <node id="COMMAND" address="0x00000022" permission="rw" description="Short or long TTC command for BGO channel 2" parameters="Table=TTC_BGO;Row=Command;Column=BGO2;Status=1;Show=nz"/>
             <node id="ENABLE" address="0x00000026" permission="rw" description="Enable BGO channel 2" parameters="Table=TTC_BGO;Row=Enable;Column=BGO2;Status=1;Show=nz" mask="0x20000000"/>
+            <node id="ENABLE_SINGLE" address="0x00000026" permission="rw" description="'1' for single command only" parameters="Table=TTC_BGO;Row=Single;Column=BGO2;Status=1;Show=nz" mask="0x40000000"/>
             <node id="LONG_CMD" address="0x00000026" permission="rw" description="'1' for long command on BGO channel 2" parameters="Table=TTC_BGO;Row=Long_Command;Column=BGO2;Status=1;Show=nz" mask="0x10000000"/>
             <node id="ORBIT_PRESCALE" address="0x00000026" permission="rw" description="Orbit prescale-1 for BGO channel 2" parameters="Table=TTC_BGO;Row=Orbit_Prescale;Column=BGO2;Status=1;Show=nz" mask="0x0000ffff"/>
          </node>
@@ -479,12 +495,19 @@
             <node id="BX" address="0x00000027" permission="rw" description="Starting BX for BGO channel 3" parameters="Table=TTC_BGO;Row=Starting_BX;Column=BGO3;Status=1;Show=nz" mask="0x0fff0000"/>
             <node id="COMMAND" address="0x00000023" permission="rw" description="Short or long TTC command for BGO channel 3" parameters="Table=TTC_BGO;Row=Command;Column=BGO3;Status=1;Show=nz"/>
             <node id="ENABLE" address="0x00000027" permission="rw" description="Enable BGO channel 3" parameters="Table=TTC_BGO;Row=Enable;Column=BGO3;Status=1;Show=nz" mask="0x20000000"/>
+            <node id="ENABLE_SINGLE" address="0x00000027" permission="rw" description="'1' for single command only" parameters="Table=TTC_BGO;Row=Single;Column=BGO3;Status=1;Show=nz" mask="0x40000000"/>
             <node id="LONG_CMD" address="0x00000027" permission="rw" description="'1' for long command on BGO channel 3" parameters="Table=TTC_BGO;Row=Long_Command;Column=BGO3;Status=1;Show=nz" mask="0x10000000"/>
             <node id="ORBIT_PRESCALE" address="0x00000027" permission="rw" description="Orbit prescale-1 for BGO channel 3" parameters="Table=TTC_BGO;Row=Orbit_Prescale;Column=BGO3;Status=1;Show=nz" mask="0x0000ffff"/>
          </node>
          <node id="ENABLE_BGO" address="0x00000001" permission="rw" description="'1' enables locally generated 'BGO' commands" parameters="Table=2_Control;Row=Reg_1;Column=BGO;Status=1;Show=nz" mask="0x00000020"/>
          <node id="ENABLE_INTERNAL_L1A" address="0x00000001" permission="rw" description="if '1', uses internally generated L1A" parameters="Table=2_Control;Row=Reg_1;Column=LTrig;Status=1" mask="0x00000004"/>
-         <node id="OCR_COMMAND" address="0x0000002a" permission="rw" description="Orbit count reset TTC command" parameters="Table=TTC_Rx;Row=OCR_command;Column=Value;Status=1" mask="0x000000ff"/>
+         <node id="OCR_COMMAND" address="0x0000002a" permission="rw" description="Orbit count reset TTC command" parameters="Table=TTC_Rx;Row=OCR_command;Column=Value;Status=2" mask="0x000000ff"/>
+         <node id="OCR_MASK" address="0x0000002a" permission="rw" description="Ignore '1' bits when comparing orbit count reset TTC command" parameters="Table=TTC_Rx;Row=OCR_mask;Column=Value;Status=2" mask="0x0000ff00"/>
+         <node id="RESYNC">
+            <node id="COMMAND" address="0x0000002b" permission="rw" description="Resync TTC command" parameters="Table=TTC_Rx;Row=Resync_command;Column=Value;Status=2" mask="0x000000ff"/>
+            <node id="MASK" address="0x0000002b" permission="rw" description="Ignore '1' bits when comparing resync TTC command" parameters="Table=TTC_Rx;Row=Resync_mask;Column=Value;Status=2" mask="0x0000ff00"/>
+         </node>
+         <node id="T3_TRIG" address="0x00000001" permission="rw" description="If '1', accept triggers from T3 (ENABLE_INTERNAL_L1A must also be '1')" parameters="Table=2_Control;Row=Reg_1;Column=T3Trig;Status=1;Show=nz" mask="0x00008000"/>
       </node>
       <node id="TTS_TEST_PATTERN" address="0x00000019" permission="rw" description="TTS output test pattern" parameters="Table=1_Config;Row=TTS;Column=TestPatt;Status=0;Format=TTSRaw" mask="0x00000f00"/>
    </node>
@@ -492,6 +515,7 @@
    <node id="MONITOR_BUFFER_RAM" address="0x00020000" permission="r" description="memory read window" mode="incremental" size="0x1ffff"/>
    <node id="STATUS">
       <node id="AMC">
+         <node id="AMC_CRC_ERR" address="0x00000e0f" permission="r" description="AMC even CRC error detected" parameters="Table=AMC_Links;Row=CRC_Err;Column=Any;Status=1;Show=nz" mask="0x80000000"/>
          <node id="BC0_LOCKED_MASK" address="0x00000006" permission="r" description="AMC1..12 BC0 locked" mask="0x0fff0000"/>
          <node id="LINK_VERS_WRONG_MASK" address="0x00000005" permission="r" description="'1' AMC1..12 link version wrong" mask="0x00000fff"/>
          <node id="LOSS_OF_SYNC_MASK" address="0x00000005" permission="r" description="'0' AMC1..12 loss of sync" mask="0x0fff0000"/>
@@ -499,133 +523,194 @@
       <node id="AMC01">
          <node id="AMC_LINK_READY_MASK" address="0x00000003" permission="r" description="'1' indicates AMC1..12 Link Ready" parameters="Table=AMC_Links;Row=AMC_LINK_READY;Column=AMC01;Status=1" mask="0x00010000"/>
          <node id="BC0_LOCKED_MASK" address="0x00000006" permission="r" description="AMC1..12 BC0 locked (local trigger only)" parameters="Table=AMC_Links;Row=BC0_LOCKED;Column=AMC01;Status=3" mask="0x00010000"/>
+         <node id="BP_CRC_ERR" address="0x00000e20" permission="r" description="Backplane link CRC error" parameters="Table=AMC_Links;Row=BP_Err;Column=_2;Status=1;Show=nz"/>
          <node id="COUNTERS" module="file://AMCCounters.xml" address="0x00000800" />
-         <node id="LINK_BUFFER_FULL" address="0x00000e0c" permission="" description="AMC_LINK buffer is full" parameters="Table=AMC_Links;Row=Link_Buffer_Full;Column=AMC01;Status=2;Show=nz" mask="0x00010000"/>
-         <node id="LINK_VERS_WRONG_MASK" address="0x00000005" permission="r" description="'1' AMC1..12 link version wrong" parameters="Table=AMC_Links;Row=LINK_VERS_WRONG;Column=AMC01;Status=1;Show=nz" mask="0x00000001"/>
-         <node id="LOSS_OF_SYNC_MASK" address="0x00000005" permission="r" description="'0' AMC1..12 loss of sync" parameters="Table=AMC_Links;Row=LOSS_OF_SYNC;Column=AMC01;Status=1;Show=nz" mask="0x00010000"/>
-         <node id="TTC_LOCKED_MASK" address="0x00000e0d" permission="r" description="1 if corresponding AMC enabled and TTC locked" parameters="Table=AMC_Trigger;Row=TTC_LOCKED;Column=AMC01;Status=2;Show=z" mask="0x00010000"/>
-         <node id="TTS_ENCODED" address="0x00000e1a" permission="r" description="MSB..LSB: DIS,ERR,SYN,BSY,OFW" parameters="Table=AMC_Links;Row=TTS_Encoded;Column=AMC01;Status=2;Show=nz;Format=TTSEnc" mask="0x0000001f"/>
-         <node id="TTS_RAW" address="0x00000e47" permission="r" description="Raw TTS from AMC13 card" parameters="Table=AMC_Links;Row=TTS_Raw;Column=AMC01;Status=2;Format=TTSRaw" mask="0x00000000"/>
+         <node id="LINK" module="file://AMCLinks.xml" address="0x00000e40" />
+         <node id="LINK_BUFFER_FULL" address="0x00000e0c" permission="" description="AMC_LINK buffer is full" parameters="Table=AMC_Links;Row=Link_Buffer_Full;Column=_2;Status=2;Show=nz" mask="0x00010000"/>
+         <node id="LINK_VERS_WRONG_MASK" address="0x00000005" permission="r" description="'1' AMC1..12 link version wrong" parameters="Table=AMC_Links;Row=LINK_VERS_WRONG;Column=_2;Status=1;Show=nz" mask="0x00000001"/>
+         <node id="LOSS_OF_SYNC_MASK" address="0x00000005" permission="r" description="'0' AMC1..12 loss of sync" parameters="Table=AMC_Links;Row=LINK_OK;Column=_2;Status=1" mask="0x00010000"/>
+         <node id="TTC_LOCKED_MASK" address="0x00000e0d" permission="r" description="1 if corresponding AMC enabled and TTC locked" parameters="Table=AMC_Trigger;Row=TTC_LOCKED;Column=_2;Status=2;Show=z" mask="0x00010000"/>
+         <node id="TTS_ENCODED" address="0x00000e1a" permission="r" description="MSB..LSB: DIS,ERR,SYN,BSY,OFW" parameters="Table=AMC_Links;Row=TTS_Encoded;Column=_2;Status=2;Show=nz;Format=TTSEnc" mask="0x0000001f"/>
+         <node id="TTS_RAW" address="0x00000e47" permission="r" description="Raw TTS from AMC" parameters="Table=AMC_Links;Row=TTS_Raw;Column=_2;Status=2;Format=TTSRaw" mask="0x00000000"/>
+         <node id="WAS_DISC" address="0x00000e1a" permission="r" description="TTC was in disconnected state" parameters="Table=AMC_Links;Row=Disc;Column=_2;Status=2;Show=nz" mask="0x00000080"/>
+         <node id="WAS_ERR" address="0x00000e1a" permission="r" description="TTC was in error state" parameters="Table=AMC_Links;Row=Err;Column=_2;Status=2;Show=nz" mask="0x00000040"/>
+         <node id="WAS_SYN" address="0x00000e1a" permission="r" description="TTC was in sync lost state" parameters="Table=AMC_Links;Row=Syn;Column=_2;Status=2;Show=nz" mask="0x00000020"/>
       </node>
       <node id="AMC02">
          <node id="AMC_LINK_READY_MASK" address="0x00000003" permission="r" description="'1' indicates AMC1..12 Link Ready" parameters="Table=AMC_Links;Row=AMC_LINK_READY;Column=AMC02;Status=1" mask="0x00020000"/>
          <node id="BC0_LOCKED_MASK" address="0x00000006" permission="r" description="AMC1..12 BC0 locked (local trigger only)" parameters="Table=AMC_Links;Row=BC0_LOCKED;Column=AMC02;Status=3" mask="0x00020000"/>
+         <node id="BP_CRC_ERR" address="0x00000e21" permission="r" description="Backplane link CRC error" parameters="Table=AMC_Links;Row=BP_Err;Column=_2;Status=1;Show=nz"/>
          <node id="COUNTERS" module="file://AMCCounters.xml" address="0x00000880" />
-         <node id="LINK_BUFFER_FULL" address="0x00000e0c" permission="" description="AMC_LINK buffer is full" parameters="Table=AMC_Links;Row=Link_Buffer_Full;Column=AMC02;Status=2;Show=nz" mask="0x00020000"/>
-         <node id="LINK_VERS_WRONG_MASK" address="0x00000005" permission="r" description="'1' AMC1..12 link version wrong" parameters="Table=AMC_Links;Row=LINK_VERS_WRONG;Column=AMC02;Status=1;Show=nz" mask="0x00000002"/>
-         <node id="LOSS_OF_SYNC_MASK" address="0x00000005" permission="r" description="'0' AMC1..12 loss of sync" parameters="Table=AMC_Links;Row=LOSS_OF_SYNC;Column=AMC02;Status=1;Show=nz" mask="0x00020000"/>
-         <node id="TTC_LOCKED_MASK" address="0x00000e0d" permission="r" description="1 if corresponding AMC enabled and TTC locked" parameters="Table=AMC_Trigger;Row=TTC_LOCKED;Column=AMC02;Status=2;Show=z" mask="0x00020000"/>
-         <node id="TTS_RAW" address="0x00000e57" permission="r" description="Raw TTS from AMC13 card" parameters="Table=AMC_Links;Row=TTS_Raw;Column=AMC02;Status=2;Format=TTSRaw" mask="0x00000000"/>
+         <node id="LINK" module="file://AMCLinks.xml" address="0x00000e50" />
+         <node id="LINK_BUFFER_FULL" address="0x00000e0c" permission="" description="AMC_LINK buffer is full" parameters="Table=AMC_Links;Row=Link_Buffer_Full;Column=_2;Status=2;Show=nz" mask="0x00020000"/>
+         <node id="LINK_VERS_WRONG_MASK" address="0x00000005" permission="r" description="'1' AMC1..12 link version wrong" parameters="Table=AMC_Links;Row=LINK_VERS_WRONG;Column=_2;Status=1;Show=nz" mask="0x00000002"/>
+         <node id="LOSS_OF_SYNC_MASK" address="0x00000005" permission="r" description="'0' AMC1..12 loss of sync" parameters="Table=AMC_Links;Row=LINK_OK;Column=_2;Status=1" mask="0x00020000"/>
+         <node id="TTC_LOCKED_MASK" address="0x00000e0d" permission="r" description="1 if corresponding AMC enabled and TTC locked" parameters="Table=AMC_Trigger;Row=TTC_LOCKED;Column=_2;Status=2;Show=z" mask="0x00020000"/>
+         <node id="TTS_ENCODED" address="0x00000e1a" permission="r" description="MSB..LSB: DIS,ERR,SYN,BSY,OFW" parameters="Table=AMC_Links;Row=TTS_Encoded;Column=_2;Status=2;Show=nz;Format=TTSEnc" mask="0x00001f00"/>
+         <node id="TTS_RAW" address="0x00000e57" permission="r" description="Raw TTS from AMC" parameters="Table=AMC_Links;Row=TTS_Raw;Column=_2;Status=2;Format=TTSRaw" mask="0x00000000"/>
+         <node id="WAS_DISC" address="0x00000e1a" permission="r" description="TTC was in disconnected state" parameters="Table=AMC_Links;Row=Disc;Column=_2;Status=2;Show=nz" mask="0x00008000"/>
+         <node id="WAS_ERR" address="0x00000e1a" permission="r" description="TTC was in error state" parameters="Table=AMC_Links;Row=Err;Column=_2;Status=2;Show=nz" mask="0x00004000"/>
+         <node id="WAS_SYN" address="0x00000e1a" permission="r" description="TTC was in sync lost state" parameters="Table=AMC_Links;Row=Syn;Column=_2;Status=2;Show=nz" mask="0x00002000"/>
       </node>
       <node id="AMC03">
          <node id="AMC_LINK_READY_MASK" address="0x00000003" permission="r" description="'1' indicates AMC1..12 Link Ready" parameters="Table=AMC_Links;Row=AMC_LINK_READY;Column=AMC03;Status=1" mask="0x00040000"/>
          <node id="BC0_LOCKED_MASK" address="0x00000006" permission="r" description="AMC1..12 BC0 locked (local trigger only)" parameters="Table=AMC_Links;Row=BC0_LOCKED;Column=AMC03;Status=3" mask="0x00040000"/>
+         <node id="BP_CRC_ERR" address="0x00000e22" permission="r" description="Backplane link CRC error" parameters="Table=AMC_Links;Row=BP_Err;Column=_2;Status=1;Show=nz"/>
          <node id="COUNTERS" module="file://AMCCounters.xml" address="0x00000900" />
-         <node id="LINK_BUFFER_FULL" address="0x00000e0c" permission="" description="AMC_LINK buffer is full" parameters="Table=AMC_Links;Row=Link_Buffer_Full;Column=AMC03;Status=2;Show=nz" mask="0x00040000"/>
-         <node id="LINK_VERS_WRONG_MASK" address="0x00000005" permission="r" description="'1' AMC1..12 link version wrong" parameters="Table=AMC_Links;Row=LINK_VERS_WRONG;Column=AMC03;Status=1;Show=nz" mask="0x00000004"/>
-         <node id="LOSS_OF_SYNC_MASK" address="0x00000005" permission="r" description="'0' AMC1..12 loss of sync" parameters="Table=AMC_Links;Row=LOSS_OF_SYNC;Column=AMC03;Status=1;Show=nz" mask="0x00040000"/>
-         <node id="TTC_LOCKED_MASK" address="0x00000e0d" permission="r" description="1 if corresponding AMC enabled and TTC locked" parameters="Table=AMC_Trigger;Row=TTC_LOCKED;Column=AMC03;Status=2;Show=z" mask="0x00040000"/>
-         <node id="TTS_ENCODED" address="0x00000e1a" permission="r" description="MSB..LSB: DIS,ERR,SYN,BSY,OFW" parameters="Table=AMC_Links;Row=TTS_Encoded;Column=AMC02;Status=2;Show=nz;Format=TTSEnc" mask="0x00001f00"/>
-         <node id="TTS_RAW" address="0x00000e67" permission="r" description="Raw TTS from AMC13 card" parameters="Table=AMC_Links;Row=TTS_Raw;Column=AMC03;Status=2;Format=TTSRaw" mask="0x00000000"/>
+         <node id="LINK" module="file://AMCLinks.xml" address="0x00000e60" />
+         <node id="LINK_BUFFER_FULL" address="0x00000e0c" permission="" description="AMC_LINK buffer is full" parameters="Table=AMC_Links;Row=Link_Buffer_Full;Column=_2;Status=2;Show=nz" mask="0x00040000"/>
+         <node id="LINK_VERS_WRONG_MASK" address="0x00000005" permission="r" description="'1' AMC1..12 link version wrong" parameters="Table=AMC_Links;Row=LINK_VERS_WRONG;Column=_2;Status=1;Show=nz" mask="0x00000004"/>
+         <node id="LOSS_OF_SYNC_MASK" address="0x00000005" permission="r" description="'0' AMC1..12 loss of sync" parameters="Table=AMC_Links;Row=LINK_OK;Column=_2;Status=1" mask="0x00040000"/>
+         <node id="TTC_LOCKED_MASK" address="0x00000e0d" permission="r" description="1 if corresponding AMC enabled and TTC locked" parameters="Table=AMC_Trigger;Row=TTC_LOCKED;Column=_2;Status=2;Show=z" mask="0x00040000"/>
+         <node id="TTS_ENCODED" address="0x00000e1a" permission="r" description="MSB..LSB: DIS,ERR,SYN,BSY,OFW" parameters="Table=AMC_Links;Row=TTS_Encoded;Column=_2;Status=2;Show=nz;Format=TTSEnc" mask="0x001f0000"/>
+         <node id="TTS_RAW" address="0x00000e67" permission="r" description="Raw TTS from AMC" parameters="Table=AMC_Links;Row=TTS_Raw;Column=_2;Status=2;Format=TTSRaw" mask="0x00000000"/>
+         <node id="WAS_DISC" address="0x00000e1a" permission="r" description="TTC was in disconnected state" parameters="Table=AMC_Links;Row=Disc;Column=_2;Status=2;Show=nz" mask="0x00800000"/>
+         <node id="WAS_ERR" address="0x00000e1a" permission="r" description="TTC was in error state" parameters="Table=AMC_Links;Row=Err;Column=_2;Status=2;Show=nz" mask="0x00400000"/>
+         <node id="WAS_SYN" address="0x00000e1a" permission="r" description="TTC was in sync lost state" parameters="Table=AMC_Links;Row=Syn;Column=_2;Status=2;Show=nz" mask="0x00200000"/>
       </node>
       <node id="AMC04">
          <node id="AMC_LINK_READY_MASK" address="0x00000003" permission="r" description="'1' indicates AMC1..12 Link Ready" parameters="Table=AMC_Links;Row=AMC_LINK_READY;Column=AMC04;Status=1" mask="0x00080000"/>
          <node id="BC0_LOCKED_MASK" address="0x00000006" permission="r" description="AMC1..12 BC0 locked (local trigger only)" parameters="Table=AMC_Links;Row=BC0_LOCKED;Column=AMC04;Status=3" mask="0x00080000"/>
+         <node id="BP_CRC_ERR" address="0x00000e23" permission="r" description="Backplane link CRC error" parameters="Table=AMC_Links;Row=BP_Err;Column=_2;Status=1;Show=nz"/>
          <node id="COUNTERS" module="file://AMCCounters.xml" address="0x00000980" />
-         <node id="LINK_BUFFER_FULL" address="0x00000e0c" permission="" description="AMC_LINK buffer is full" parameters="Table=AMC_Links;Row=Link_Buffer_Full;Column=AMC04;Status=2;Show=nz" mask="0x00080000"/>
-         <node id="LINK_VERS_WRONG_MASK" address="0x00000005" permission="r" description="'1' AMC1..12 link version wrong" parameters="Table=AMC_Links;Row=LINK_VERS_WRONG;Column=AMC04;Status=1;Show=nz" mask="0x00000008"/>
-         <node id="LOSS_OF_SYNC_MASK" address="0x00000005" permission="r" description="'0' AMC1..12 loss of sync" parameters="Table=AMC_Links;Row=LOSS_OF_SYNC;Column=AMC04;Status=1;Show=nz" mask="0x00080000"/>
-         <node id="TTC_LOCKED_MASK" address="0x00000e0d" permission="r" description="1 if corresponding AMC enabled and TTC locked" parameters="Table=AMC_Trigger;Row=TTC_LOCKED;Column=AMC04;Status=2;Show=z" mask="0x00080000"/>
-         <node id="TTS_ENCODED" address="0x00000e1a" permission="r" description="MSB..LSB: DIS,ERR,SYN,BSY,OFW" parameters="Table=AMC_Links;Row=TTS_Encoded;Column=AMC04;Status=2;Show=nz;Format=TTSEnc" mask="0x1f000000"/>
-         <node id="TTS_RAW" address="0x00000e77" permission="r" description="Raw TTS from AMC13 card" parameters="Table=AMC_Links;Row=TTS_Raw;Column=AMC04;Status=2;Format=TTSRaw" mask="0x00000000"/>
+         <node id="LINK" module="file://AMCLinks.xml" address="0x00000e70" />
+         <node id="LINK_BUFFER_FULL" address="0x00000e0c" permission="" description="AMC_LINK buffer is full" parameters="Table=AMC_Links;Row=Link_Buffer_Full;Column=_2;Status=2;Show=nz" mask="0x00080000"/>
+         <node id="LINK_VERS_WRONG_MASK" address="0x00000005" permission="r" description="'1' AMC1..12 link version wrong" parameters="Table=AMC_Links;Row=LINK_VERS_WRONG;Column=_2;Status=1;Show=nz" mask="0x00000008"/>
+         <node id="LOSS_OF_SYNC_MASK" address="0x00000005" permission="r" description="'0' AMC1..12 loss of sync" parameters="Table=AMC_Links;Row=LINK_OK;Column=_2;Status=1" mask="0x00080000"/>
+         <node id="TTC_LOCKED_MASK" address="0x00000e0d" permission="r" description="1 if corresponding AMC enabled and TTC locked" parameters="Table=AMC_Trigger;Row=TTC_LOCKED;Column=_2;Status=2;Show=z" mask="0x00080000"/>
+         <node id="TTS_ENCODED" address="0x00000e1a" permission="r" description="MSB..LSB: DIS,ERR,SYN,BSY,OFW" parameters="Table=AMC_Links;Row=TTS_Encoded;Column=_2;Status=2;Show=nz;Format=TTSEnc" mask="0x1f000000"/>
+         <node id="TTS_RAW" address="0x00000e77" permission="r" description="Raw TTS from AMC" parameters="Table=AMC_Links;Row=TTS_Raw;Column=_2;Status=2;Format=TTSRaw" mask="0x00000000"/>
+         <node id="WAS_DISC" address="0x00000e1a" permission="r" description="TTC was in disconnected state" parameters="Table=AMC_Links;Row=Disc;Column=_2;Status=2;Show=nz" mask="0x80000000"/>
+         <node id="WAS_ERR" address="0x00000e1a" permission="r" description="TTC was in error state" parameters="Table=AMC_Links;Row=Err;Column=_2;Status=2;Show=nz" mask="0x40000000"/>
+         <node id="WAS_SYN" address="0x00000e1a" permission="r" description="TTC was in sync lost state" parameters="Table=AMC_Links;Row=Syn;Column=_2;Status=2;Show=nz" mask="0x20000000"/>
       </node>
       <node id="AMC05">
          <node id="AMC_LINK_READY_MASK" address="0x00000003" permission="r" description="'1' indicates AMC1..12 Link Ready" parameters="Table=AMC_Links;Row=AMC_LINK_READY;Column=AMC05;Status=1" mask="0x00100000"/>
          <node id="BC0_LOCKED_MASK" address="0x00000006" permission="r" description="AMC1..12 BC0 locked (local trigger only)" parameters="Table=AMC_Links;Row=BC0_LOCKED;Column=AMC05;Status=3" mask="0x00100000"/>
+         <node id="BP_CRC_ERR" address="0x00000e24" permission="r" description="Backplane link CRC error" parameters="Table=AMC_Links;Row=BP_Err;Column=_2;Status=1;Show=nz"/>
          <node id="COUNTERS" module="file://AMCCounters.xml" address="0x00000a00" />
-         <node id="LINK_BUFFER_FULL" address="0x00000e0c" permission="" description="AMC_LINK buffer is full" parameters="Table=AMC_Links;Row=Link_Buffer_Full;Column=AMC05;Status=2;Show=nz" mask="0x00100000"/>
-         <node id="LINK_VERS_WRONG_MASK" address="0x00000005" permission="r" description="'1' AMC1..12 link version wrong" parameters="Table=AMC_Links;Row=LINK_VERS_WRONG;Column=AMC05;Status=1;Show=nz" mask="0x00000010"/>
-         <node id="LOSS_OF_SYNC_MASK" address="0x00000005" permission="r" description="'0' AMC1..12 loss of sync" parameters="Table=AMC_Links;Row=LOSS_OF_SYNC;Column=AMC05;Status=1;Show=nz" mask="0x00100000"/>
-         <node id="TTC_LOCKED_MASK" address="0x00000e0d" permission="r" description="1 if corresponding AMC enabled and TTC locked" parameters="Table=AMC_Trigger;Row=TTC_LOCKED;Column=AMC05;Status=2;Show=z" mask="0x00100000"/>
-         <node id="TTS_ENCODED" address="0x00000e1b" permission="r" description="MSB..LSB: DIS,ERR,SYN,BSY,OFW" parameters="Table=AMC_Links;Row=TTS_Encoded;Column=AMC05;Status=2;Show=nz;Format=TTSEnc" mask="0x0000001f"/>
-         <node id="TTS_RAW" address="0x00000e87" permission="r" description="Raw TTS from AMC13 card" parameters="Table=AMC_Links;Row=TTS_Raw;Column=AMC05;Status=2;Format=TTSRaw" mask="0x00000000"/>
+         <node id="LINK" module="file://AMCLinks.xml" address="0x00000e80" />
+         <node id="LINK_BUFFER_FULL" address="0x00000e0c" permission="" description="AMC_LINK buffer is full" parameters="Table=AMC_Links;Row=Link_Buffer_Full;Column=_2;Status=2;Show=nz" mask="0x00100000"/>
+         <node id="LINK_VERS_WRONG_MASK" address="0x00000005" permission="r" description="'1' AMC1..12 link version wrong" parameters="Table=AMC_Links;Row=LINK_VERS_WRONG;Column=_2;Status=1;Show=nz" mask="0x00000010"/>
+         <node id="LOSS_OF_SYNC_MASK" address="0x00000005" permission="r" description="'0' AMC1..12 loss of sync" parameters="Table=AMC_Links;Row=LINK_OK;Column=_2;Status=1" mask="0x00100000"/>
+         <node id="TTC_LOCKED_MASK" address="0x00000e0d" permission="r" description="1 if corresponding AMC enabled and TTC locked" parameters="Table=AMC_Trigger;Row=TTC_LOCKED;Column=_2;Status=2;Show=z" mask="0x00100000"/>
+         <node id="TTS_ENCODED" address="0x00000e1b" permission="r" description="MSB..LSB: DIS,ERR,SYN,BSY,OFW" parameters="Table=AMC_Links;Row=TTS_Encoded;Column=_2;Status=2;Show=nz;Format=TTSEnc" mask="0x0000001f"/>
+         <node id="TTS_RAW" address="0x00000e87" permission="r" description="Raw TTS from AMC" parameters="Table=AMC_Links;Row=TTS_Raw;Column=_2;Status=2;Format=TTSRaw" mask="0x00000000"/>
+         <node id="WAS_DISC" address="0x00000e1b" permission="r" description="TTC was in disconnected state" parameters="Table=AMC_Links;Row=Disc;Column=_2;Status=2;Show=nz" mask="0x00000080"/>
+         <node id="WAS_ERR" address="0x00000e1b" permission="r" description="TTC was in error state" parameters="Table=AMC_Links;Row=Err;Column=_2;Status=2;Show=nz" mask="0x00000040"/>
+         <node id="WAS_SYN" address="0x00000e1b" permission="r" description="TTC was in sync lost state" parameters="Table=AMC_Links;Row=Syn;Column=_2;Status=2;Show=nz" mask="0x00000020"/>
       </node>
       <node id="AMC06">
          <node id="AMC_LINK_READY_MASK" address="0x00000003" permission="r" description="'1' indicates AMC1..12 Link Ready" parameters="Table=AMC_Links;Row=AMC_LINK_READY;Column=AMC06;Status=1" mask="0x00200000"/>
          <node id="BC0_LOCKED_MASK" address="0x00000006" permission="r" description="AMC1..12 BC0 locked (local trigger only)" parameters="Table=AMC_Links;Row=BC0_LOCKED;Column=AMC06;Status=3" mask="0x00200000"/>
+         <node id="BP_CRC_ERR" address="0x00000e25" permission="r" description="Backplane link CRC error" parameters="Table=AMC_Links;Row=BP_Err;Column=_2;Status=1;Show=nz"/>
          <node id="COUNTERS" module="file://AMCCounters.xml" address="0x00000a80" />
-         <node id="LINK_BUFFER_FULL" address="0x00000e0c" permission="" description="AMC_LINK buffer is full" parameters="Table=AMC_Links;Row=Link_Buffer_Full;Column=AMC06;Status=2;Show=nz" mask="0x00200000"/>
-         <node id="LINK_VERS_WRONG_MASK" address="0x00000005" permission="r" description="'1' AMC1..12 link version wrong" parameters="Table=AMC_Links;Row=LINK_VERS_WRONG;Column=AMC06;Status=1;Show=nz" mask="0x00000020"/>
-         <node id="LOSS_OF_SYNC_MASK" address="0x00000005" permission="r" description="'0' AMC1..12 loss of sync" parameters="Table=AMC_Links;Row=LOSS_OF_SYNC;Column=AMC06;Status=1;Show=nz" mask="0x00200000"/>
-         <node id="TTC_LOCKED_MASK" address="0x00000e0d" permission="r" description="1 if corresponding AMC enabled and TTC locked" parameters="Table=AMC_Trigger;Row=TTC_LOCKED;Column=AMC06;Status=2;Show=z" mask="0x00200000"/>
-         <node id="TTS_ENCODED" address="0x00000e1b" permission="r" description="MSB..LSB: DIS,ERR,SYN,BSY,OFW" parameters="Table=AMC_Links;Row=TTS_Encoded;Column=AMC06;Status=2;Show=nz;Format=TTSEnc" mask="0x00001f00"/>
-         <node id="TTS_RAW" address="0x00000e97" permission="r" description="Raw TTS from AMC13 card" parameters="Table=AMC_Links;Row=TTS_Raw;Column=AMC06;Status=2;Format=TTSRaw" mask="0x00000000"/>
+         <node id="LINK" module="file://AMCLinks.xml" address="0x00000e90" />
+         <node id="LINK_BUFFER_FULL" address="0x00000e0c" permission="" description="AMC_LINK buffer is full" parameters="Table=AMC_Links;Row=Link_Buffer_Full;Column=_2;Status=2;Show=nz" mask="0x00200000"/>
+         <node id="LINK_VERS_WRONG_MASK" address="0x00000005" permission="r" description="'1' AMC1..12 link version wrong" parameters="Table=AMC_Links;Row=LINK_VERS_WRONG;Column=_2;Status=1;Show=nz" mask="0x00000020"/>
+         <node id="LOSS_OF_SYNC_MASK" address="0x00000005" permission="r" description="'0' AMC1..12 loss of sync" parameters="Table=AMC_Links;Row=LINK_OK;Column=_2;Status=1" mask="0x00200000"/>
+         <node id="TTC_LOCKED_MASK" address="0x00000e0d" permission="r" description="1 if corresponding AMC enabled and TTC locked" parameters="Table=AMC_Trigger;Row=TTC_LOCKED;Column=_2;Status=2;Show=z" mask="0x00200000"/>
+         <node id="TTS_ENCODED" address="0x00000e1b" permission="r" description="MSB..LSB: DIS,ERR,SYN,BSY,OFW" parameters="Table=AMC_Links;Row=TTS_Encoded;Column=_2;Status=2;Show=nz;Format=TTSEnc" mask="0x00001f00"/>
+         <node id="TTS_RAW" address="0x00000e97" permission="r" description="Raw TTS from AMC" parameters="Table=AMC_Links;Row=TTS_Raw;Column=_2;Status=2;Format=TTSRaw" mask="0x00000000"/>
+         <node id="WAS_DISC" address="0x00000e1b" permission="r" description="TTC was in disconnected state" parameters="Table=AMC_Links;Row=Disc;Column=_2;Status=2;Show=nz" mask="0x00008000"/>
+         <node id="WAS_ERR" address="0x00000e1b" permission="r" description="TTC was in error state" parameters="Table=AMC_Links;Row=Err;Column=_2;Status=2;Show=nz" mask="0x00004000"/>
+         <node id="WAS_SYN" address="0x00000e1b" permission="r" description="TTC was in sync lost state" parameters="Table=AMC_Links;Row=Syn;Column=_2;Status=2;Show=nz" mask="0x00002000"/>
       </node>
       <node id="AMC07">
          <node id="AMC_LINK_READY_MASK" address="0x00000003" permission="r" description="'1' indicates AMC1..12 Link Ready" parameters="Table=AMC_Links;Row=AMC_LINK_READY;Column=AMC07;Status=1" mask="0x00400000"/>
          <node id="BC0_LOCKED_MASK" address="0x00000006" permission="r" description="AMC1..12 BC0 locked (local trigger only)" parameters="Table=AMC_Links;Row=BC0_LOCKED;Column=AMC07;Status=3" mask="0x00400000"/>
+         <node id="BP_CRC_ERR" address="0x00000e26" permission="r" description="Backplane link CRC error" parameters="Table=AMC_Links;Row=BP_Err;Column=_2;Status=1;Show=nz"/>
          <node id="COUNTERS" module="file://AMCCounters.xml" address="0x00000b00" />
-         <node id="LINK_BUFFER_FULL" address="0x00000e0c" permission="" description="AMC_LINK buffer is full" parameters="Table=AMC_Links;Row=Link_Buffer_Full;Column=AMC07;Status=2;Show=nz" mask="0x00400000"/>
-         <node id="LINK_VERS_WRONG_MASK" address="0x00000005" permission="r" description="'1' AMC1..12 link version wrong" parameters="Table=AMC_Links;Row=LINK_VERS_WRONG;Column=AMC07;Status=1;Show=nz" mask="0x00000040"/>
-         <node id="LOSS_OF_SYNC_MASK" address="0x00000005" permission="r" description="'0' AMC1..12 loss of sync" parameters="Table=AMC_Links;Row=LOSS_OF_SYNC;Column=AMC07;Status=1;Show=nz" mask="0x00400000"/>
-         <node id="TTC_LOCKED_MASK" address="0x00000e0d" permission="r" description="1 if corresponding AMC enabled and TTC locked" parameters="Table=AMC_Trigger;Row=TTC_LOCKED;Column=AMC07;Status=2;Show=z" mask="0x00400000"/>
-         <node id="TTS_ENCODED" address="0x00000e1b" permission="r" description="MSB..LSB: DIS,ERR,SYN,BSY,OFW" parameters="Table=AMC_Links;Row=TTS_Encoded;Column=AMC07;Status=2;Show=nz;Format=TTSEnc" mask="0x001f0000"/>
-         <node id="TTS_RAW" address="0x00000ea7" permission="r" description="Raw TTS from AMC13 card" parameters="Table=AMC_Links;Row=TTS_Raw;Column=AMC07;Status=2;Format=TTSRaw" mask="0x00000000"/>
+         <node id="LINK" module="file://AMCLinks.xml" address="0x00000ea0" />
+         <node id="LINK_BUFFER_FULL" address="0x00000e0c" permission="" description="AMC_LINK buffer is full" parameters="Table=AMC_Links;Row=Link_Buffer_Full;Column=_2;Status=2;Show=nz" mask="0x00400000"/>
+         <node id="LINK_VERS_WRONG_MASK" address="0x00000005" permission="r" description="'1' AMC1..12 link version wrong" parameters="Table=AMC_Links;Row=LINK_VERS_WRONG;Column=_2;Status=1;Show=nz" mask="0x00000040"/>
+         <node id="LOSS_OF_SYNC_MASK" address="0x00000005" permission="r" description="'0' AMC1..12 loss of sync" parameters="Table=AMC_Links;Row=LINK_OK;Column=_2;Status=1" mask="0x00400000"/>
+         <node id="TTC_LOCKED_MASK" address="0x00000e0d" permission="r" description="1 if corresponding AMC enabled and TTC locked" parameters="Table=AMC_Trigger;Row=TTC_LOCKED;Column=_2;Status=2;Show=z" mask="0x00400000"/>
+         <node id="TTS_ENCODED" address="0x00000e1b" permission="r" description="MSB..LSB: DIS,ERR,SYN,BSY,OFW" parameters="Table=AMC_Links;Row=TTS_Encoded;Column=_2;Status=2;Show=nz;Format=TTSEnc" mask="0x001f0000"/>
+         <node id="TTS_RAW" address="0x00000ea7" permission="r" description="Raw TTS from AMC" parameters="Table=AMC_Links;Row=TTS_Raw;Column=_2;Status=2;Format=TTSRaw" mask="0x00000000"/>
+         <node id="WAS_DISC" address="0x00000e1b" permission="r" description="TTC was in disconnected state" parameters="Table=AMC_Links;Row=Disc;Column=_2;Status=2;Show=nz" mask="0x00800000"/>
+         <node id="WAS_ERR" address="0x00000e1b" permission="r" description="TTC was in error state" parameters="Table=AMC_Links;Row=Err;Column=_2;Status=2;Show=nz" mask="0x00400000"/>
+         <node id="WAS_SYN" address="0x00000e1b" permission="r" description="TTC was in sync lost state" parameters="Table=AMC_Links;Row=Syn;Column=_2;Status=2;Show=nz" mask="0x00200000"/>
       </node>
       <node id="AMC08">
          <node id="AMC_LINK_READY_MASK" address="0x00000003" permission="r" description="'1' indicates AMC1..12 Link Ready" parameters="Table=AMC_Links;Row=AMC_LINK_READY;Column=AMC08;Status=1" mask="0x00800000"/>
          <node id="BC0_LOCKED_MASK" address="0x00000006" permission="r" description="AMC1..12 BC0 locked (local trigger only)" parameters="Table=AMC_Links;Row=BC0_LOCKED;Column=AMC08;Status=3" mask="0x00800000"/>
+         <node id="BP_CRC_ERR" address="0x00000e27" permission="r" description="Backplane link CRC error" parameters="Table=AMC_Links;Row=BP_Err;Column=_2;Status=1;Show=nz"/>
          <node id="COUNTERS" module="file://AMCCounters.xml" address="0x00000b80" />
-         <node id="LINK_BUFFER_FULL" address="0x00000e0c" permission="" description="AMC_LINK buffer is full" parameters="Table=AMC_Links;Row=Link_Buffer_Full;Column=AMC08;Status=2;Show=nz" mask="0x00800000"/>
-         <node id="LINK_VERS_WRONG_MASK" address="0x00000005" permission="r" description="'1' AMC1..12 link version wrong" parameters="Table=AMC_Links;Row=LINK_VERS_WRONG;Column=AMC08;Status=1;Show=nz" mask="0x00000080"/>
-         <node id="LOSS_OF_SYNC_MASK" address="0x00000005" permission="r" description="'0' AMC1..12 loss of sync" parameters="Table=AMC_Links;Row=LOSS_OF_SYNC;Column=AMC08;Status=1;Show=nz" mask="0x00800000"/>
-         <node id="TTC_LOCKED_MASK" address="0x00000e0d" permission="r" description="1 if corresponding AMC enabled and TTC locked" parameters="Table=AMC_Trigger;Row=TTC_LOCKED;Column=AMC08;Status=2;Show=z" mask="0x00800000"/>
-         <node id="TTS_ENCODED" address="0x00000e1b" permission="r" description="MSB..LSB: DIS,ERR,SYN,BSY,OFW" parameters="Table=AMC_Links;Row=TTS_Encoded;Column=AMC08;Status=2;Show=nz;Format=TTSEnc" mask="0x1f000000"/>
-         <node id="TTS_RAW" address="0x00000eb7" permission="r" description="Raw TTS from AMC13 card" parameters="Table=AMC_Links;Row=TTS_Raw;Column=AMC08;Status=2;Format=TTSRaw" mask="0x00000000"/>
+         <node id="LINK" module="file://AMCLinks.xml" address="0x00000eb0" />
+         <node id="LINK_BUFFER_FULL" address="0x00000e0c" permission="" description="AMC_LINK buffer is full" parameters="Table=AMC_Links;Row=Link_Buffer_Full;Column=_2;Status=2;Show=nz" mask="0x00800000"/>
+         <node id="LINK_VERS_WRONG_MASK" address="0x00000005" permission="r" description="'1' AMC1..12 link version wrong" parameters="Table=AMC_Links;Row=LINK_VERS_WRONG;Column=_2;Status=1;Show=nz" mask="0x00000080"/>
+         <node id="LOSS_OF_SYNC_MASK" address="0x00000005" permission="r" description="'0' AMC1..12 loss of sync" parameters="Table=AMC_Links;Row=LINK_OK;Column=_2;Status=1" mask="0x00800000"/>
+         <node id="TTC_LOCKED_MASK" address="0x00000e0d" permission="r" description="1 if corresponding AMC enabled and TTC locked" parameters="Table=AMC_Trigger;Row=TTC_LOCKED;Column=_2;Status=2;Show=z" mask="0x00800000"/>
+         <node id="TTS_ENCODED" address="0x00000e1b" permission="r" description="MSB..LSB: DIS,ERR,SYN,BSY,OFW" parameters="Table=AMC_Links;Row=TTS_Encoded;Column=_2;Status=2;Show=nz;Format=TTSEnc" mask="0x1f000000"/>
+         <node id="TTS_RAW" address="0x00000eb7" permission="r" description="Raw TTS from AMC" parameters="Table=AMC_Links;Row=TTS_Raw;Column=_2;Status=2;Format=TTSRaw" mask="0x00000000"/>
+         <node id="WAS_DISC" address="0x00000e1b" permission="r" description="TTC was in disconnected state" parameters="Table=AMC_Links;Row=Disc;Column=_2;Status=2;Show=nz" mask="0x80000000"/>
+         <node id="WAS_ERR" address="0x00000e1b" permission="r" description="TTC was in error state" parameters="Table=AMC_Links;Row=Err;Column=_2;Status=2;Show=nz" mask="0x40000000"/>
+         <node id="WAS_SYN" address="0x00000e1b" permission="r" description="TTC was in sync lost state" parameters="Table=AMC_Links;Row=Syn;Column=_2;Status=2;Show=nz" mask="0x20000000"/>
       </node>
       <node id="AMC09">
          <node id="AMC_LINK_READY_MASK" address="0x00000003" permission="r" description="'1' indicates AMC1..12 Link Ready" parameters="Table=AMC_Links;Row=AMC_LINK_READY;Column=AMC09;Status=1" mask="0x01000000"/>
          <node id="BC0_LOCKED_MASK" address="0x00000006" permission="r" description="AMC1..12 BC0 locked (local trigger only)" parameters="Table=AMC_Links;Row=BC0_LOCKED;Column=AMC09;Status=3" mask="0x01000000"/>
+         <node id="BP_CRC_ERR" address="0x00000e28" permission="r" description="Backplane link CRC error" parameters="Table=AMC_Links;Row=BP_Err;Column=_2;Status=1;Show=nz"/>
          <node id="COUNTERS" module="file://AMCCounters.xml" address="0x00000c00" />
-         <node id="LINK_BUFFER_FULL" address="0x00000e0c" permission="" description="AMC_LINK buffer is full" parameters="Table=AMC_Links;Row=Link_Buffer_Full;Column=AMC09;Status=2;Show=nz" mask="0x01000000"/>
-         <node id="LINK_VERS_WRONG_MASK" address="0x00000005" permission="r" description="'1' AMC1..12 link version wrong" parameters="Table=AMC_Links;Row=LINK_VERS_WRONG;Column=AMC09;Status=1;Show=nz" mask="0x00000100"/>
-         <node id="LOSS_OF_SYNC_MASK" address="0x00000005" permission="r" description="'0' AMC1..12 loss of sync" parameters="Table=AMC_Links;Row=LOSS_OF_SYNC;Column=AMC09;Status=1;Show=nz" mask="0x01000000"/>
-         <node id="TTC_LOCKED_MASK" address="0x00000e0d" permission="r" description="1 if corresponding AMC enabled and TTC locked" parameters="Table=AMC_Trigger;Row=TTC_LOCKED;Column=AMC09;Status=2;Show=z" mask="0x01000000"/>
-         <node id="TTS_ENCODED" address="0x00000e1c" permission="r" description="MSB..LSB: DIS,ERR,SYN,BSY,OFW" parameters="Table=AMC_Links;Row=TTS_Encoded;Column=AMC09;Status=2;Show=nz;Format=TTSEnc" mask="0x0000001f"/>
-         <node id="TTS_RAW" address="0x00000ec7" permission="r" description="Raw TTS from AMC13 card" parameters="Table=AMC_Links;Row=TTS_Raw;Column=AMC09;Status=2;Format=TTSRaw" mask="0x00000000"/>
+         <node id="LINK" module="file://AMCLinks.xml" address="0x00000ec0" />
+         <node id="LINK_BUFFER_FULL" address="0x00000e0c" permission="" description="AMC_LINK buffer is full" parameters="Table=AMC_Links;Row=Link_Buffer_Full;Column=_2;Status=2;Show=nz" mask="0x01000000"/>
+         <node id="LINK_VERS_WRONG_MASK" address="0x00000005" permission="r" description="'1' AMC1..12 link version wrong" parameters="Table=AMC_Links;Row=LINK_VERS_WRONG;Column=_2;Status=1;Show=nz" mask="0x00000100"/>
+         <node id="LOSS_OF_SYNC_MASK" address="0x00000005" permission="r" description="'0' AMC1..12 loss of sync" parameters="Table=AMC_Links;Row=LINK_OK;Column=_2;Status=1" mask="0x01000000"/>
+         <node id="TTC_LOCKED_MASK" address="0x00000e0d" permission="r" description="1 if corresponding AMC enabled and TTC locked" parameters="Table=AMC_Trigger;Row=TTC_LOCKED;Column=_2;Status=2;Show=z" mask="0x01000000"/>
+         <node id="TTS_ENCODED" address="0x00000e1c" permission="r" description="MSB..LSB: DIS,ERR,SYN,BSY,OFW" parameters="Table=AMC_Links;Row=TTS_Encoded;Column=_2;Status=2;Show=nz;Format=TTSEnc" mask="0x0000001f"/>
+         <node id="TTS_RAW" address="0x00000ec7" permission="r" description="Raw TTS from AMC" parameters="Table=AMC_Links;Row=TTS_Raw;Column=_2;Status=2;Format=TTSRaw" mask="0x00000000"/>
+         <node id="WAS_DISC" address="0x00000e1c" permission="r" description="TTC was in disconnected state" parameters="Table=AMC_Links;Row=Disc;Column=_2;Status=2;Show=nz" mask="0x00000080"/>
+         <node id="WAS_ERR" address="0x00000e1c" permission="r" description="TTC was in error state" parameters="Table=AMC_Links;Row=Err;Column=_2;Status=2;Show=nz" mask="0x00000040"/>
+         <node id="WAS_SYN" address="0x00000e1c" permission="r" description="TTC was in sync lost state" parameters="Table=AMC_Links;Row=Syn;Column=_2;Status=2;Show=nz" mask="0x00000020"/>
       </node>
       <node id="AMC10">
          <node id="AMC_LINK_READY_MASK" address="0x00000003" permission="r" description="'1' indicates AMC1..12 Link Ready" parameters="Table=AMC_Links;Row=AMC_LINK_READY;Column=AMC10;Status=1" mask="0x02000000"/>
          <node id="BC0_LOCKED_MASK" address="0x00000006" permission="r" description="AMC1..12 BC0 locked (local trigger only)" parameters="Table=AMC_Links;Row=BC0_LOCKED;Column=AMC10;Status=3" mask="0x02000000"/>
+         <node id="BP_CRC_ERR" address="0x00000e29" permission="r" description="Backplane link CRC error" parameters="Table=AMC_Links;Row=BP_Err;Column=_2;Status=1;Show=nz"/>
          <node id="COUNTERS" module="file://AMCCounters.xml" address="0x00000c80" />
-         <node id="LINK_BUFFER_FULL" address="0x00000e0c" permission="" description="AMC_LINK buffer is full" parameters="Table=AMC_Links;Row=Link_Buffer_Full;Column=AMC10;Status=2;Show=nz" mask="0x02000000"/>
-         <node id="LINK_VERS_WRONG_MASK" address="0x00000005" permission="r" description="'1' AMC1..12 link version wrong" parameters="Table=AMC_Links;Row=LINK_VERS_WRONG;Column=AMC10;Status=1;Show=nz" mask="0x00000200"/>
-         <node id="LOSS_OF_SYNC_MASK" address="0x00000005" permission="r" description="'0' AMC1..12 loss of sync" parameters="Table=AMC_Links;Row=LOSS_OF_SYNC;Column=AMC10;Status=1;Show=nz" mask="0x02000000"/>
-         <node id="TTC_LOCKED_MASK" address="0x00000e0d" permission="r" description="1 if corresponding AMC enabled and TTC locked" parameters="Table=AMC_Trigger;Row=TTC_LOCKED;Column=AMC10;Status=2;Show=z" mask="0x02000000"/>
-         <node id="TTS_ENCODED" address="0x00000e1c" permission="r" description="MSB..LSB: DIS,ERR,SYN,BSY,OFW" parameters="Table=AMC_Links;Row=TTS_Encoded;Column=AMC10;Status=2;Show=nz;Format=TTSEnc" mask="0x00001f00"/>
-         <node id="TTS_RAW" address="0x00000ed7" permission="r" description="Raw TTS from AMC13 card" parameters="Table=AMC_Links;Row=TTS_Raw;Column=AMC10;Status=2;Format=TTSRaw" mask="0x00000000"/>
+         <node id="LINK" module="file://AMCLinks.xml" address="0x00000ed0" />
+         <node id="LINK_BUFFER_FULL" address="0x00000e0c" permission="" description="AMC_LINK buffer is full" parameters="Table=AMC_Links;Row=Link_Buffer_Full;Column=_2;Status=2;Show=nz" mask="0x02000000"/>
+         <node id="LINK_VERS_WRONG_MASK" address="0x00000005" permission="r" description="'1' AMC1..12 link version wrong" parameters="Table=AMC_Links;Row=LINK_VERS_WRONG;Column=_2;Status=1;Show=nz" mask="0x00000200"/>
+         <node id="LOSS_OF_SYNC_MASK" address="0x00000005" permission="r" description="'0' AMC1..12 loss of sync" parameters="Table=AMC_Links;Row=LINK_OK;Column=_2;Status=1" mask="0x02000000"/>
+         <node id="TTC_LOCKED_MASK" address="0x00000e0d" permission="r" description="1 if corresponding AMC enabled and TTC locked" parameters="Table=AMC_Trigger;Row=TTC_LOCKED;Column=_2;Status=2;Show=z" mask="0x02000000"/>
+         <node id="TTS_ENCODED" address="0x00000e1c" permission="r" description="MSB..LSB: DIS,ERR,SYN,BSY,OFW" parameters="Table=AMC_Links;Row=TTS_Encoded;Column=_2;Status=2;Show=nz;Format=TTSEnc" mask="0x00001f00"/>
+         <node id="TTS_RAW" address="0x00000ed7" permission="r" description="Raw TTS from AMC" parameters="Table=AMC_Links;Row=TTS_Raw;Column=_2;Status=2;Format=TTSRaw" mask="0x00000000"/>
+         <node id="WAS_DISC" address="0x00000e1c" permission="r" description="TTC was in disconnected state" parameters="Table=AMC_Links;Row=Disc;Column=_2;Status=2;Show=nz" mask="0x00008000"/>
+         <node id="WAS_ERR" address="0x00000e1c" permission="r" description="TTC was in error state" parameters="Table=AMC_Links;Row=Err;Column=_2;Status=2;Show=nz" mask="0x00004000"/>
+         <node id="WAS_SYN" address="0x00000e1c" permission="r" description="TTC was in sync lost state" parameters="Table=AMC_Links;Row=Syn;Column=_2;Status=2;Show=nz" mask="0x00002000"/>
       </node>
       <node id="AMC11">
          <node id="AMC_LINK_READY_MASK" address="0x00000003" permission="r" description="'1' indicates AMC1..12 Link Ready" parameters="Table=AMC_Links;Row=AMC_LINK_READY;Column=AMC11;Status=1" mask="0x04000000"/>
          <node id="BC0_LOCKED_MASK" address="0x00000006" permission="r" description="AMC1..12 BC0 locked (local trigger only)" parameters="Table=AMC_Links;Row=BC0_LOCKED;Column=AMC11;Status=3" mask="0x04000000"/>
+         <node id="BP_CRC_ERR" address="0x00000e2a" permission="r" description="Backplane link CRC error" parameters="Table=AMC_Links;Row=BP_Err;Column=_2;Status=1;Show=nz"/>
          <node id="COUNTERS" module="file://AMCCounters.xml" address="0x00000d00" />
-         <node id="LINK_BUFFER_FULL" address="0x00000e0c" permission="" description="AMC_LINK buffer is full" parameters="Table=AMC_Links;Row=Link_Buffer_Full;Column=AMC11;Status=2;Show=nz" mask="0x04000000"/>
-         <node id="LINK_VERS_WRONG_MASK" address="0x00000005" permission="r" description="'1' AMC1..12 link version wrong" parameters="Table=AMC_Links;Row=LINK_VERS_WRONG;Column=AMC11;Status=1;Show=nz" mask="0x00000400"/>
-         <node id="LOSS_OF_SYNC_MASK" address="0x00000005" permission="r" description="'0' AMC1..12 loss of sync" parameters="Table=AMC_Links;Row=LOSS_OF_SYNC;Column=AMC11;Status=1;Show=nz" mask="0x04000000"/>
-         <node id="TTC_LOCKED_MASK" address="0x00000e0d" permission="r" description="1 if corresponding AMC enabled and TTC locked" parameters="Table=AMC_Trigger;Row=TTC_LOCKED;Column=AMC11;Status=2;Show=z" mask="0x04000000"/>
-         <node id="TTS_ENCODED" address="0x00000e1c" permission="r" description="MSB..LSB: DIS,ERR,SYN,BSY,OFW" parameters="Table=AMC_Links;Row=TTS_Encoded;Column=AMC11;Status=2;Show=nz;Format=TTSEnc" mask="0x001f0000"/>
-         <node id="TTS_RAW" address="0x00000ee7" permission="r" description="Raw TTS from AMC13 card" parameters="Table=AMC_Links;Row=TTS_Raw;Column=AMC11;Status=2;Format=TTSRaw" mask="0x00000000"/>
+         <node id="LINK" module="file://AMCLinks.xml" address="0x00000ee0" />
+         <node id="LINK_BUFFER_FULL" address="0x00000e0c" permission="" description="AMC_LINK buffer is full" parameters="Table=AMC_Links;Row=Link_Buffer_Full;Column=_2;Status=2;Show=nz" mask="0x04000000"/>
+         <node id="LINK_VERS_WRONG_MASK" address="0x00000005" permission="r" description="'1' AMC1..12 link version wrong" parameters="Table=AMC_Links;Row=LINK_VERS_WRONG;Column=_2;Status=1;Show=nz" mask="0x00000400"/>
+         <node id="LOSS_OF_SYNC_MASK" address="0x00000005" permission="r" description="'0' AMC1..12 loss of sync" parameters="Table=AMC_Links;Row=LINK_OK;Column=_2;Status=1" mask="0x04000000"/>
+         <node id="TTC_LOCKED_MASK" address="0x00000e0d" permission="r" description="1 if corresponding AMC enabled and TTC locked" parameters="Table=AMC_Trigger;Row=TTC_LOCKED;Column=_2;Status=2;Show=z" mask="0x04000000"/>
+         <node id="TTS_ENCODED" address="0x00000e1c" permission="r" description="MSB..LSB: DIS,ERR,SYN,BSY,OFW" parameters="Table=AMC_Links;Row=TTS_Encoded;Column=_2;Status=2;Show=nz;Format=TTSEnc" mask="0x001f0000"/>
+         <node id="TTS_RAW" address="0x00000ee7" permission="r" description="Raw TTS from AMC" parameters="Table=AMC_Links;Row=TTS_Raw;Column=_2;Status=2;Format=TTSRaw" mask="0x00000000"/>
+         <node id="WAS_DISC" address="0x00000e1c" permission="r" description="TTC was in disconnected state" parameters="Table=AMC_Links;Row=Disc;Column=_2;Status=2;Show=nz" mask="0x00800000"/>
+         <node id="WAS_ERR" address="0x00000e1c" permission="r" description="TTC was in error state" parameters="Table=AMC_Links;Row=Err;Column=_2;Status=2;Show=nz" mask="0x00400000"/>
+         <node id="WAS_SYN" address="0x00000e1c" permission="r" description="TTC was in sync lost state" parameters="Table=AMC_Links;Row=Syn;Column=_2;Status=2;Show=nz" mask="0x00200000"/>
       </node>
       <node id="AMC12">
          <node id="AMC_LINK_READY_MASK" address="0x00000003" permission="r" description="'1' indicates AMC1..12 Link Ready" parameters="Table=AMC_Links;Row=AMC_LINK_READY;Column=AMC12;Status=1" mask="0x08000000"/>
          <node id="BC0_LOCKED_MASK" address="0x00000006" permission="r" description="AMC1..12 BC0 locked (local trigger only)" parameters="Table=AMC_Links;Row=BC0_LOCKED;Column=AMC12;Status=3" mask="0x08000000"/>
+         <node id="BP_CRC_ERR" address="0x00000e2b" permission="r" description="Backplane link CRC error" parameters="Table=AMC_Links;Row=BP_Err;Column=_2;Status=1;Show=nz"/>
          <node id="COUNTERS" module="file://AMCCounters.xml" address="0x00000d80" />
-         <node id="LINK_BUFFER_FULL" address="0x00000e0c" permission="" description="AMC_LINK buffer is full" parameters="Table=AMC_Links;Row=Link_Buffer_Full;Column=AMC12;Status=2;Show=nz" mask="0x08000000"/>
-         <node id="LINK_VERS_WRONG_MASK" address="0x00000005" permission="r" description="'1' AMC1..12 link version wrong" parameters="Table=AMC_Links;Row=LINK_VERS_WRONG;Column=AMC12;Status=1;Show=nz" mask="0x00000800"/>
-         <node id="LOSS_OF_SYNC_MASK" address="0x00000005" permission="r" description="'0' AMC1..12 loss of sync" parameters="Table=AMC_Links;Row=LOSS_OF_SYNC;Column=AMC12;Status=1;Show=nz" mask="0x08000000"/>
-         <node id="TTC_LOCKED_MASK" address="0x00000e0d" permission="r" description="1 if corresponding AMC enabled and TTC locked" parameters="Table=AMC_Trigger;Row=TTC_LOCKED;Column=AMC12;Status=2;Show=z" mask="0x08000000"/>
-         <node id="TTS_ENCODED" address="0x00000e1c" permission="r" description="MSB..LSB: DIS,ERR,SYN,BSY,OFW" parameters="Table=AMC_Links;Row=TTS_Encoded;Column=AMC12;Status=2;Show=nz;Format=TTSEnc" mask="0x1f000000"/>
-         <node id="TTS_RAW" address="0x00000ef7" permission="r" description="Raw TTS from AMC13 card" parameters="Table=AMC_Links;Row=TTS_Raw;Column=AMC12;Status=2;Format=TTSRaw" mask="0x00000000"/>
+         <node id="LINK" module="file://AMCLinks.xml" address="0x00000ef0" />
+         <node id="LINK_BUFFER_FULL" address="0x00000e0c" permission="" description="AMC_LINK buffer is full" parameters="Table=AMC_Links;Row=Link_Buffer_Full;Column=_2;Status=2;Show=nz" mask="0x08000000"/>
+         <node id="LINK_VERS_WRONG_MASK" address="0x00000005" permission="r" description="'1' AMC1..12 link version wrong" parameters="Table=AMC_Links;Row=LINK_VERS_WRONG;Column=_2;Status=1;Show=nz" mask="0x00000800"/>
+         <node id="LOSS_OF_SYNC_MASK" address="0x00000005" permission="r" description="'0' AMC1..12 loss of sync" parameters="Table=AMC_Links;Row=LINK_OK;Column=_2;Status=1" mask="0x08000000"/>
+         <node id="TTC_LOCKED_MASK" address="0x00000e0d" permission="r" description="1 if corresponding AMC enabled and TTC locked" parameters="Table=AMC_Trigger;Row=TTC_LOCKED;Column=_2;Status=2;Show=z" mask="0x08000000"/>
+         <node id="TTS_ENCODED" address="0x00000e1c" permission="r" description="MSB..LSB: DIS,ERR,SYN,BSY,OFW" parameters="Table=AMC_Links;Row=TTS_Encoded;Column=_2;Status=2;Show=nz;Format=TTSEnc" mask="0x1f000000"/>
+         <node id="TTS_RAW" address="0x00000ef7" permission="r" description="Raw TTS from AMC" parameters="Table=AMC_Links;Row=TTS_Raw;Column=_2;Status=2;Format=TTSRaw" mask="0x00000000"/>
+         <node id="WAS_DISC" address="0x00000e1c" permission="r" description="TTC was in disconnected state" parameters="Table=AMC_Links;Row=Disc;Column=_2;Status=2;Show=nz" mask="0x80000000"/>
+         <node id="WAS_ERR" address="0x00000e1c" permission="r" description="TTC was in error state" parameters="Table=AMC_Links;Row=Err;Column=_2;Status=2;Show=nz" mask="0x40000000"/>
+         <node id="WAS_SYN" address="0x00000e1c" permission="r" description="TTC was in sync lost state" parameters="Table=AMC_Links;Row=Syn;Column=_2;Status=2;Show=nz" mask="0x20000000"/>
       </node>
       <node id="AMC_LINK_READY_MASK" address="0x00000003" permission="r" description="'1' indicates AMC1..12 Link Ready" mask="0x0fff0000"/>
       <node id="AMC_TTC">
@@ -671,6 +756,13 @@
          <node id="BUSY_TIME_LO" address="0x0000004c" permission="r" description="busy time counter" parameters="Table=State_Timers;Row=Busy;Column=Count;Status=1;Show=nz"/>
          <node id="L1A_COUNT_HI" address="0x00000047" permission="r" description="" parameters="Table=Event_Builder;Row=L1A;Column=Count;Status=1" mask="0x0000ffff"/>
          <node id="L1A_COUNT_LO" address="0x00000046" permission="r" description="L1A counter" parameters="Table=Event_Builder;Row=L1A;Column=Count;Status=1"/>
+         <node id="L1A_RATE_HZ" address="0x0000002c" permission="r" description="L1A rate in Hz" parameters="Table=Event_Builder;Row=L1A;Column=RateHz;Status=1;Show=nz;Format=d"/>
+         <node id="L1A_WHEN_BSY_HI" address="0x00000055" permission="r" description="" parameters="Table=State_Timers;Row=L1A_in_BSY;Column=Count;Status=1;Show=nz" mask="0x0000ffff"/>
+         <node id="L1A_WHEN_BSY_LO" address="0x00000054" permission="r" description="L1A received when in BSY state" parameters="Table=State_Timers;Row=L1A_in_BSY;Column=Count;Status=1;Show=nz"/>
+         <node id="L1A_WHEN_OFW_HI" address="0x00000053" permission="r" description="" parameters="Table=State_Timers;Row=L1A_in_OFW;Column=Count;Status=1;Show=nz" mask="0x0000ffff"/>
+         <node id="L1A_WHEN_OFW_LO" address="0x00000052" permission="r" description="L1A received when in OFW state" parameters="Table=State_Timers;Row=L1A_in_OFW;Column=Count;Status=1;Show=nz"/>
+         <node id="L1A_WHEN_SYN_HI" address="0x00000057" permission="r" description="" parameters="Table=State_Timers;Row=L1A_in_SYN;Column=Count;Status=1;Show=nz" mask="0x0000ffff"/>
+         <node id="L1A_WHEN_SYN_LO" address="0x00000056" permission="r" description="L1A received when in SYN state" parameters="Table=State_Timers;Row=L1A_in_SYN;Column=Count;Status=1;Show=nz"/>
          <node id="OF_WARN_TIME_HI" address="0x00000051" permission="r" description="" parameters="Table=State_Timers;Row=Overflow_Warning;Column=Count;Status=1;Show=nz" mask="0x0000ffff"/>
          <node id="OF_WARN_TIME_LO" address="0x00000050" permission="r" description="L1A overflow warning time counter" parameters="Table=State_Timers;Row=Overflow_Warning;Column=Count;Status=1;Show=nz"/>
          <node id="READY_TIME_HI" address="0x0000004b" permission="r" description="" parameters="Table=State_Timers;Row=Ready;Column=Count;Status=1" mask="0x0000ffff"/>
@@ -685,22 +777,37 @@
       </node>
       <node id="LSC">
          <node id="SFP0">
-            <node id="BLOCK_COUNT" address="0x000000c8" permission="r" description="word count for SFP0" parameters="Table=Event_Builder;Row=Words;Column=SFP0;Status=1;Show=nz"/>
-            <node id="BUILT_EVENT_COUNT" address="0x000000c0" permission="r" description="SFP0 built event count" parameters="Table=Slink_Express;Row=Built_Events;Column=SFP0;Status=2;Show=nz"/>
+            <node id="BLOCK_COUNT" address="0x000000c8" permission="r" description="word count for SFP0" parameters="Table=Slink_Express;Row=Blocks;Column=SFP0;Status=1;Show=nz"/>
+            <node id="BUILT_EVENT_COUNT" address="0x000000c0" permission="r" description="SFP0 built event count" parameters="Table=Slink_Express;Row=Events;Column=SFP0;Status=2;Show=nz"/>
+            <node id="CMS_CRC_ERR" address="0x000000b3" permission="r" description="CMS CRC error" parameters="Table=Slink_Express;Row=CMS_CRC_Err;Column=SFP0;Status=1;Show=nz"/>
+            <node id="EVENT_LGTH_ERR" address="0x000000b6" permission="r" description="Event Length Error" parameters="Table=Slink_Express;Row=Event_Lgth_Err;Column=SFP0;Status=1;Show=nz"/>
+            <node id="EVENT_LGTH_SUM_HI" address="0x000000bb" permission="r" description="Sum of event lengths" parameters="Table=Slink_Express;Row=Event_Lgth_Sum;Column=SFP0;Status=2;Show=nz"/>
+            <node id="EVENT_LGTH_SUM_LO" address="0x000000ba" permission="r" description="Sum of event lengths" parameters="Table=Slink_Express;Row=Event_Lgth_Sum;Column=SFP0;Status=2;Show=nz"/>
+            <node id="LINK_FULL_N" address="0x000000d4" permission="r" description="SFP0 link full signal from sender core" parameters="Table=Slink_Express;Row=LinkNotFull;Column=SFP0;Status=1;Show=z" mask="0x00010000"/>
             <node id="SYNC_LOSS_COUNT" address="0x000000b0" permission="r" description="SFP0 sync loss count" parameters="Table=Slink_Express;Row=Sync_Loss;Column=SFP0;Status=2;Show=nz"/>
-            <node id="WORD_COUNT" address="0x000000c4" permission="r" description="event count for SFP0" parameters="Table=Event_Builder;Row=Events;Column=SFP0;Status=1;Show=nz"/>
+            <node id="WORD_COUNT" address="0x000000c4" permission="r" description="event count for SFP0" parameters="Table=Slink_Express;Row=Words;Column=SFP0;Status=1;Show=nz"/>
          </node>
          <node id="SFP1">
-            <node id="BLOCK_COUNT" address="0x000000c9" permission="r" description="word count for SFP1" parameters="Table=Event_Builder;Row=Words;Column=SFP1;Status=1;Show=nz"/>
-            <node id="BUILT_EVENT_COUNT" address="0x000000c1" permission="r" description="SFP1 built event count" parameters="Table=Slink_Express;Row=Built_Events;Column=SFP1;Status=2;Show=nz"/>
+            <node id="BLOCK_COUNT" address="0x000000c9" permission="r" description="word count for SFP1" parameters="Table=Slink_Express;Row=Blocks;Column=SFP1;Status=1;Show=nz"/>
+            <node id="BUILT_EVENT_COUNT" address="0x000000c1" permission="r" description="SFP1 built event count" parameters="Table=Slink_Express;Row=Events;Column=SFP1;Status=2;Show=nz"/>
+            <node id="CMS_CRC_ERR" address="0x000000b4" permission="r" description="CMS CRC error" parameters="Table=Slink_Express;Row=CMS_CRC_Err;Column=SFP1;Status=1;Show=nz"/>
+            <node id="EVENT_LGTH_ERR" address="0x000000b7" permission="r" description="Event Length Error" parameters="Table=Slink_Express;Row=Event_Lgth_Err;Column=SFP1;Status=1;Show=nz"/>
+            <node id="EVENT_LGTH_SUM_HI" address="0x000000bd" permission="r" description="Sum of event lengths" parameters="Table=Slink_Express;Row=Event_Lgth_Sum;Column=SFP1;Status=2;Show=nz"/>
+            <node id="EVENT_LGTH_SUM_LO" address="0x000000bc" permission="r" description="Sum of event lengths" parameters="Table=Slink_Express;Row=Event_Lgth_Sum;Column=SFP1;Status=2;Show=nz"/>
+            <node id="LINK_FULL_N" address="0x000000d4" permission="r" description="SFP1 link full signal from sender core" parameters="Table=Slink_Express;Row=LinkNotFull;Column=SFP1;Status=1;Show=z" mask="0x00020000"/>
             <node id="SYNC_LOSS_COUNT" address="0x000000b1" permission="r" description="SFP1 sync loss count" parameters="Table=Slink_Express;Row=Sync_Loss;Column=SFP1;Status=2;Show=nz"/>
-            <node id="WORD_COUNT" address="0x000000c5" permission="r" description="event count for SFP1" parameters="Table=Event_Builder;Row=Events;Column=SFP1;Status=1;Show=nz"/>
+            <node id="WORD_COUNT" address="0x000000c5" permission="r" description="event count for SFP1" parameters="Table=Slink_Express;Row=Words;Column=SFP1;Status=1;Show=nz"/>
          </node>
          <node id="SFP2">
-            <node id="BLOCK_COUNT" address="0x000000ca" permission="r" description="word count for SFP2" parameters="Table=Event_Builder;Row=Words;Column=SFP2;Status=1;Show=nz"/>
-            <node id="BUILT_EVENT_COUNT" address="0x000000c2" permission="r" description="SFP2 built event count" parameters="Table=Slink_Express;Row=Built_Events;Column=SFP2;Status=2;Show=nz"/>
+            <node id="BLOCK_COUNT" address="0x000000ca" permission="r" description="word count for SFP2" parameters="Table=Slink_Express;Row=Blocks;Column=SFP2;Status=1;Show=nz"/>
+            <node id="BUILT_EVENT_COUNT" address="0x000000c2" permission="r" description="SFP2 built event count" parameters="Table=Slink_Express;Row=Events;Column=SFP2;Status=2;Show=nz"/>
+            <node id="CMS_CRC_ERR" address="0x000000b5" permission="r" description="CMS CRC error" parameters="Table=Slink_Express;Row=CMS_CRC_Err;Column=SFP2;Status=1;Show=nz"/>
+            <node id="EVENT_LGTH_ERR" address="0x000000b8" permission="r" description="Event Length Error" parameters="Table=Slink_Express;Row=Event_Lgth_Err;Column=SFP2;Status=1;Show=nz"/>
+            <node id="EVENT_LGTH_SUM_HI" address="0x000000bf" permission="r" description="Sum of event lengths" parameters="Table=Slink_Express;Row=Event_Lgth_Sum;Column=SFP2;Status=2;Show=nz"/>
+            <node id="EVENT_LGTH_SUM_LO" address="0x000000be" permission="r" description="Sum of event lengths" parameters="Table=Slink_Express;Row=Event_Lgth_Sum;Column=SFP2;Status=2;Show=nz"/>
+            <node id="LINK_FULL_N" address="0x000000d4" permission="r" description="SFP2 link full signal from sender core" parameters="Table=Slink_Express;Row=LinkNotFull;Column=SFP2;Status=1;Show=z" mask="0x00040000"/>
             <node id="SYNC_LOSS_COUNT" address="0x000000b2" permission="r" description="SFP2 sync loss count" parameters="Table=Slink_Express;Row=Sync_Loss;Column=SFP2;Status=2;Show=nz"/>
-            <node id="WORD_COUNT" address="0x000000c6" permission="r" description="event count for SFP2" parameters="Table=Event_Builder;Row=Events;Column=SFP2;Status=1;Show=nz"/>
+            <node id="WORD_COUNT" address="0x000000c6" permission="r" description="event count for SFP2" parameters="Table=Slink_Express;Row=Words;Column=SFP2;Status=1;Show=nz"/>
          </node>
       </node>
       <node id="LTRIG">
@@ -929,54 +1036,86 @@
          <node id="WORDS_SFP1" address="0x0000000f" permission="r" description="SFP 1 monitored event size in 32-bit word. 0 if no data available" parameters="Table=Monitor_Buffer;Row=Words;Column=SFP1;Status=1;Show=nz" mask="0x0001ffff"/>
          <node id="WORDS_SFP2" address="0x0000001d" permission="r" description="SFP 2 monitored event size in 32-bit word. 0 if no data available" parameters="Table=Monitor_Buffer;Row=Words;Column=SFP2;Status=1;Show=nz" mask="0x0001ffff"/>
       </node>
-      <node id="SERIAL_NO" address="0x00000000" permission="r" description="T1 board SN" parameters="Table=0_Board;Row=Info;Column=SerialNo;Status=1" mask="0xff000000"/>
+      <node id="SERIAL_HI" address="0x00000000" permission="r" description="Serial Number High one bit" parameters="Table=0_Board;Row=info;Column=SerialNo;Status=1;Format=d" mask="0x00800000"/>
+      <node id="SERIAL_LO" address="0x00000000" permission="r" description="Serial Number Low eight bits" parameters="Table=0_Board;Row=info;Column=SerialNo;Status=1;Format=d" mask="0xff000000"/>
+      <node id="SERIAL_NO" address="0x00000000" permission="r" description="T1 board SN" parameters="Table=0_Board;Row=Info;Column=SerialNo;Status=1;Format=d" mask="0xff000000"/>
       <node id="SFP">
          <node id="ANY_DOWN" address="0x00000000" permission="r" description="reads '1' when any of the enabled SFP ports is down" parameters="Table=Slink_Express;Row=Any_Down;Column=L;Status=2;Show=nz" mask="0x00000001"/>
          <node id="RX_SIG_LOST_MASK" address="0x00000004" permission="r" description="'1' indicates SFP0..2 Receiver signal lost" mask="0x00000070"/>
          <node id="SFP0">
-            <node id="DAQLSC_STATUS_00" address="0x80" permission="r" description="SFP0 DAQ sender core status register_00" parameters="Table=Slink_Express;Row=Status_00;Column=SFP0;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_01" address="0x81" permission="r" description="SFP0 DAQ sender core status register_01" parameters="Table=Slink_Express;Row=Status_01;Column=SFP0;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_02" address="0x82" permission="r" description="SFP0 DAQ sender core status register_02" parameters="Table=Slink_Express;Row=Status_02;Column=SFP0;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_03" address="0x83" permission="r" description="SFP0 DAQ sender core status register_03" parameters="Table=Slink_Express;Row=Status_03;Column=SFP0;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_04" address="0x84" permission="r" description="SFP0 DAQ sender core status register_04" parameters="Table=Slink_Express;Row=Status_04;Column=SFP0;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_05" address="0x85" permission="r" description="SFP0 DAQ sender core status register_05" parameters="Table=Slink_Express;Row=Status_05;Column=SFP0;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_06" address="0x86" permission="r" description="SFP0 DAQ sender core status register_06" parameters="Table=Slink_Express;Row=Status_06;Column=SFP0;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_07" address="0x87" permission="r" description="SFP0 DAQ sender core status register_07" parameters="Table=Slink_Express;Row=Status_07;Column=SFP0;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_08" address="0x88" permission="r" description="SFP0 DAQ sender core status register_08" parameters="Table=Slink_Express;Row=Status_08;Column=SFP0;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_09" address="0x89" permission="r" description="SFP0 DAQ sender core status register_09" parameters="Table=Slink_Express;Row=Status_09;Column=SFP0;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_10" address="0x8a" permission="r" description="SFP0 DAQ sender core status register_10" parameters="Table=Slink_Express;Row=Status_10;Column=SFP0;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_11" address="0x8b" permission="r" description="SFP0 DAQ sender core status register_11" parameters="Table=Slink_Express;Row=Status_11;Column=SFP0;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_12" address="0x8c" permission="r" description="SFP0 DAQ sender core status register_12" parameters="Table=Slink_Express;Row=Status_12;Column=SFP0;Status=2;Show=nz"/>
+            <node id="LSC">
+               <node id="BACKP_COUNTER" address="0x00000089" permission="r" description="Number of clocks in the LinkFull state" parameters="Table=Slink_Express;Row=Backpressure_Time;Column=SFP0;Status=1;Show=nz"/>
+               <node id="BLOCKS_FREE" address="0x00000081" permission="r" description="'1' at least one block is free to receive data" parameters="Table=Slink_Express;Row=Blocks_Free;Column=SFP0;Status=2" mask="0x10000000"/>
+               <node id="BLOCKS_SENT" address="0x00000084" permission="r" description="Number of blocks sent by the core" parameters="Table=Slink_Express;Row=Blocks_Sent;Column=SFP0;Status=1;Show=nz"/>
+               <node id="BLOCK_READY_MASK" address="0x00000086" permission="r" description="'1' if block is ready to be sent" parameters="Table=Slink_Express;Row=Block_Ready_Mask;Column=SFP0;Status=3" mask="0x000000f0"/>
+               <node id="BLOCK_USED_MASK" address="0x00000086" permission="r" description="'1' if block is used" parameters="Table=Slink_Express;Row=Block_Used_Mask;Column=SFP0;Status=3" mask="0x0000000f"/>
+               <node id="CORE_STATUS" address="0x00000086" permission="r" description="Core status" parameters="Table=Slink_Express;Row=Core_Status;Column=SFP0;Status=3"/>
+               <node id="EVENTS_SENT" address="0x00000083" permission="r" description="Number of events sent by the core" parameters="Table=Slink_Express;Row=Events_Sent;Column=SFP0;Status=1;Show=nz"/>
+               <node id="EXPERT" address="0x0000008b" permission="r" description="For expert" parameters="Table=Slink_Express;Row=Expert_2;Column=SFP0;Status=3"/>
+               <node id="FSM_CLOSE" address="0x00000081" permission="r" description="FED state machine: 'close the block'" parameters="Table=Slink_Express;Row=FSM_close;Column=SFP0;Status=3;Show=nz" mask="0x00000004"/>
+               <node id="FSM_IDLE" address="0x00000081" permission="r" description="FED state machine: 'idle'" parameters="Table=Slink_Express;Row=FSM_idle;Column=SFP0;Status=3;Show=nz" mask="0x00000001"/>
+               <node id="FSM_READ" address="0x00000081" permission="r" description="FED state machine: 'read data from FED'" parameters="Table=Slink_Express;Row=FSM_read;Column=SFP0;Status=3;Show=nz" mask="0x00000002"/>
+               <node id="INITIALIZED" address="0x00000086" permission="r" description="'1' indicates the core is initialized" parameters="Table=Slink_Express;Row=Initialized;Column=SFP0;Status=1" mask="0x80000000"/>
+               <node id="LINK_Status" address="0x00000081" permission="r" description="SFP0 DAQ sender core status register 0" parameters="Table=Slink_Express;Row=Status_d;Column=SFP0;Status=3;Show=nz"/>
+               <node id="LINK_UP" address="0x00000081" permission="r" description="'1' means link is up, '0' link is down" parameters="Table=Slink_Express;Row=Link_Up;Column=SFP0;Status=1" mask="0x40000000"/>
+               <node id="NO_BACKPRESSURE" address="0x00000081" permission="r" description="'0' means link is in backpressure" parameters="Table=Slink_Express;Row=No_Backpressure;Column=SFP0;Status=1" mask="0x20000000"/>
+               <node id="PACKETS_RCVD" address="0x00000085" permission="r" description="Number of packets received" parameters="Table=Slink_Express;Row=Packets_Rcvd;Column=SFP0;Status=1;Show=nz"/>
+               <node id="PACKETS_SENT" address="0x00000087" permission="r" description="Packets sent count" parameters="Table=Slink_Express;Row=Packets_Sent;Column=SFP0;Status=1;Show=nz"/>
+               <node id="STATUS_BUILD" address="0x00000088" permission="r" description="For expert:  See docs for details" parameters="Table=Slink_Express;Row=Expert_1;Column=SFP0;Status=3"/>
+               <node id="TEST_MODE" address="0x00000081" permission="r" description="'1' means link is in test mode, '0' for FED data" parameters="Table=Slink_Express;Row=Test_Mode;Column=SFP0;Status=1" mask="0x80000000"/>
+               <node id="VERSION" address="0x0000008a" permission="r" description="Core version" parameters="Table=Slink_Express;Row=Revision;Column=SFP0;Status=1"/>
+               <node id="WORDS_SENT" address="0x00000082" permission="r" description="Number of 64 bit words sent by the core" parameters="Table=Slink_Express;Row=Words_Sent;Column=SFP0;Status=1;Show=nz"/>
+            </node>
          </node>
          <node id="SFP1">
-            <node id="DAQLSC_STATUS_00" address="0x90" permission="r" description="SFP1 DAQ sender core status register_00" parameters="Table=Slink_Express;Row=Status_00;Column=SFP1;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_01" address="0x91" permission="r" description="SFP1 DAQ sender core status register_01" parameters="Table=Slink_Express;Row=Status_01;Column=SFP1;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_02" address="0x92" permission="r" description="SFP1 DAQ sender core status register_02" parameters="Table=Slink_Express;Row=Status_02;Column=SFP1;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_03" address="0x93" permission="r" description="SFP1 DAQ sender core status register_03" parameters="Table=Slink_Express;Row=Status_03;Column=SFP1;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_04" address="0x94" permission="r" description="SFP1 DAQ sender core status register_04" parameters="Table=Slink_Express;Row=Status_04;Column=SFP1;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_05" address="0x95" permission="r" description="SFP1 DAQ sender core status register_05" parameters="Table=Slink_Express;Row=Status_05;Column=SFP1;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_06" address="0x96" permission="r" description="SFP1 DAQ sender core status register_06" parameters="Table=Slink_Express;Row=Status_06;Column=SFP1;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_07" address="0x97" permission="r" description="SFP1 DAQ sender core status register_07" parameters="Table=Slink_Express;Row=Status_07;Column=SFP1;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_08" address="0x98" permission="r" description="SFP1 DAQ sender core status register_08" parameters="Table=Slink_Express;Row=Status_08;Column=SFP1;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_09" address="0x99" permission="r" description="SFP1 DAQ sender core status register_09" parameters="Table=Slink_Express;Row=Status_09;Column=SFP1;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_10" address="0x9a" permission="r" description="SFP1 DAQ sender core status register_10" parameters="Table=Slink_Express;Row=Status_10;Column=SFP1;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_11" address="0x9b" permission="r" description="SFP1 DAQ sender core status register_11" parameters="Table=Slink_Express;Row=Status_11;Column=SFP1;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_12" address="0x9c" permission="r" description="SFP1 DAQ sender core status register_12" parameters="Table=Slink_Express;Row=Status_12;Column=SFP1;Status=2;Show=nz"/>
+            <node id="LSC">
+               <node id="BACKP_COUNTER" address="0x00000099" permission="r" description="Number of clocks in the LinkFull state" parameters="Table=Slink_Express;Row=Backpressure_Time;Column=SFP1;Status=1;Show=nz"/>
+               <node id="BLOCKS_FREE" address="0x00000091" permission="r" description="'1' at least one block is free to receive data" parameters="Table=Slink_Express;Row=Blocks_Free;Column=SFP1;Status=2" mask="0x10000000"/>
+               <node id="BLOCKS_SENT" address="0x00000094" permission="r" description="Number of blocks sent by the core" parameters="Table=Slink_Express;Row=Blocks_Sent;Column=SFP1;Status=1;Show=nz"/>
+               <node id="BLOCK_READY_MASK" address="0x00000096" permission="r" description="'1' if block is ready to be sent" parameters="Table=Slink_Express;Row=Block_Ready_Mask;Column=SFP1;Status=3" mask="0x000000f0"/>
+               <node id="BLOCK_USED_MASK" address="0x00000096" permission="r" description="'1' if block is used" parameters="Table=Slink_Express;Row=Block_Used_Mask;Column=SFP1;Status=3" mask="0x0000000f"/>
+               <node id="CORE_STATUS" address="0x00000096" permission="r" description="Core status" parameters="Table=Slink_Express;Row=Core_Status;Column=SFP1;Status=3"/>
+               <node id="EVENTS_SENT" address="0x00000093" permission="r" description="Number of events sent by the core" parameters="Table=Slink_Express;Row=Events_Sent;Column=SFP1;Status=1;Show=nz"/>
+               <node id="EXPERT" address="0x0000009b" permission="r" description="For expert" parameters="Table=Slink_Express;Row=Expert_2;Column=SFP1;Status=3"/>
+               <node id="FSM_CLOSE" address="0x00000091" permission="r" description="FED state machine: 'close the block'" parameters="Table=Slink_Express;Row=FSM_close;Column=SFP1;Status=3;Show=nz" mask="0x00000004"/>
+               <node id="FSM_IDLE" address="0x00000091" permission="r" description="FED state machine: 'idle'" parameters="Table=Slink_Express;Row=FSM_idle;Column=SFP1;Status=3;Show=nz" mask="0x00000001"/>
+               <node id="FSM_READ" address="0x00000091" permission="r" description="FED state machine: 'read data from FED'" parameters="Table=Slink_Express;Row=FSM_read;Column=SFP1;Status=3;Show=nz" mask="0x00000002"/>
+               <node id="INITIALIZED" address="0x00000096" permission="r" description="'1' indicates the core is initialized" parameters="Table=Slink_Express;Row=Initialized;Column=SFP1;Status=1" mask="0x80000000"/>
+               <node id="LINK_Status" address="0x00000091" permission="r" description="DAQ sender core status register 0" parameters="Table=Slink_Express;Row=Status_d;Column=SFP1;Status=3;Show=nz"/>
+               <node id="LINK_UP" address="0x00000091" permission="r" description="'1' means link is up, '0' link is down" parameters="Table=Slink_Express;Row=Link_Up;Column=SFP1;Status=1" mask="0x40000000"/>
+               <node id="NO_BACKPRESSURE" address="0x00000091" permission="r" description="'0' means link is in backpressure" parameters="Table=Slink_Express;Row=No_Backpressure;Column=SFP1;Status=1" mask="0x20000000"/>
+               <node id="PACKETS_RCVD" address="0x00000095" permission="r" description="Number of packets received" parameters="Table=Slink_Express;Row=Packets_Rcvd;Column=SFP1;Status=1;Show=nz"/>
+               <node id="PACKETS_SENT" address="0x00000097" permission="r" description="Packets sent count" parameters="Table=Slink_Express;Row=Packets_Sent;Column=SFP1;Status=1;Show=nz"/>
+               <node id="STATUS_BUILD" address="0x00000098" permission="r" description="For expert:  See docs for details" parameters="Table=Slink_Express;Row=Expert_1;Column=SFP1;Status=3"/>
+               <node id="TEST_MODE" address="0x00000091" permission="r" description="'1' means link is in test mode, '0' for FED data" parameters="Table=Slink_Express;Row=Test_Mode;Column=SFP1;Status=1" mask="0x80000000"/>
+               <node id="VERSION" address="0x0000009a" permission="r" description="Core version" parameters="Table=Slink_Express;Row=Revision;Column=SFP1;Status=1"/>
+               <node id="WORDS_SENT" address="0x00000092" permission="r" description="Number of 64 bit words sent by the core" parameters="Table=Slink_Express;Row=Words_Sent;Column=SFP1;Status=1;Show=nz"/>
+            </node>
          </node>
          <node id="SFP2">
-            <node id="DAQLSC_STATUS_00" address="0xa0" permission="r" description="SFP2 DAQ sender core status register_00" parameters="Table=Slink_Express;Row=Status_00;Column=SFP2;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_01" address="0xa1" permission="r" description="SFP2 DAQ sender core status register_01" parameters="Table=Slink_Express;Row=Status_01;Column=SFP2;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_02" address="0xa2" permission="r" description="SFP2 DAQ sender core status register_02" parameters="Table=Slink_Express;Row=Status_02;Column=SFP2;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_03" address="0xa3" permission="r" description="SFP2 DAQ sender core status register_03" parameters="Table=Slink_Express;Row=Status_03;Column=SFP2;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_04" address="0xa4" permission="r" description="SFP2 DAQ sender core status register_04" parameters="Table=Slink_Express;Row=Status_04;Column=SFP2;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_05" address="0xa5" permission="r" description="SFP2 DAQ sender core status register_05" parameters="Table=Slink_Express;Row=Status_05;Column=SFP2;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_06" address="0xa6" permission="r" description="SFP2 DAQ sender core status register_06" parameters="Table=Slink_Express;Row=Status_06;Column=SFP2;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_07" address="0xa7" permission="r" description="SFP2 DAQ sender core status register_07" parameters="Table=Slink_Express;Row=Status_07;Column=SFP2;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_08" address="0xa8" permission="r" description="SFP2 DAQ sender core status register_08" parameters="Table=Slink_Express;Row=Status_08;Column=SFP2;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_09" address="0xa9" permission="r" description="SFP2 DAQ sender core status register_09" parameters="Table=Slink_Express;Row=Status_09;Column=SFP2;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_10" address="0xaa" permission="r" description="SFP2 DAQ sender core status register_10" parameters="Table=Slink_Express;Row=Status_10;Column=SFP2;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_11" address="0xab" permission="r" description="SFP2 DAQ sender core status register_11" parameters="Table=Slink_Express;Row=Status_11;Column=SFP2;Status=2;Show=nz"/>
-            <node id="DAQLSC_STATUS_12" address="0xac" permission="r" description="SFP2 DAQ sender core status register_12" parameters="Table=Slink_Express;Row=Status_12;Column=SFP2;Status=2;Show=nz"/>
+            <node id="LSC">
+               <node id="BACKP_COUNTER" address="0x000000a9" permission="r" description="Number of clocks in the LinkFull state" parameters="Table=Slink_Express;Row=Backpressure_Time;Column=SFP2;Status=1;Show=nz"/>
+               <node id="BLOCKS_FREE" address="0x000000a1" permission="r" description="'1' at least one block is free to receive data" parameters="Table=Slink_Express;Row=Blocks_Free;Column=SFP2;Status=2" mask="0x10000000"/>
+               <node id="BLOCKS_SENT" address="0x000000a4" permission="r" description="Number of blocks sent by the core" parameters="Table=Slink_Express;Row=Blocks_Sent;Column=SFP2;Status=1;Show=nz"/>
+               <node id="BLOCK_READY_MASK" address="0x000000a6" permission="r" description="'1' if block is ready to be sent" parameters="Table=Slink_Express;Row=Block_Ready_Mask;Column=SFP2;Status=3" mask="0x000000f0"/>
+               <node id="BLOCK_USED_MASK" address="0x000000a6" permission="r" description="'1' if block is used" parameters="Table=Slink_Express;Row=Block_Used_Mask;Column=SFP2;Status=3" mask="0x0000000f"/>
+               <node id="CORE_STATUS" address="0x000000a6" permission="r" description="Core status" parameters="Table=Slink_Express;Row=Core_Status;Column=SFP2;Status=3"/>
+               <node id="EVENTS_SENT" address="0x000000a3" permission="r" description="Number of events sent by the core" parameters="Table=Slink_Express;Row=Events_Sent;Column=SFP2;Status=1;Show=nz"/>
+               <node id="EXPERT" address="0x000000ab" permission="r" description="For expert" parameters="Table=Slink_Express;Row=Expert_2;Column=SFP2;Status=3"/>
+               <node id="FSM_CLOSE" address="0x000000a1" permission="r" description="FED state machine: 'close the block'" parameters="Table=Slink_Express;Row=FSM_close;Column=SFP2;Status=3;Show=nz" mask="0x00000004"/>
+               <node id="FSM_IDLE" address="0x000000a1" permission="r" description="FED state machine: 'idle'" parameters="Table=Slink_Express;Row=FSM_idle;Column=SFP2;Status=3;Show=nz" mask="0x00000001"/>
+               <node id="FSM_READ" address="0x000000a1" permission="r" description="FED state machine: 'read data from FED'" parameters="Table=Slink_Express;Row=FSM_read;Column=SFP2;Status=3;Show=nz" mask="0x00000002"/>
+               <node id="INITIALIZED" address="0x000000a6" permission="r" description="'1' indicates the core is initialized" parameters="Table=Slink_Express;Row=Initialized;Column=SFP2;Status=1" mask="0x80000000"/>
+               <node id="LINK_Status" address="0x000000a1" permission="r" description="DAQ sender core status register 0" parameters="Table=Slink_Express;Row=Status_d;Column=SFP2;Status=3;Show=nz"/>
+               <node id="LINK_UP" address="0x000000a1" permission="r" description="'1' means link is up, '0' link is down" parameters="Table=Slink_Express;Row=Link_Up;Column=SFP2;Status=1" mask="0x40000000"/>
+               <node id="NO_BACKPRESSURE" address="0x000000a1" permission="r" description="'0' means link is in backpressure" parameters="Table=Slink_Express;Row=No_Backpressure;Column=SFP2;Status=1" mask="0x20000000"/>
+               <node id="PACKETS_RCVD" address="0x000000a5" permission="r" description="Number of packets received" parameters="Table=Slink_Express;Row=Packets_Rcvd;Column=SFP2;Status=1;Show=nz"/>
+               <node id="PACKETS_SENT" address="0x000000a7" permission="r" description="Packets sent count" parameters="Table=Slink_Express;Row=Packets_Sent;Column=SFP2;Status=1;Show=nz"/>
+               <node id="STATUS_BUILD" address="0x000000a8" permission="r" description="For expert:  See docs for details" parameters="Table=Slink_Express;Row=Expert_1;Column=SFP2;Status=3"/>
+               <node id="TEST_MODE" address="0x000000a1" permission="r" description="'1' means link is in test mode, '0' for FED data" parameters="Table=Slink_Express;Row=Test_Mode;Column=SFP2;Status=1" mask="0x80000000"/>
+               <node id="VERSION" address="0x000000aa" permission="r" description="Core version" parameters="Table=Slink_Express;Row=Revision;Column=SFP2;Status=1"/>
+               <node id="WORDS_SENT" address="0x000000a2" permission="r" description="Number of 64 bit words sent by the core" parameters="Table=Slink_Express;Row=Words_Sent;Column=SFP2;Status=1;Show=nz"/>
+            </node>
          </node>
          <node id="SFP_ABSENT_MASK" address="0x00000004" permission="r" description="'1' indicates SFP0..2 absent" mask="0x00000007"/>
          <node id="TTS_LOS_LOL" address="0x00000004" permission="r" description="'1' indicates TTC_LOS or TTC_LOL" parameters="Table=Slink_Express;Row=LOS_or_LOL;Column=TTC;Status=2;Show=nz" mask="0x00000080"/>
@@ -985,10 +1124,10 @@
          <node id="TX_FAULT_MASK" address="0x00000004" permission="r" description="'1' indicates SFP0..2 TxFault" mask="0x00000700"/>
       </node>
       <node id="SFP0">
-         <node id="DATA_READY_MASK" address="0x00000010" permission="r" description="event data ready in event buffer of event builders" parameters="Table=Event_Builder;Row=DATA_READY;Column=SFP0;Status=9" mask="0x00000001"/>
-         <node id="DDR3_WRITE_PORT_FULL" address="0x00000010" permission="r" description="ddr3 event data write port input FIFO full" parameters="Table=Event_Builder;Row=DDR3_FIFO_full;Column=SFP0;Status=9;Show=nz" mask="0x00001000"/>
-         <node id="DDR3_WRITE_PORT_READY_MASK" address="0x00000010" permission="r" description="ddr3 event data write port ready" parameters="Table=Event_Builder;Row=DDR3_WRITE_PORT_READY;Column=SFP0;Status=9" mask="0x00000100"/>
-         <node id="EVENT_SIZE_MASK" address="0x00000010" permission="r" description="event size in event buffer of event builders" parameters="Table=Event_Builder;Row=EvSiz_in_buffer;Column=SFP0;Status=9" mask="0x00000010"/>
+         <node id="DATA_READY_MASK" address="0x00000010" permission="r" description="event data ready in event buffer of event builders" parameters="Table=Event_Builder;Row=DATA_READY;Column=_2;Status=9" mask="0x00000001"/>
+         <node id="DDR3_WRITE_PORT_FULL" address="0x00000010" permission="r" description="ddr3 event data write port input FIFO full" parameters="Table=Event_Builder;Row=DDR3_FIFO_full;Column=_2;Status=9;Show=nz" mask="0x00001000"/>
+         <node id="DDR3_WRITE_PORT_READY_MASK" address="0x00000010" permission="r" description="ddr3 event data write port ready" parameters="Table=Event_Builder;Row=DDR3_WRITE_PORT_READY;Column=_2;Status=9" mask="0x00000100"/>
+         <node id="EVENT_SIZE_MASK" address="0x00000010" permission="r" description="event size in event buffer of event builders" parameters="Table=Event_Builder;Row=EvSiz_in_buffer;Column=_2;Status=9" mask="0x00000010"/>
          <node id="ROM" address="0x00000100" permission="r" description="SFP0 ROM data(first 128 bytes, little endian)" size="0x1f" parameters="Table=SFP_ROM;Row=ROM_Data;Column=SFP0;Status=9"/>
          <node id="RX_SIG_LOST_MASK" address="0x00000004" permission="r" description="'1' indicates SFP0..2 Receiver signal lost" parameters="Table=Slink_Express;Row=RX_SIG_LOST;Column=SFP0;Status=2;Show=nz" mask="0x00000010"/>
          <node id="SFP_ABSENT_MASK" address="0x00000004" permission="r" description="'1' indicates SFP0..2 absent" parameters="Table=Slink_Express;Row=SFP_ABSENT;Column=SFP0;Status=1;Show=nz" mask="0x00000001"/>
@@ -996,10 +1135,10 @@
          <node id="TX_FAULT_MASK" address="0x00000004" permission="r" description="'1' indicates SFP0..2 TxFault" parameters="Table=Slink_Express;Row=TX_FAULT;Column=SFP0;Status=2;Show=nz" mask="0x00000100"/>
       </node>
       <node id="SFP1">
-         <node id="DATA_READY_MASK" address="0x00000010" permission="r" description="event data ready in event buffer of event builders" parameters="Table=Event_Builder;Row=DATA_READY;Column=SFP1;Status=9" mask="0x00000002"/>
-         <node id="DDR3_WRITE_PORT_FULL" address="0x00000010" permission="r" description="ddr3 event data write port input FIFO full" parameters="Table=Event_Builder;Row=DDR3_FIFO_full;Column=SFP1;Status=9;Show=nz" mask="0x00002000"/>
-         <node id="DDR3_WRITE_PORT_READY_MASK" address="0x00000010" permission="r" description="ddr3 event data write port ready" parameters="Table=Event_Builder;Row=DDR3_WRITE_PORT_READY;Column=SFP1;Status=9" mask="0x00000200"/>
-         <node id="EVENT_SIZE_MASK" address="0x00000010" permission="r" description="event size in event buffer of event builders" parameters="Table=Event_Builder;Row=EvSiz_in_buffer;Column=SFP1;Status=9" mask="0x00000020"/>
+         <node id="DATA_READY_MASK" address="0x00000010" permission="r" description="event data ready in event buffer of event builders" parameters="Table=Event_Builder;Row=DATA_READY;Column=_2;Status=9" mask="0x00000002"/>
+         <node id="DDR3_WRITE_PORT_FULL" address="0x00000010" permission="r" description="ddr3 event data write port input FIFO full" parameters="Table=Event_Builder;Row=DDR3_FIFO_full;Column=_2;Status=9;Show=nz" mask="0x00002000"/>
+         <node id="DDR3_WRITE_PORT_READY_MASK" address="0x00000010" permission="r" description="ddr3 event data write port ready" parameters="Table=Event_Builder;Row=DDR3_WRITE_PORT_READY;Column=_2;Status=9" mask="0x00000200"/>
+         <node id="EVENT_SIZE_MASK" address="0x00000010" permission="r" description="event size in event buffer of event builders" parameters="Table=Event_Builder;Row=EvSiz_in_buffer;Column=_2;Status=9" mask="0x00000020"/>
          <node id="ROM" address="0x00000120" permission="r" description="SFP1 ROM data(first 128 bytes, little endian)" size="0x1f" parameters="Table=SFP_ROM;Row=ROM_Data;Column=SFP1;Status=9"/>
          <node id="RX_SIG_LOST_MASK" address="0x00000004" permission="r" description="'1' indicates SFP0..2 Receiver signal lost" parameters="Table=Slink_Express;Row=RX_SIG_LOST;Column=SFP1;Status=2;Show=nz" mask="0x00000020"/>
          <node id="SFP_ABSENT_MASK" address="0x00000004" permission="r" description="'1' indicates SFP0..2 absent" parameters="Table=Slink_Express;Row=SFP_ABSENT;Column=SFP1;Status=1;Show=nz" mask="0x00000002"/>
@@ -1007,10 +1146,10 @@
          <node id="TX_FAULT_MASK" address="0x00000004" permission="r" description="'1' indicates SFP0..2 TxFault" parameters="Table=Slink_Express;Row=TX_FAULT;Column=SFP1;Status=2;Show=nz" mask="0x00000200"/>
       </node>
       <node id="SFP2">
-         <node id="DATA_READY_MASK" address="0x00000010" permission="r" description="event data ready in event buffer of event builders" parameters="Table=Event_Builder;Row=DATA_READY;Column=SFP2;Status=9" mask="0x00000004"/>
-         <node id="DDR3_WRITE_PORT_FULL" address="0x00000010" permission="r" description="ddr3 event data write port input FIFO full" parameters="Table=Event_Builder;Row=DDR3_FIFO_full;Column=SFP2;Status=9;Show=nz" mask="0x00004000"/>
-         <node id="DDR3_WRITE_PORT_READY_MASK" address="0x00000010" permission="r" description="ddr3 event data write port ready" parameters="Table=Event_Builder;Row=DDR3_WRITE_PORT_READY;Column=SFP2;Status=9" mask="0x00000400"/>
-         <node id="EVENT_SIZE_MASK" address="0x00000010" permission="r" description="event size in event buffer of event builders" parameters="Table=Event_Builder;Row=EvSiz_in_buffer;Column=SFP2;Status=9" mask="0x00000040"/>
+         <node id="DATA_READY_MASK" address="0x00000010" permission="r" description="event data ready in event buffer of event builders" parameters="Table=Event_Builder;Row=DATA_READY;Column=_2;Status=9" mask="0x00000004"/>
+         <node id="DDR3_WRITE_PORT_FULL" address="0x00000010" permission="r" description="ddr3 event data write port input FIFO full" parameters="Table=Event_Builder;Row=DDR3_FIFO_full;Column=_2;Status=9;Show=nz" mask="0x00004000"/>
+         <node id="DDR3_WRITE_PORT_READY_MASK" address="0x00000010" permission="r" description="ddr3 event data write port ready" parameters="Table=Event_Builder;Row=DDR3_WRITE_PORT_READY;Column=_2;Status=9" mask="0x00000400"/>
+         <node id="EVENT_SIZE_MASK" address="0x00000010" permission="r" description="event size in event buffer of event builders" parameters="Table=Event_Builder;Row=EvSiz_in_buffer;Column=_2;Status=9" mask="0x00000040"/>
          <node id="ROM" address="0x00000140" permission="r" description="SFP2 ROM data(first 128 bytes, little endian)" size="0x1f" parameters="Table=SFP_ROM;Row=ROM_Data;Column=SFP2;Status=9"/>
          <node id="RX_SIG_LOST_MASK" address="0x00000004" permission="r" description="'1' indicates SFP0..2 Receiver signal lost" parameters="Table=Slink_Express;Row=RX_SIG_LOST;Column=SFP2;Status=2;Show=nz" mask="0x00000040"/>
          <node id="SFP_ABSENT_MASK" address="0x00000004" permission="r" description="'1' indicates SFP0..2 absent" parameters="Table=Slink_Express;Row=SFP_ABSENT;Column=SFP2;Status=1;Show=nz" mask="0x00000004"/>
@@ -1027,6 +1166,7 @@
          <node id="MULT_BIT_ERRORS_HI" address="0x00000043" permission="r" description="" parameters="Table=TTC_Rx;Row=Mult_Bit_error;Column=Count;Status=1;Show=nz" mask="0x0000ffff"/>
          <node id="MULT_BIT_ERRORS_LO" address="0x00000042" permission="r" description="TTC multi-bit error counter" parameters="Table=TTC_Rx;Row=Mult_Bit_error;Column=Count;Status=1;Show=nz"/>
          <node id="NOT_READY" address="0x00000000" permission="r" description="TTC not ready" parameters="Table=TTC_Rx;Row=State;Column=nRDY;Status=1;Show=nz" mask="0x00000020"/>
+         <node id="RESYNC_COUNT" address="0x0000001a" permission="rw" description="Count of TTC resync commands received" parameters="Table=TTC_Rx;Row=Resync;Column=Count;Status=1;Show=nz" mask="0xffff0000"/>
          <node id="ROM" address="0x00000160" permission="r" description="TTC/TTS SFP ROM data(first 128 bytes, little endian)" parameters="Table=SFP_ROM;Row=ROM_Data;Column=TTC;Status=9"/>
          <node id="SGL_BIT_ERROR" address="0x00000000" permission="r" description="TTC single bit error" parameters="Table=TTC_Rx;Row=State;Column=SGL;Status=1;Show=nz" mask="0x00000080"/>
          <node id="SGL_BIT_ERRORS_HI" address="0x00000041" permission="r" description="" parameters="Table=TTC_Rx;Row=Sgl_Bit_Error;Column=Count;Status=1;Show=nz" mask="0x0000ffff"/>

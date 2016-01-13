@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- Generated from temp.csv -->
+<!-- Input fields:  Address LoBit HiBit Permission Name Description P_Status P_Show P_Table P_Row P_Column P_Format-->
+<node id="TOP">
+   <node id="ACKNUM_A" address="0x02" permission="r" description="Guru meditation" parameters="Table=AMC_Links;Row=ACKNUM_a;Column=_2;Status=4" mask="0x0c000000"/>
+   <node id="AMC13_LINK_VER" address="0x08" permission="r" description="AMC13 Link Version" parameters="Table=AMC_Links;Row=AMC13_LINK_VER;Column=_2;Status=2" mask="0x00ff0000"/>
+   <node id="AMCRDY" address="0x02" permission="r" description="Guru meditation" parameters="Table=AMC_Links;Row=AMCRdy;Column=_2;Status=4" mask="0x01000000"/>
+   <node id="AMC_DATA_RDEN_WRD_CTR" address="0x05" permission="r" description="Guru meditation" parameters="Table=AMC_Links;Row=DataRdEnWrdCount;Column=_2;Status=4" mask="0x0000ffff"/>
+   <node id="AMC_LINK_VER" address="0x08" permission="r" description="AMC Link Version" parameters="Table=AMC_Links;Row=AMC_LINK_VER;Column=_2;Status=2" mask="0x000000ff"/>
+   <node id="AMC_TTS" address="0x07" permission="r" description="TTS received from AMC" parameters="Table=AMC_Links;Row=AMC_TTS;Column=_2;Status=2;Format=TTSRaw" mask="0x0000000f"/>
+   <node id="BC0_LOCK" address="0x03" permission="r" description="Guru meditation" parameters="Table=AMC_Links;Row=BC0_lock;Column=_2;Status=2" mask="0x00000004"/>
+   <node id="BLOCK32K" address="0x04" permission="r" description="Guru meditation" parameters="Table=AMC_Links;Row=block32k;Column=_2;Status=4" mask="0x80000000"/>
+   <node id="EVENTBUF_RA" address="0x00" permission="r" description="Guru meditation" parameters="Table=AMC_Links;Row=EVENTBUF_RA;Column=_2;Status=4" mask="0x3ffc0000"/>
+   <node id="EVENTBUF_WA" address="0x00" permission="r" description="Guru meditation" parameters="Table=AMC_Links;Row=EVENTBUF_WA;Column=_2;Status=4" mask="0x00003fff"/>
+   <node id="EVENTINFO_A" address="0x03" permission="r" description="Guru meditation" parameters="Table=AMC_Links;Row=EventInfo_a;Column=_2;Status=4" mask="0x0000f000"/>
+   <node id="EVENT_INFO_RD_DONE_TOGL" address="0x03" permission="r" description="Guru meditation" parameters="Table=AMC_Links;Row=EvtInfoRdDoneTogl;Column=_2;Status=4" mask="0x00000002"/>
+   <node id="EVENT_INFO_TOGL" address="0x03" permission="r" description="Guru meditation" parameters="Table=AMC_Links;Row=EvtInfoTogl;Column=_2;Status=4" mask="0x00000001"/>
+   <node id="EVENT_WC" address="0x04" permission="r" description="Guru meditation" parameters="Table=AMC_Links;Row=EventWC;Column=_2;Status=4" mask="0x000fffff"/>
+   <node id="GOT_AMC_BC0" address="0x03" permission="r" description="Guru meditation" parameters="Table=AMC_Links;Row=got_AMC_BC0;Column=_2;Status=4" mask="0x00000010"/>
+   <node id="INIT_LINK" address="0x02" permission="r" description="Guru meditation" parameters="Table=AMC_Links;Row=InitLink;Column=_2;Status=4" mask="0x00100000"/>
+   <node id="L1AINFO_RA" address="0x01" permission="r" description="Guru meditation" parameters="Table=AMC_Links;Row=L1AINFO_RA;Column=_2;Status=4" mask="0x0fff0000"/>
+   <node id="L1AINFO_WA" address="0x01" permission="r" description="Guru meditation" parameters="Table=AMC_Links;Row=L1AINFO_WA;Column=_2;Status=4" mask="0x000003ff"/>
+   <node id="L1AINFO_WAP" address="0x02" permission="r" description="Guru meditation" parameters="Table=AMC_Links;Row=L1Ainfo_wap;Column=_2;Status=4" mask="0x000000ff"/>
+   <node id="MISMATCH_BCN_N" address="0x09" permission="r" description="If '0', BcN mismatch" parameters="Table=AMC_Links;Row=Mismatch_BcN;Column=_2;Status=2;Show=z" mask="0x04000000"/>
+   <node id="MISMATCH_EVN_N" address="0x09" permission="r" description="If '0', EvN mismatch" parameters="Table=AMC_Links;Row=Mismatch_EvN;Column=_2;Status=2;Show=z" mask="0x02000000"/>
+   <node id="MISMATCH_LINK_TTS" address="0x09" permission="r" description="Link TTS on first mismatch of EvN/BcN/OrN" parameters="Table=AMC_Links;Row=Mismatch_TTS;Column=_2;Status=2" mask="0xf0000000"/>
+   <node id="MISMATCH_ORN_N" address="0x09" permission="r" description="If '0', OrN mismatch" parameters="Table=AMC_Links;Row=Mismatch_OrN;Column=_2;Status=2;Show=z" mask="0x08000000"/>
+   <node id="RESENDQUE_A" address="0x02" permission="r" description="Guru meditation" parameters="Table=AMC_Links;Row=ReSendQue_a;Column=_2;Status=4" mask="0xc0000000"/>
+   <node id="RESET_SYNC3" address="0x02" permission="r" description="Guru meditation" parameters="Table=AMC_Links;Row=reset_sync3;Column=_2;Status=4" mask="0x02000000"/>
+   <node id="RFIFO_A" address="0x02" permission="r" description="Guru meditation" parameters="Table=AMC_Links;Row=RFIFO_a;Column=_2;Status=4" mask="0x30000000"/>
+   <node id="RX_PLL_LOCK" address="0x02" permission="r" description="Guru meditation" parameters="Table=AMC_Links;Row=RxPllLock;Column=_2;Status=4" mask="0x00200000"/>
+   <node id="RX_RST_DONE" address="0x02" permission="r" description="Guru meditation" parameters="Table=AMC_Links;Row=RxRstDone;Column=_2;Status=4" mask="0x00400000"/>
+   <node id="TTC_LOCK" address="0x03" permission="r" description="Guru meditation" parameters="Table=AMC_Links;Row=TTC_lock;Column=_2;Status=2" mask="0x00000008"/>
+   <node id="TX_RST_DONE" address="0x02" permission="r" description="Guru meditation" parameters="Table=AMC_Links;Row=TxRstDone;Column=_2;Status=4" mask="0x00800000"/>
+   <node id="TX_STATE" address="0x02" permission="r" description="Guru meditation" parameters="Table=AMC_Links;Row=TxState;Column=_2;Status=4" mask="0x000f0000"/>
+</node>

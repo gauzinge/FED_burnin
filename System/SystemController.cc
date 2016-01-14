@@ -132,7 +132,6 @@ void SystemController::parseHWxml( const std::string& pFilename, std::ostream& o
             Fitel* cFitel = new Fitel( cBeId, cFitelNode.attribute( "FMC" ).as_int(), cFitelNode.attribute( "Id" ).as_int(), cFileName );
             cPixFED->addFitel(cFitel);
         }
-
         fPixFEDVector.push_back(cPixFED);
 
         PixFEDFWInterface* cTmpFWInterface = new PixFEDFWInterface(cBeBoardConnectionNode.attribute( "id" ).value(), cBeBoardConnectionNode.attribute( "uri" ).value(), cBeBoardConnectionNode.attribute("address_table").value() );

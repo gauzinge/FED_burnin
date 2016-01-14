@@ -75,7 +75,7 @@ void Fitel::loadfRegMap( const std::string& filename )
         file.close();
     }
     else
-        std::cerr << "The CBC Settings File " << filename << " could not be opened!" << std::endl;
+        std::cerr << "The Fitel Settings File " << filename << " could not be opened!" << std::endl;
 }
 
 

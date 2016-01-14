@@ -12,6 +12,8 @@
     <PixFED Id="0" boardType="CTA">
         <connection id="board0" uri="chtcp-2.0://cmsuppixch:10203?target=192.168.000.11:50001" address_table="file://settings/address_table.xml" />
         <!-- Trigger -->
+        <!--Used to set the CLK input to the TTC clock from the BP - 3 is XTAL, 0 is BP-->
+        <Register name="ctrl.ttc_xpoint_A_out3">0</Register>
         <Register name="pixfed_ctrl_regs.TRIGGER_SEL">1</Register>
         <Register name="pixfed_ctrl_regs.INT_TRIGGER_FREQ_SEL">9</Register>
         <!-- TBM MASK -->

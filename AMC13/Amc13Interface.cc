@@ -45,22 +45,22 @@ void Amc13Interface::ConfigureAmc13()
 
     //now configure the BGOs, loop through the list, get the properties and call the function
     int cIndex = 0;
-    if(!fDescription->fBGOs.empty())
+    if (!fDescription->fBGOs.empty())
     {
-    for (auto& cBGO : fDescription->fBGOs )
-    {
-        //fAMC13->configureBGOShort(cIndex, uint8_t(cBGO->fCommand), uint16_t(cBGO->fBX), uint16_t(cBGO->fPrescale), cBGO->fRepeat);
-        //fAMC13->enableBGO(cIndex);
-        std::cout << "Configured & enabling BGO Channel " << cIndex << " : Command: " << cBGO->fCommand << " BX: " << cBGO->fBX << " Prescale: " << cBGO->fPrescale << " Repetetive: " << cBGO->fRepeat << std::endl;
-        cIndex++;
-    }
+        for (auto& cBGO : fDescription->fBGOs )
+        {
+            configureBGO(cIndex, uint8_t(cBGO->fCommand), uint16_t(cBGO->fBX), uint16_t(cBGO->fPrescale), cBGO->fRepeat);
+            enableBGO(cIndex);
+            std::cout << "Configured & enabling BGO Channel " << cIndex << " : Command: " << cBGO->fCommand << " BX: " << cBGO->fBX << " Prescale: " << cBGO->fPrescale << " Repetetive: " << cBGO->fRepeat << std::endl;
+            cIndex++;
+        }
     }
 
     // now configure the Trigger
-    if(fDescription->fTrigger != nullptr)
+    if (fDescription->fTrigger != nullptr)
     {
-    fAMC13->configureLocalL1A(fDescription->fTrigger->fLocal, fDescription->fTrigger->fMode, uint32_t(fDescription->fTrigger->fBurst), uint32_t(fDescription->fTrigger->fRate), fDescription->fTrigger->fRules );
-    std::cout << "Configuring local L1A: Mode: " << fDescription->fTrigger->fMode << " Rate: " << fDescription->fTrigger->fRate << " Burst: " << fDescription->fTrigger->fBurst << " Rules: " << fDescription->fTrigger->fRules << std::endl;
+        fAMC13->configureLocalL1A(fDescription->fTrigger->fLocal, fDescription->fTrigger->fMode, uint32_t(fDescription->fTrigger->fBurst), uint32_t(fDescription->fTrigger->fRate), fDescription->fTrigger->fRules );
+        std::cout << "Configuring local L1A: Mode: " << fDescription->fTrigger->fMode << " Rate: " << fDescription->fTrigger->fRate << " Burst: " << fDescription->fTrigger->fBurst << " Rules: " << fDescription->fTrigger->fRules << std::endl;
     }
     // if TTC simulator is enabled, the loopback fiber is required and no external TTC stream will be received, the Triggers are local by definition
     if (fDescription->fSimulate)
@@ -94,11 +94,6 @@ void Amc13Interface::BurstL1A()
 {
     fAMC13->sendL1ABurst();
 }
-
-//void Amc13Interface::SendBGO()
-//{
-//fAMC13->sendBGO();
-//}
 
 void Amc13Interface::EnableBGO(int pChan)
 {
@@ -167,6 +162,86 @@ void Amc13Interface::DumpTriggers(int pNlastEntries)
     }
 }
 
-//void Amc13Interface::HaltAMC13(){
-     
-//}
+void Amc13Interface::HaltAMC13()
+{
+    std::cout << "Resetting T1, T2 & all counters!" << std::endl;
+    fAMC13->reset(amc13::AMC13Simple::T1);
+    fAMC13->reset(amc13::AMC13Simple::T2);
+    // now reset the counters
+    fAMC13->resetCounters();
+}
+
+void Amc13Interface::ResetAMC13()
+{
+    std::cout << "Resetting T1, T2 & all counters! - Remind Georg to add OC0 and EC0 when you read this!" << std::endl;
+    fAMC13->reset(amc13::AMC13Simple::T1);
+    fAMC13->reset(amc13::AMC13Simple::T2);
+    // now reset the counters
+    fAMC13->resetCounters();
+}
+
+void Amc13Interface::configureBGO(int pChan, uint8_t pCommand, uint16_t pBX, uint16_t pPrescale, bool pRepeat)
+{
+    char tmp[32];
+
+    if ( pChan < 0 || pChan > 3)
+    {
+        amc13::Exception::UnexpectedRange e;
+        e.Append("AMC13::configureBGOShort() - channel must be in range 0 to 3");
+        throw e;
+    }
+
+    if ( pBX > 3563)
+    {
+        amc13::Exception::UnexpectedRange e;
+        e.Append("AMC13::configureBGOShort() - bx must be in range 0 to 3563");
+        throw e;
+    }
+
+    snprintf( tmp, sizeof(tmp), "CONF.TTC.BGO%d.%s", pChan, "COMMAND");
+    fAMC13->write( amc13::AMC13Simple::T1, tmp, pCommand);
+
+    snprintf( tmp, sizeof(tmp), "CONF.TTC.BGO%d.%s", pChan, "LONG_CMD");
+    fAMC13->write( amc13::AMC13Simple::T1, tmp, 0);
+
+    snprintf( tmp, sizeof(tmp), "CONF.TTC.BGO%d.%s", pChan, "BX");
+    fAMC13->write( amc13::AMC13Simple::T1, tmp, pBX);
+
+    snprintf( tmp, sizeof(tmp), "CONF.TTC.BGO%d.%s", pChan, "ORBIT_PRESCALE");
+    fAMC13->write( amc13::AMC13Simple::T1, tmp, pPrescale);
+
+    snprintf( tmp, sizeof(tmp), "CONF.TTC.BGO%d.%s", pChan, "ENABLE_SINGLE");
+    if ( !pRepeat)
+        fAMC13->write( amc13::AMC13Simple::T1, tmp, 1);
+    else
+        fAMC13->write( amc13::AMC13Simple::T1, tmp, 0);
+}
+
+void Amc13Interface::enableBGO(int pChan)
+{
+    char tmp[32];
+
+    if ( pChan < 0 || pChan > 3)
+    {
+        amc13::Exception::UnexpectedRange e;
+        e.Append("AMC13::enableBGO() - channel must be in range 0 to 3");
+        throw e;
+    }
+
+    snprintf( tmp, sizeof(tmp), "CONF.TTC.BGO%d.%s", pChan, "ENABLE");
+    fAMC13->write( amc13::AMC13Simple::T1, tmp, 1);
+}
+void Amc13Interface::disableBGO(int pChan)
+{
+    char tmp[32];
+
+    if ( pChan < 0 || pChan > 3)
+    {
+        amc13::Exception::UnexpectedRange e;
+        e.Append("AMC13::enableBGO() - channel must be in range 0 to 3");
+        throw e;
+    }
+
+    snprintf( tmp, sizeof(tmp), "CONF.TTC.BGO%d.%s", pChan, "ENABLE");
+    fAMC13->write( amc13::AMC13Simple::T1, tmp, 0);
+}

@@ -1,4 +1,4 @@
- #include <ctime>
+#include <ctime>
 #include <cstring>
 #include "uhal/uhal.hpp"
 #include "../Utils/Utilities.h"
@@ -9,8 +9,8 @@
 #include "../Utils/Data.h"
 void mypause()
 {
-        std::cout << "Press [Enter] to read FIFOs ...";
-            std::cin.get();
+    std::cout << "Press [Enter] to read FIFOs ...";
+    std::cin.get();
 
 }
 int main(int argc, char* argv[] )
@@ -53,5 +53,7 @@ int main(int argc, char* argv[] )
         cSystemController.fFEDInterface->readTransparentFIFO(cFED);
         cSystemController.fFEDInterface->readSpyFIFO(cFED);
     }
+
+    cAmc13Controller.fAmc13Interface->HaltAMC13();
     exit(0);
-}   
+}

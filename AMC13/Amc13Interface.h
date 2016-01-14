@@ -19,8 +19,10 @@ public:
         fDescription = pDescription;
     }
     // a long list of methods wrapping the BU AMC13 methods!
+    // Configure and Halt for something like a State Machine!
     void ConfigureAmc13();
-
+    void HaltAMC13();
+    void ResetAMC13();
     // Start / Stop L1A
     void StartL1A();
     void StopL1A();
@@ -44,6 +46,9 @@ private:
     {
         pRegValue ^= ( -pValue ^ pRegValue ) & ( 1 << pPos - 1 );
     }
+    void enableBGO(int pChan);
+    void disableBGO(int pChan);
+    void configureBGO(int pChan, uint8_t pCommand, uint16_t pBX, uint16_t pPrescale, bool pRepeat);
 };
 
 

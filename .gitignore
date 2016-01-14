@@ -3,6 +3,6 @@ bin/
 src/run
 src/fpgaconfig
 src/amc13test
-src/feconfig
+src/fedonfig
 logifle*
 *.txt

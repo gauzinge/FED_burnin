@@ -45,6 +45,8 @@ void Amc13Interface::ConfigureAmc13()
 
     //now configure the BGOs, loop through the list, get the properties and call the function
     int cIndex = 0;
+    if(!fDescription->fBGOs.empty())
+    {
     for (auto& cBGO : fDescription->fBGOs )
     {
         //fAMC13->configureBGOShort(cIndex, uint8_t(cBGO->fCommand), uint16_t(cBGO->fBX), uint16_t(cBGO->fPrescale), cBGO->fRepeat);
@@ -52,10 +54,14 @@ void Amc13Interface::ConfigureAmc13()
         std::cout << "Configured & enabling BGO Channel " << cIndex << " : Command: " << cBGO->fCommand << " BX: " << cBGO->fBX << " Prescale: " << cBGO->fPrescale << " Repetetive: " << cBGO->fRepeat << std::endl;
         cIndex++;
     }
+    }
 
     // now configure the Trigger
+    if(fDescription->fTrigger != nullptr)
+    {
     fAMC13->configureLocalL1A(fDescription->fTrigger->fLocal, fDescription->fTrigger->fMode, uint32_t(fDescription->fTrigger->fBurst), uint32_t(fDescription->fTrigger->fRate), fDescription->fTrigger->fRules );
     std::cout << "Configuring local L1A: Mode: " << fDescription->fTrigger->fMode << " Rate: " << fDescription->fTrigger->fRate << " Burst: " << fDescription->fTrigger->fBurst << " Rules: " << fDescription->fTrigger->fRules << std::endl;
+    }
     // if TTC simulator is enabled, the loopback fiber is required and no external TTC stream will be received, the Triggers are local by definition
     if (fDescription->fSimulate)
     {
@@ -160,3 +166,7 @@ void Amc13Interface::DumpTriggers(int pNlastEntries)
         std::cout << "Orbit: " << cOrbit << " - Bunch: " << (cBunch & 0xFFF) << " - Event Nr: " << (cEventNr & 0xFFFFFF) << " - Flags: " << cFlags << std::endl;
     }
 }
+
+//void Amc13Interface::HaltAMC13(){
+     
+//}

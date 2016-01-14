@@ -5,6 +5,7 @@
 #include "../HWDescription/PixFED.h"
 #include "../HWInterface/PixFEDInterface.h"
 #include "../System/SystemController.h"
+#include "../AMC13/Amc13Controller.h"
 #include "../Utils/Data.h"
 void mypause()
 {
@@ -22,15 +23,19 @@ int main(int argc, char* argv[] )
 
     // instantiate System Controller
     SystemController cSystemController;
+    Amc13Controller  cAmc13Controller;
 
     // initialize map of settings so I can know the proper number of acquisitions and TBMs
     cSystemController.InitializeSettings(cHWFile, std::cout);
 
     // initialize HWdescription from XML, beware, settings have to be read first
+    cAmc13Controller.InitializeAmc13( cHWFile, std::cout );
     cSystemController.InitializeHw(cHWFile, std::cout);
 
     // configure the HW
+    cAmc13Controller.ConfigureAmc13( std::cout );
     cSystemController.ConfigureHw(std::cout );
+
     auto cSetting = cSystemController.fSettingsMap.find("NAcq");
     int cNAcq = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 10;
 

@@ -92,7 +92,7 @@ void SystemController::parseHWxml( const std::string& pFilename, std::ostream& o
 
 
     // Iterate the BeBoard Node
-    for ( pugi::xml_node cBeBoardNode = doc.child( "HwDescription" ).child( "PixFED" ); cBeBoardNode; cBeBoardNode = cBeBoardNode.next_sibling() )
+    for ( pugi::xml_node cBeBoardNode = doc.child( "HwDescription" ).child( "PixFED" ); cBeBoardNode; cBeBoardNode = cBeBoardNode.next_sibling("PixFED") )
     {
 
         os << BOLDCYAN << cBeBoardNode.name() << "  " << cBeBoardNode.first_attribute().name() << " :" << cBeBoardNode.attribute( "Id" ).value() << RESET << std::endl;
@@ -105,7 +105,7 @@ void SystemController::parseHWxml( const std::string& pFilename, std::ostream& o
         std::cout << BOLDBLUE <<  "|" << "----" << "Board Id: " << BOLDYELLOW << cBeBoardConnectionNode.attribute("id").value() << BOLDBLUE << " URI: " << BOLDYELLOW << cBeBoardConnectionNode.attribute("uri").value() << BOLDBLUE << " Address Table: " << BOLDYELLOW << cBeBoardConnectionNode.attribute("address_table").value() << RESET << std::endl;
 
         // Iterate the BeBoardRegister Nodes
-        for ( pugi::xml_node cBeBoardRegNode = cBeBoardNode.child( "Register" ); cBeBoardRegNode; cBeBoardRegNode = cBeBoardRegNode.next_sibling() )
+        for ( pugi::xml_node cBeBoardRegNode = cBeBoardNode.child( "Register" ); cBeBoardRegNode; cBeBoardRegNode = cBeBoardRegNode.next_sibling("Register") )
         {
             std::string nodename = cBeBoardRegNode.name();
             if (nodename == "Register") os << BOLDCYAN << "|" << "----" << cBeBoardRegNode.name() << "  " << cBeBoardRegNode.first_attribute().name() << " :" << cBeBoardRegNode.attribute( "name" ).value() << " " << BOLDRED << atoi(cBeBoardRegNode.first_child().value()) << RESET << std:: endl;
@@ -119,20 +119,19 @@ void SystemController::parseHWxml( const std::string& pFilename, std::ostream& o
         if ( !cFilePrefix.empty() ) os << GREEN << "|" << std::endl <<  "|" << "----" << "Fitel Files Path : " << cFilePrefix << RESET << std::endl;
 
         // Iterate the Fitel node
-        for ( pugi::xml_node cFitelNode = cBeBoardNode.child( "Fitel" ); cFitelNode; cFitelNode = cFitelNode.next_sibling() )
+        for ( pugi::xml_node cFitelNode = cBeBoardNode.child( "Fitel" ); cFitelNode; cFitelNode = cFitelNode.next_sibling( "Fitel" ) )
         {
-            os << BOLDCYAN << "|" << "----" << cFitelNode.name() << "  " << cFitelNode.first_attribute().name() << " :" << cFitelNode.attribute( "FMC" ).value() << cFitelNode.attribute( "Id" ).value() << ", File: " << cFitelNode.attribute( "file" ).value() << RESET << std:: endl;
+            os << BOLDCYAN << "|" << "----" << cFitelNode.name() << "  " << cFitelNode.first_attribute().name() << " :" << cFitelNode.attribute( "FMC" ).as_int() << " " <<  cFitelNode.attribute( "Id" ).name() << " " << cFitelNode.attribute( "Id" ).as_int() << ", File: " << cFitelNode.attribute( "file" ).value() << RESET << std:: endl;
 
 
             std::string cFileName;
             if ( !cFilePrefix.empty() )
                 cFileName = cFilePrefix + cFitelNode.attribute( "file" ).value();
             else cFileName = cFitelNode.attribute( "file" ).value();
-
+            cPixFED->fFitelVector.clear();
             Fitel* cFitel = new Fitel( cBeId, cFitelNode.attribute( "FMC" ).as_int(), cFitelNode.attribute( "Id" ).as_int(), cFileName );
             cPixFED->addFitel(cFitel);
         }
-
         fPixFEDVector.push_back(cPixFED);
 
         PixFEDFWInterface* cTmpFWInterface = new PixFEDFWInterface(cBeBoardConnectionNode.attribute( "id" ).value(), cBeBoardConnectionNode.attribute( "uri" ).value(), cBeBoardConnectionNode.attribute("address_table").value() );

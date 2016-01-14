@@ -212,15 +212,15 @@
 
     <!-- HEPHY STATUS REGISERS -->
     <node id="hephy_firmware_version" address="0x40020000" mask="0xffffffff" permission="r" />
-    <node id="idel_individual_stat" address="0x40020001" mask="0xffffffff" permission="r" />
+    <node id="idel_individual_stat" address="0x40020001" mode="block" size="192" permission="r" />
 
     <!-- HEPHY CONTROL REGISTERS -->
     <node id="fe_ctrl_regs">
         <node id="decode_reset" address="0x40030000" mask="0x00000001" permission="w" />
         <node id="decode_reg_reset" address="0x40030000" mask="0x00000002" permission="w" />
-        <node id="idel_ctrl_reset" address="0x40030000" mask="0x00000003" permission="w" />
+        <node id="idel_ctrl_reset" address="0x40030000" mask="0x00000004" permission="w" />
         <node id="initialize_swap" address="0x40030000" mask="0x00000008" permission="w" />
-        <node id="idel_individual_ctrl" address="0x40030001" mask="0xffffffff" permission="w" />
+        <node id="idel_individual_ctrl" address="0x40030001" mode="block" size="48" permission="w" />
         <node id="fifo_config" address="0x40030031" permission="rw" >
             <node id="overflow_value" mask="0x000fffff" />
             <node id="channel_of_interest" mask="0x03f00000" />

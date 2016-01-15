@@ -95,6 +95,10 @@ public:
     * \param pPixFED
     */
     bool ConfigureBoard( const PixFED* pPixFED );
+    /*!
+     * \brief: Halt Board and put it back to safe state with internal Clock and golden Image FW
+     */
+    void HaltBoard();
     // Methods for management of FMCs
     /*!
      * \brief Disable FMC power

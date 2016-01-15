@@ -42,7 +42,11 @@ int main(int argc, char* argv[] )
     // get the board info of all boards and start the acquistion
     for (auto& cFED : cSystemController.fPixFEDVector)
     {
-        cSystemController.fFEDInterface->getBoardInfo(cFED);
+        for (auto& cFitel : cFED->fFitelVector)
+        {
+            cSystemController.fFEDInterface->ReadLightOnFibre(cFitel);
+        }
+        //cSystemController.fFEDInterface->getBoardInfo(cFED);
         cSystemController.fFEDInterface->findPhases(cFED, 0);
     }
 
@@ -53,7 +57,7 @@ int main(int argc, char* argv[] )
         cSystemController.fFEDInterface->readTransparentFIFO(cFED);
         cSystemController.fFEDInterface->readSpyFIFO(cFED);
     }
-
-    cAmc13Controller.fAmc13Interface->HaltAMC13();
+    cSystemController.HaltHw();
+    cAmc13Controller.HaltAmc13();
     exit(0);
 }

@@ -17,7 +17,7 @@ public:
 
     void InitializeAmc13( const std::string& pFilename, std::ostream& os = std::cout );
     void ConfigureAmc13( std::ostream& os = std::cout );
-
+    void HaltAmc13( std::ostream& os = std::cout );
 public:
 
     Amc13Interface* fAmc13Interface;

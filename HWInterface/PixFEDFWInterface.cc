@@ -169,8 +169,8 @@ void PixFEDFWInterface::findPhases(uint32_t pScopeFIFOCh)
 
     // initialize Phase Finding
     WriteReg("fe_ctrl_regs.initialize_swap", 1);
-    std::cout << "Initializing ..." << std::endl;
-    std::chrono::milliseconds cWait( 6000 );
+    std::cout << "Initializing Phase Finding ..." << std::endl << std::endl;
+    std::chrono::milliseconds cWait( 4000 );
     std::this_thread::sleep_for( cWait );
 
     //here I might do the print loop again as Helmut does it in the latest version of the PixFED python script
@@ -181,54 +181,24 @@ void PixFEDFWInterface::findPhases(uint32_t pScopeFIFOCh)
     std::cout <<  "Phase finding Results: " << std::endl;
 
     uint32_t cNChannel = 12;
-    std::vector<uint32_t> cReadValues = ReadBlockRegValue( "idel_individual_stat", cNChannel * 4 );
-    //
+    std::vector<uint32_t> cReadValues = ReadBlockRegValue( "idel_individual_stat_block", cNChannel * 4 );
+
+    std::cout << BOLDGREEN << "FIBRE CTRL_RDY CNTVAL_Hi CNTVAL_Lo   pattern:                     S H1 L1 H0 L0   W R" << RESET << std::endl;
     //for(uint32_t cChannel = 0; cChannel < 48; cChannel++){
     for (uint32_t cChannel = 0; cChannel < cNChannel; cChannel++)
     {
         prettyprintPhase(cReadValues, cChannel);
-        std::cout << GREEN << "Fibre: " <<  cChannel + 1 << RESET << "    " <<
-                  std::bitset<1>( (cReadValues.at( (cChannel * 4 ) + 0 ) >> 10 ) & 0x1 )   << "    " <<
-                  ((cReadValues.at( (cChannel * 4 ) + 0 ) >> 5  ) & 0x1f )  << "    " <<
-                  ((cReadValues.at( (cChannel * 4 ) + 0 )       ) & 0x1f ) << "    " <<
-                  BLUE << std::bitset<32>( cReadValues.at( (cChannel * 4 ) + 1 )) << RESET << "    " <<
-                  std::bitset<1>( (cReadValues.at( (cChannel * 4 ) + 2 ) >> 31 ) & 0x1 )  << " " <<
-                  ((cReadValues.at( (cChannel * 4 ) + 2 ) >> 23 ) & 0x1f)  << " " <<
-                  ((cReadValues.at( (cChannel * 4 ) + 2 ) >> 18 ) & 0x1f)  << " " <<
-                  ((cReadValues.at( (cChannel * 4 ) + 2 ) >> 13 ) & 0x1f ) << " " <<
-                  ((cReadValues.at( (cChannel * 4 ) + 2 ) >> 8  ) & 0x1f ) << " " <<
-                  ((cReadValues.at( (cChannel * 4 ) + 2 ) >> 5  ) & 0x7  ) << " " <<
-                  ((cReadValues.at( (cChannel * 4 ) + 2 )       ) & 0x1f ) << std::endl;
     }
 
     std::this_thread::sleep_for( cWait );
 
-    std::cout << "Monitoring Phases for selected Channel of Interest for 10 seconds ... " << std::endl;
+    std::cout << "Monitoring Phases for selected Channel of Interest for 10 seconds ... " << std::endl << std::endl;
+    std::cout << BOLDGREEN << "FIBRE CTRL_RDY CNTVAL_Hi CNTVAL_Lo   pattern:                     S H1 L1 H0 L0   W R" << RESET << std::endl;
     for (uint32_t cCounter = 0; cCounter < 10; cCounter++)
     {
         std::string cRegname = "idel_individual_stat.CH" + std::to_string(pScopeFIFOCh);
         std::vector<uint32_t> cReadValues = ReadBlockRegValue( cRegname, 4 );
-        prettyprintPhase(cReadValues, pScopeFIFOCh);
-        //cReadValues.clear();
-        //cReadValues = ReadBlockRegValue( "idel_individual_stat", pScopeFIFOCh * 4 );
-        //TODO: find a better fix for this! With a read-block reg at offset or so! This will have to be a modification to RegManager by adding an address offset parameter that is by default 0?
-        //uhal::ValWord<uint32_t> cValue0 = ReadAtAddress( 0x400200001 + (pScopeFIFOCh * 4 ) + 0);
-        //uhal::ValWord<uint32_t> cValue1 = ReadAtAddress( 0x400200001 + (pScopeFIFOCh * 4 ) + 1);
-        //uhal::ValWord<uint32_t> cValue2 = ReadAtAddress( 0x400200001 + (pScopeFIFOCh * 4 ) + 2);
-
-        //std::cout << "Fibre: " << pScopeFIFOCh + 1  << "    " <<
-        //std::bitset<1>( (cValue0 >> 10 ) & 0x1 ) << "    " <<
-        //((cValue0 >> 5 ) & 0x1f)   << "    " <<
-        //((cValue0) & 0x1f      )   << "    " <<
-        //std::bitset<32>( (cValue1) )  << "    " <<
-        //std::bitset<1>( (cValue2 >> 31 ) & 0x1 )    << " " <<
-        //((cValue2 >> 23 ) & 0x1f) << " " <<
-        //((cValue2 >> 18 ) & 0x1f) << " " <<
-        //((cValue2 >> 13 ) & 0x1f) << " " <<
-        //((cValue2 >> 8 ) & 0x1f ) << " " <<
-        //((cValue2 >> 5 ) & 0x7  ) << " " <<
-        //((cValue2) & 0x1f ) << std::endl;
-
+        prettyprintPhase(cReadValues, 0);
         std::this_thread::sleep_for( cWait );
 
     }
@@ -240,18 +210,17 @@ void PixFEDFWInterface::findPhases(uint32_t pScopeFIFOCh)
 
 void PixFEDFWInterface::prettyprintPhase(const std::vector<uint32_t>& pData, int pChannel)
 {
-    std::cout << BOLDGREEN << "CTRL_RDY    CNTVAL_Hi   CNTVAL_Lo   pattern:        S H1 L1 H0 L0 W R" << RESET << std::endl;
     std::cout << GREEN << "Fibre: " << std::setw(2) <<  pChannel + 1 << RESET << "    " <<
-              std::bitset<1>( (pData.at( (pChannel * 4 ) + 0 ) >> 10 ) & 0x1 )   << "    " <<
-              ((pData.at( (pChannel * 4 ) + 0 ) >> 5  ) & 0x1f )  << "    " <<
+              std::bitset<1>( (pData.at( (pChannel * 4 ) + 0 ) >> 10 ) & 0x1 )   << "    " << std::setw(2) <<
+              ((pData.at( (pChannel * 4 ) + 0 ) >> 5  ) & 0x1f )  << "    " << std::setw(2) <<
               ((pData.at( (pChannel * 4 ) + 0 )       ) & 0x1f ) << "    " <<
               BLUE << std::bitset<32>( pData.at( (pChannel * 4 ) + 1 )) << RESET << "    " <<
-              std::bitset<1>( (pData.at( (pChannel * 4 ) + 2 ) >> 31 ) & 0x1 )  << " " <<
-              ((pData.at( (pChannel * 4 ) + 2 ) >> 23 ) & 0x1f)  << " " <<
-              ((pData.at( (pChannel * 4 ) + 2 ) >> 18 ) & 0x1f)  << " " <<
-              ((pData.at( (pChannel * 4 ) + 2 ) >> 13 ) & 0x1f ) << " " <<
-              ((pData.at( (pChannel * 4 ) + 2 ) >> 8  ) & 0x1f ) << " " <<
-              ((pData.at( (pChannel * 4 ) + 2 ) >> 5  ) & 0x7  ) << " " <<
+              std::bitset<1>( (pData.at( (pChannel * 4 ) + 2 ) >> 31 ) & 0x1 )  << " " << std::setw(2) <<
+              ((pData.at( (pChannel * 4 ) + 2 ) >> 23 ) & 0x1f)  << " " << std::setw(2) <<
+              ((pData.at( (pChannel * 4 ) + 2 ) >> 18 ) & 0x1f)  << " " << std::setw(2) <<
+              ((pData.at( (pChannel * 4 ) + 2 ) >> 13 ) & 0x1f ) << " " << std::setw(2) <<
+              ((pData.at( (pChannel * 4 ) + 2 ) >> 8  ) & 0x1f ) << " " << std::setw(2) <<
+              ((pData.at( (pChannel * 4 ) + 2 ) >> 5  ) & 0x7  ) << " " << std::setw(2) <<
               ((pData.at( (pChannel * 4 ) + 2 )       ) & 0x1f ) << std::endl;
 }
 // helmut does a reg reset 1 while he queries for the Fifos inside a loop
@@ -427,6 +396,13 @@ bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED )
     if ( cDDR3calibrated ) std::cout << "DDR3 calibrated, board configured!" << std::endl;
     return cDDR3calibrated;
 
+}
+
+void PixFEDFWInterface::HaltBoard()
+{
+    std::string cRegName = "ctrl.ttc_xpoint_A_out3";
+    uint32_t cRegValue = 3;
+    WriteReg(cRegName, cRegValue);
 }
 
 void PixFEDFWInterface::Start()

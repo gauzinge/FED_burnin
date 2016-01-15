@@ -3,7 +3,7 @@
     <AMC13>
         <connection id="T1" uri="chtcp-2.0://cmsuppixch:10203?target=192.168.000.152:50001" address_table="file://settings/AMC13XG_T1.xml" />
         <connection id="T2" uri="chtcp-2.0://cmsuppixch:10203?target=192.168.000.151:50001" address_table="file://settings/AMC13XG_T2.xml" />
-        <AMCmask enable="8,9,10" />
+        <AMCmask enable="9" />
         <!--<Register tounge="T1" name="test.test">0</Register>-->
         <!--<BGO command="15" repeat="1" prescale="0" bx="100" />-->
         <!--<Trigger local="1" mode="1" rate="100" burst="100" rules="0" />-->

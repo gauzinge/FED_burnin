@@ -108,5 +108,7 @@ int main(int argc, char* argv[] )
         cSystemController.fFEDInterface->JumpToFpgaConfig(cFED, cImageName);
         std::cout << "Re-loading golden CTA image for FED " << +cFED->getBeId() << std::endl;
     }
+
+    cSystemController.HaltHw();
     exit(0);
 }

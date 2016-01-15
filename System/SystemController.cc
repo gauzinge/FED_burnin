@@ -56,12 +56,19 @@ void SystemController::ConfigureHw( std::ostream& os )
     os << BOLDGREEN << "All FEDs successfully configured!" << RESET << std::endl;
 }
 
-// void SystemController::Run( BeBoard* pBeBoard, uint32_t pNthAcq )
-// {
-//  fBeBoardInterface->Start( pBeBoard );
-//  fBeBoardInterface->ReadData( pBeBoard, pNthAcq, true );
-//  fBeBoardInterface->Stop( pBeBoard, pNthAcq );
-// }
+void SystemController::HaltHw( std::ostream& os )
+{
+    // write some code
+    os << BOLDGREEN <<  "Halting FEDs: " << RESET << std::endl;
+    for (auto& cFED : fPixFEDVector)
+    {
+        fFEDInterface->HaltFED(cFED);
+
+        os << "Halted FED " << +cFED->getBeId() << std::endl;
+    }
+    os << BOLDGREEN << "All FEDs successfully Halted!" << RESET << std::endl;
+}
+
 
 void SystemController::parseHWxml( const std::string& pFilename, std::ostream& os )
 {
@@ -119,16 +126,15 @@ void SystemController::parseHWxml( const std::string& pFilename, std::ostream& o
         if ( !cFilePrefix.empty() ) os << GREEN << "|" << std::endl <<  "|" << "----" << "Fitel Files Path : " << cFilePrefix << RESET << std::endl;
 
         // Iterate the Fitel node
+        cPixFED->fFitelVector.clear();
         for ( pugi::xml_node cFitelNode = cBeBoardNode.child( "Fitel" ); cFitelNode; cFitelNode = cFitelNode.next_sibling( "Fitel" ) )
         {
             os << BOLDCYAN << "|" << "----" << cFitelNode.name() << "  " << cFitelNode.first_attribute().name() << " :" << cFitelNode.attribute( "FMC" ).as_int() << " " <<  cFitelNode.attribute( "Id" ).name() << " " << cFitelNode.attribute( "Id" ).as_int() << ", File: " << cFitelNode.attribute( "file" ).value() << RESET << std:: endl;
-
 
             std::string cFileName;
             if ( !cFilePrefix.empty() )
                 cFileName = cFilePrefix + cFitelNode.attribute( "file" ).value();
             else cFileName = cFitelNode.attribute( "file" ).value();
-            cPixFED->fFitelVector.clear();
             Fitel* cFitel = new Fitel( cBeId, cFitelNode.attribute( "FMC" ).as_int(), cFitelNode.attribute( "Id" ).as_int(), cFileName );
             cPixFED->addFitel(cFitel);
         }

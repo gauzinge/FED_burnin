@@ -26,6 +26,12 @@ void Amc13Controller::ConfigureAmc13( std::ostream& os )
     fAmc13Interface->ConfigureAmc13();
 }
 
+void Amc13Controller::HaltAmc13( std::ostream& os )
+{
+    os << BOLDGREEN << "Halting Amc13!" << RESET << std::endl;
+    fAmc13Interface->HaltAMC13();
+}
+
 void Amc13Controller::parseAmc13xml(const std::string& pFilename, std::ostream& os)
 {
     pugi::xml_document doc;

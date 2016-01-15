@@ -95,7 +95,6 @@ void SystemController::parseHWxml( const std::string& pFilename, std::ostream& o
     for ( i = 0; i < 80; i++ )
         os << "*";
     os << "\n";
-    os << "\n";
 
 
     // Iterate the BeBoard Node
@@ -155,7 +154,6 @@ void SystemController::parseHWxml( const std::string& pFilename, std::ostream& o
     fFEDInterface = new PixFEDInterface(fFWMap);
 
     os << "\n";
-    os << "\n";
     for ( i = 0; i < 80; i++ )
         os << "*";
     os << "\n";
@@ -164,7 +162,6 @@ void SystemController::parseHWxml( const std::string& pFilename, std::ostream& o
     os << BOLDRED << "END OF HW SUMMARY: " << RESET << std::endl;
     for ( i = 0; i < 80; i++ )
         os << "*";
-    os << "\n";
     os << "\n";
 }
 

@@ -56,7 +56,6 @@ void Amc13Controller::parseAmc13xml(const std::string& pFilename, std::ostream& 
     for ( i = 0; i < 80; i++ )
         os << "*";
     os << "\n";
-    os << "\n";
 
     // no clue why I have to loop but that's what it is!
     for ( pugi::xml_node cAmc13node = doc.child( "HwDescription" ).child( "AMC13" ); cAmc13node; cAmc13node = cAmc13node.next_sibling("AMC13") )
@@ -121,7 +120,6 @@ void Amc13Controller::parseAmc13xml(const std::string& pFilename, std::ostream& 
             fAmc13Interface->setAmc13Description(fAmc13);
         }
     }
-    os << "\n";
 }
 
 std::vector<int> Amc13Controller::parseAMCMask(pugi::xml_node pNode,  std::ostream & os)

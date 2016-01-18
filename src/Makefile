@@ -39,7 +39,7 @@ run: acquisition.cc
 	$(CXX) -std=c++11 $(CCFlags) -o $@ $< $(IncludePaths) $(ExternalObjects)
 	cp $@ ../bin
 
-clt: commandlinetool.cc
+clt: commandlinetool.cc commandlinetool.hh
 	$(CXX) -std=c++11 $(CCFlags) -o $@ $< $(IncludePaths) $(ExternalObjects)
 	cp $@ ../bin
 

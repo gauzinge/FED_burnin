@@ -10,6 +10,7 @@ int main(int argc, char* argv[] )
     std::cout << "HW Description File: " << cHWFile << std::endl;
 
     // for logging
+    /*
     time_t rawtime;
     struct tm * timeinfo;
     char buffer[80];
@@ -26,9 +27,9 @@ int main(int argc, char* argv[] )
     logger.open(logfilename);
     std::cout << "Dumping log to: " << logfilename << std::endl;
     uhal::setLogLevelTo(uhal::Debug());
-
+    */
     // instantiate System Controller
-    //SystemController cSystemController;
+    cSystemController;
 
     // initialize map of settings so I can know the proper number of acquisitions and TBMs
     cSystemController.InitializeSettings(cHWFile, std::cout);
@@ -51,13 +52,16 @@ int main(int argc, char* argv[] )
     while( userInput != "q" &&  userInput != "quit")
       {
 	//show the user a promt to choose his actions from       
-	printPromt();
-	//get user input
-	getline(std::cin,userInput);
-	//this is for testing purposes
-	std::cout << "You entred: " << userInput << std::endl;
-	//sanitize input
-	splitUserInput = splitInput(userInput);
+	if(splitUserInput.size() == 0)
+	  {
+	    printPromt();
+	    //get user input
+	    getline(std::cin,userInput);
+	    //this is for testing purposes
+	    std::cout << "You entred: " << userInput << std::endl;
+	    //sanitize input
+	    splitInput(userInput);
+	  }
 
 	//if invalid input do nothing and show promt again
 	if(splitUserInput.size() == 0)
@@ -72,6 +76,7 @@ int main(int argc, char* argv[] )
 	else if(splitUserInput[0] == "i" || splitUserInput[0] == "info")
 	  {
 	    splitUserInput.erase(splitUserInput.begin());
+	    //	    std::cout << "DAQinfo()" <<  std::endl;
 	    DAQinfo();
 	  }
 	else if(splitUserInput[0] == "s" || splitUserInput[0] == "start")
@@ -201,7 +206,7 @@ int main(int argc, char* argv[] )
 	  }
 
       }
-    logger.close();
+    //    logger.close();
 
 }
 
@@ -256,7 +261,7 @@ void defineValidInput(){
 
 
 
-std::vector<std::string> splitInput(std::string userInput){
+void splitInput(std::string userInput){
 
   //split into different words
   std::istringstream iss (userInput);
@@ -264,6 +269,15 @@ std::vector<std::string> splitInput(std::string userInput){
     {
       std::string uI;
       getline(iss,uI,' ');
+      std::cout << uI << std::endl;
+      // if(checkInput(uI))
+      // 	{
+      // 	  std::cout << "True for " << uI << std::endl; 
+      // 	}
+      // else
+      // 	{
+      // 	  std::cout << "False for " << uI << std::endl; 
+      // 	}
       splitUserInput.push_back(uI);
     }
 }
@@ -273,12 +287,7 @@ bool checkInput(std::string userInput){
 
   for ( auto& s : validInput)
     {
-      if( userInput.compare(0,1,"a") && userInput.compare(1,1," "))
-	{
-	  //for the acquisition loop we also want to be able to provide a number of loops
-	  return true;
-	}
-      else if( s.compare(userInput) == 0)
+      if( s.compare(userInput) == 0)
 	{
 	  // we have a valid input
 	  return true;
@@ -326,6 +335,7 @@ bool fileexists(std::string filename){
 
 void DAQinfo(){
   // get the board INFO of all boards and start the acquistion
+  std::cout << "DAQ info" << std::endl;
   for (auto& cFED : cSystemController.fPixFEDVector)
     {
       cSystemController.fFEDInterface->getBoardInfo(cFED);

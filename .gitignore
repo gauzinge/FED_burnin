@@ -7,3 +7,4 @@ src/amc13test
 src/fedconfig
 logifle*
 *.txt
+*.*~

@@ -36,7 +36,7 @@ std::vector<std::string> validInput;
 //my functions
 
 void defineValidInput();
-std::vector<std::string> splitInput(std::string userInput);
+void splitInput(std::string userInput);
 bool checkInput(std::string userInput);
 void printPromt();
 

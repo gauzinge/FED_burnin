@@ -212,15 +212,43 @@
 
     <!-- HEPHY STATUS REGISERS -->
     <node id="hephy_firmware_version" address="0x40020000" mask="0xffffffff" permission="r" />
-    <node id="idel_individual_stat" address="0x40020001" mask="0xffffffff" permission="r" />
+    <node id="idel_individual_stat_block" address="0x40020001" mode="block" size="192" permission="r" />
+    <node id="idel_individual_stat" address="0x40020001" permission="r">
+		<node id="CH0" address="0x00000000" mode="block" size="4"/>
+		<node id="CH1" address="0x00000004" mode="block" size="4"/>
+		<node id="CH2" address="0x00000008" mode="block" size="4"/>
+		<node id="CH3" address="0x0000000C" mode="block" size="4"/>
+		<node id="CH4" address="0x0000000F" mode="block" size="4"/>
+		<node id="CH5" address="0x00000014" mode="block" size="4"/>
+		<node id="CH6" address="0x00000018" mode="block" size="4"/>
+		<node id="CH7" address="0x0000001C" mode="block" size="4"/>
+		<node id="CH8" address="0x0000001F" mode="block" size="4"/>
+		<node id="CH9" address="0x00000024" mode="block" size="4"/>
+		<node id="CH10" address="0x00000028" mode="block" size="4"/>
+		<node id="CH11" address="0x0000002C" mode="block" size="4"/>
+
+		<node id="CH12" address="0x0000002F" mode="block" size="4"/>
+		<node id="CH13" address="0x00000034" mode="block" size="4"/>
+		<node id="CH14" address="0x00000038" mode="block" size="4"/>
+		<node id="CH15" address="0x0000003C" mode="block" size="4"/>
+		<node id="CH16" address="0x0000003F" mode="block" size="4"/>
+		<node id="CH17" address="0x00000044" mode="block" size="4"/>
+		<node id="CH18" address="0x00000048" mode="block" size="4"/>
+		<node id="CH19" address="0x0000004C" mode="block" size="4"/>
+		<node id="CH20" address="0x0000004F" mode="block" size="4"/>
+		<node id="CH21" address="0x00000054" mode="block" size="4"/>
+		<node id="CH22" address="0x00000058" mode="block" size="4"/>
+		<node id="CH23" address="0x0000005C" mode="block" size="4"/>
+		<!-- more to come! -->
+    </node>
 
     <!-- HEPHY CONTROL REGISTERS -->
     <node id="fe_ctrl_regs">
         <node id="decode_reset" address="0x40030000" mask="0x00000001" permission="w" />
         <node id="decode_reg_reset" address="0x40030000" mask="0x00000002" permission="w" />
-        <node id="idel_ctrl_reset" address="0x40030000" mask="0x00000003" permission="w" />
+        <node id="idel_ctrl_reset" address="0x40030000" mask="0x00000004" permission="w" />
         <node id="initialize_swap" address="0x40030000" mask="0x00000008" permission="w" />
-        <node id="idel_individual_ctrl" address="0x40030001" mask="0xffffffff" permission="w" />
+        <node id="idel_individual_ctrl" address="0x40030001" mode="block" size="48" permission="w" />
         <node id="fifo_config" address="0x40030031" permission="rw" >
             <node id="overflow_value" mask="0x000fffff" />
             <node id="channel_of_interest" mask="0x03f00000" />

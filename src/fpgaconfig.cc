@@ -64,6 +64,8 @@ int main( int argc, char* argv[] )
 
     //TODO: fix me and introduce a loop
     PixFED* pBoard = cSystemController.fPixFEDVector.at(0);
+    //for ( auto& pBoard : cSystemController.fPixFEDVector )
+    //{
     vector<string> lstNames = cSystemController.fFEDInterface->getFpgaConfigList(pBoard);
     std::string cFWFile;
     std::string strImage("1");
@@ -81,7 +83,7 @@ int main( int argc, char* argv[] )
         if (lstNames.size() == 0 && cFWFile.find(".mcs") == std::string::npos)
         {
             std::cout << "Error, the specified file is not a .mcs file" << std::endl;
-            exit(1);
+            //exit(1);
         }
         else if (lstNames.size() > 0 && cFWFile.compare(cFWFile.length() - 4, 4, ".bit") && cFWFile.compare(cFWFile.length() - 4, 4, ".bin"))
         {
@@ -94,7 +96,6 @@ int main( int argc, char* argv[] )
         strImage = cmd.optionValue("delete");
         verifyImageName(strImage, lstNames);
         cSystemController.fFEDInterface->DeleteFpgaConfig(pBoard, strImage);
-        std::cout << "Firmware image: " << strImage << " deleted from SD card" << std::endl;
         exit(0);
     }
     else if (!cmd.foundOption("image"))
@@ -155,4 +156,6 @@ int main( int argc, char* argv[] )
 
     t.stop();
     t.show( "Time elapsed:" );
+
+    //}
 }

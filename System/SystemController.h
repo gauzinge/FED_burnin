@@ -64,6 +64,10 @@ public:
      */
     void ConfigureHw( std::ostream& os = std::cout );
     /*!
+     * \brief: Halt Hardware and put it back to safe mode!
+     */
+    void HaltHw( std::ostream& os = std::cout );
+    /*!
      * \brief Run a DAQ
      * \param pBeBoard
      * \param pNthAcq

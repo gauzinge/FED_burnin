@@ -3,5 +3,7 @@ bin/
 src/run
 src/clt
 src/fpgaconfig
+src/amc13test
+src/fedconfig
 logifle*
 *.txt

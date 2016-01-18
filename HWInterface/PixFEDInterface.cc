@@ -24,7 +24,11 @@ PixFEDInterface::PixFEDInterface( const PixFEDFWMap& pFWMap ) :
 
 PixFEDInterface::~PixFEDInterface()
 {
-
+    //std::string cImageName = "GoldenImage.bin";
+    //std::vector<std::string> cImageList = fFEDFW->getFpgaConfigList();
+    //verifyImageName(cImageName, cImageList);
+    //fFEDFW->JumpToFpgaConfig(cImageName);
+    //std::cout << "Successfully loaded golden FW on FED " << +pFED->getBeId() << std::endl;
 }
 
 void PixFEDInterface::setBoard( uint16_t pBoardIdentifier )
@@ -207,9 +211,45 @@ void PixFEDInterface::ConfigureFitel( const Fitel* pFitel, bool pVerifLoop )
     }
 }
 
+void PixFEDInterface::ReadLightOnFibre( const Fitel* pFitel )
+{
+    setBoard( pFitel->getBeId() );
 
+    std::vector<uint32_t> cVecWrite;
+    std::vector<uint32_t> cVecRead;
 
-bool PixFEDInterface::WriteFitelReg(Fitel* pFitel, const std::string& pRegNode, uint8_t pValue, bool pVerifLoop)
+    uint32_t cCounter = 0;
+    FitelRegMap cFitelRegMap = pFitel->getRegMap();
+    //FitelRegMap::iterator cIt = cFitelRegMap.begin();
+    for ( int cFibre = 1; cFibre < 13; cFibre++ )
+    {
+        std::string cRegname = "Ch";
+        std::stringstream ss;
+        ss << "Ch" << std::setw(2) << std::setfill('0') << cFibre << "_InterruptReg";
+        FitelRegMap::iterator cIt = cFitelRegMap.find(ss.str());
+
+        FitelRegItem cItem = cIt->second;
+        cItem.fValue = 0;
+
+        EncodeFitelReg( cItem, pFitel->getFMCId(), pFitel->getFitelId(), cVecRead );
+        cCounter++;
+    }
+
+    uint8_t cFMCId = pFitel->getFMCId();
+    uint8_t cFitelId = pFitel->getFitelId();
+
+    fFEDFW->ReadFitelBlockReg( cVecRead );
+    for (int cItem = 0; cItem < cVecRead.size(); cItem++)
+    {
+        FitelRegItem cRegItemRead;
+        DecodeFitelReg( cRegItemRead, cFMCId, cFitelId, cVecRead.at(cItem) );
+        if (cRegItemRead.fValue == 0x80)
+            std::cout << RED <<  "Detected Light on FMC: " << +cFMCId <<  " Fitel Id: " << +cFitelId  << " Fibre: " << cItem << RESET << std::endl;
+
+    }
+}
+
+bool PixFEDInterface::WriteFitelReg(Fitel * pFitel, const std::string & pRegNode, uint8_t pValue, bool pVerifLoop)
 {
     FitelRegItem cRegItem = pFitel->getRegItem( pRegNode );
     std::vector<uint32_t> cVecWrite;
@@ -297,7 +337,7 @@ bool PixFEDInterface::WriteFitelReg(Fitel* pFitel, const std::string& pRegNode, 
     else return true;
 }
 
-uint8_t PixFEDInterface::ReadFitelReg( Fitel* pFitel, const std::string& pRegNode )
+uint8_t PixFEDInterface::ReadFitelReg( Fitel * pFitel, const std::string & pRegNode )
 {
     FitelRegItem cRegItem = pFitel->getRegItem( pRegNode );
     std::vector<uint32_t> cVecReq;
@@ -314,7 +354,7 @@ uint8_t PixFEDInterface::ReadFitelReg( Fitel* pFitel, const std::string& pRegNod
     return cRegItem.fValue;
 }
 
-std::vector<uint32_t> PixFEDInterface::ReadBlockBoardReg( PixFED* pFED, const std::string& pRegNode, uint32_t pSize )
+std::vector<uint32_t> PixFEDInterface::ReadBlockBoardReg( PixFED * pFED, const std::string & pRegNode, uint32_t pSize )
 {
     setBoard( pFED->getBeId() );
     return fFEDFW->ReadBlockRegValue( pRegNode, pSize );
@@ -324,60 +364,72 @@ std::vector<uint32_t> PixFEDInterface::ReadBlockBoardReg( PixFED* pFED, const st
 // Startup  Methods
 //////////////
 
-void PixFEDInterface::getBoardInfo( const PixFED* pFED )
+void PixFEDInterface::getBoardInfo( const PixFED * pFED )
 {
     setBoard( pFED->getBeId() );
     fFEDFW->getBoardInfo();
 }
 
-void PixFEDInterface::enableFMCs( const PixFED* pFED )
+void PixFEDInterface::enableFMCs( const PixFED * pFED )
 {
     setBoard( pFED->getBeId() );
     fFEDFW->enableFMCs();
 }
 
-void PixFEDInterface::disableFMCs( const PixFED* pFED )
+void PixFEDInterface::disableFMCs( const PixFED * pFED )
 {
     setBoard( pFED->getBeId() );
     fFEDFW->disableFMCs();
 }
 
-void PixFEDInterface::ConfigureFED( const PixFED* pFED )
+void PixFEDInterface::ConfigureFED( const PixFED * pFED )
 {
     //before I can configure the FED FW, I need to load it to the CTA which runs the golden Image as default!
     setBoard( pFED->getBeId() );
-    std::string cImageName = "PixFEDImage.bin";
-    std::vector<std::string> cImageList = fFEDFW->getFpgaConfigList();
-    verifyImageName(cImageName, cImageList);
-    fFEDFW->JumpToFpgaConfig(cImageName);
-    std::cout << "Successfully loaded FW on FED " << +pFED->getBeId() << std::endl;
+    std::string cImageName = "PixFEDFeImage.bin";
+    //std::vector<std::string> cImageList = fFEDFW->getFpgaConfigList();
+    //verifyImageName(cImageName, cImageList);
+    //fFEDFW->JumpToFpgaConfig(cImageName);
+    //std::cout << "Successfully loaded FW on FED " << +pFED->getBeId() << std::endl;
     fFEDFW->ConfigureBoard( pFED );
+}
+
+void PixFEDInterface::HaltFED( const PixFED * pFED )
+{
+    setBoard( pFED->getBeId() );
+    std::string cImageName = "GoldenImage.bin";
+    //std::vector<std::string> cImageList = fFEDFW->getFpgaConfigList();
+    //verifyImageName(cImageName, cImageList);
+    //fFEDFW->JumpToFpgaConfig(cImageName);
+    //std::cout << "Successfully loaded FW on FED " << +pFED->getBeId() << std::endl;
+    fFEDFW->HaltBoard();
+    std::cout << "FED back on Golden Image and internal Clock!" << std::endl;
 }
 
 ///////////////
 // Setup  Methods
 //////////////
 
-void PixFEDInterface::findPhases( const PixFED* pFED, uint32_t pScopeFIFOCh )
+void PixFEDInterface::findPhases( const PixFED * pFED, uint32_t pScopeFIFOCh )
 {
     setBoard( pFED->getBeId() );
     fFEDFW->findPhases(pScopeFIFOCh);
 }
 
 
-std::vector<uint32_t> PixFEDInterface::readTransparentFIFO( const PixFED* pFED )
+std::vector<uint32_t> PixFEDInterface::readTransparentFIFO( const PixFED * pFED )
 {
     setBoard( pFED->getBeId() );
     return fFEDFW->readTransparentFIFO();
 }
 
-std::vector<uint32_t> PixFEDInterface::readSpyFIFO( const PixFED* pFED )
+std::vector<uint32_t> PixFEDInterface::readSpyFIFO( const PixFED * pFED )
 {
     setBoard( pFED->getBeId() );
     return fFEDFW->readSpyFIFO();
 }
 
-std::string PixFEDInterface::readFIFO1( const PixFED* pFED )
+std::string PixFEDInterface::readFIFO1( const PixFED * pFED )
 {
     setBoard( pFED->getBeId() );
     return fFEDFW->readFIFO1();
@@ -387,35 +439,35 @@ std::string PixFEDInterface::readFIFO1( const PixFED* pFED )
 // Readout  Methods
 //////////////
 
-void PixFEDInterface::Start( PixFED* pFED )
+void PixFEDInterface::Start( PixFED * pFED )
 {
     setBoard( pFED->getBeId() );
     fFEDFW->Start();
 }
 
 
-void PixFEDInterface::Stop( PixFED* pFED )
+void PixFEDInterface::Stop( PixFED * pFED )
 {
     setBoard( pFED->getBeId() );
     fFEDFW->Stop();
 }
 
 
-void PixFEDInterface::Pause( PixFED* pFED )
+void PixFEDInterface::Pause( PixFED * pFED )
 {
     setBoard( pFED->getBeId() );
     fFEDFW->Pause();
 }
 
 
-void PixFEDInterface::Resume( PixFED* pFED )
+void PixFEDInterface::Resume( PixFED * pFED )
 {
     setBoard( pFED->getBeId() );
     fFEDFW->Resume();
 }
 
 
-std::vector<uint32_t> PixFEDInterface::ReadData( PixFED* pFED )
+std::vector<uint32_t> PixFEDInterface::ReadData( PixFED * pFED )
 {
     setBoard( pFED->getBeId() );
     return fFEDFW->ReadData( pFED );
@@ -426,50 +478,50 @@ std::vector<uint32_t> PixFEDInterface::ReadData( PixFED* pFED )
 // Auxillary  Methods
 //////////////
 
-const uhal::Node& PixFEDInterface::getUhalNode( const PixFED* pFED, const std::string& pStrPath )
+const uhal::Node& PixFEDInterface::getUhalNode( const PixFED * pFED, const std::string & pStrPath )
 {
     setBoard( pFED->getBeId() );
     return fFEDFW->getUhalNode( pStrPath );
 }
 
-uhal::HwInterface* PixFEDInterface::getHardwareInterface( const PixFED* pFED )
+uhal::HwInterface* PixFEDInterface::getHardwareInterface( const PixFED * pFED )
 {
     setBoard( pFED->getBeId() );
     return fFEDFW->getHardwareInterface();
 }
 
 
-void PixFEDInterface::FlashProm( PixFED* pFED, const std::string& strConfig, const char* pstrFile )
+void PixFEDInterface::FlashProm( PixFED * pFED, const std::string & strConfig, const char* pstrFile )
 {
     setBoard( pFED->getBeId() );
     fFEDFW->FlashProm( strConfig, pstrFile );
 }
 
-void PixFEDInterface::JumpToFpgaConfig( PixFED* pFED, const std::string& strConfig )
+void PixFEDInterface::JumpToFpgaConfig( PixFED * pFED, const std::string & strConfig )
 {
     setBoard( pFED->getBeId() );
     fFEDFW->JumpToFpgaConfig( strConfig );
 }
 
-const FpgaConfig* PixFEDInterface::getConfiguringFpga( PixFED* pFED )
+const FpgaConfig* PixFEDInterface::getConfiguringFpga( PixFED * pFED )
 {
     setBoard( pFED->getBeId() );
     return fFEDFW->getConfiguringFpga();
 }
 
-std::vector<std::string> PixFEDInterface::getFpgaConfigList( PixFED* pFED )
+std::vector<std::string> PixFEDInterface::getFpgaConfigList( PixFED * pFED )
 {
     setBoard( pFED->getBeId() );
     return fFEDFW->getFpgaConfigList();
 }
 
-void PixFEDInterface::DownloadFpgaConfig( PixFED* pFED, const std::string& strConfig, const std::string& strDest)
+void PixFEDInterface::DownloadFpgaConfig( PixFED * pFED, const std::string & strConfig, const std::string & strDest)
 {
     setBoard( pFED->getBeId() );
     fFEDFW->DownloadFpgaConfig( strConfig, strDest );
 }
 
-void PixFEDInterface::DeleteFpgaConfig( PixFED* pFED, const std::string& strId )
+void PixFEDInterface::DeleteFpgaConfig( PixFED * pFED, const std::string & strId )
 {
     setBoard( pFED->getBeId() );
     fFEDFW->DeleteFpgaConfig( strId );

@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- Generated from temp.csv -->
+<!-- Input fields:  Address LoBit HiBit Permission Name Description Mode Size P_Status P_Show P_Table P_Row P_Column P_Format-->
+<node id="TOP">
+   <node id="ACTION">
+      <node id="MONITOR_BUFFER">
+         <node id="NEXT_PAGE" address="0x0000000c" permission="w" description="SDRAM increment page number by 1 in run mode" parameters="Table=Actions;Row=Monitor_Buffer;Column=Next_Page;Status=0" mask="0x00000001"/>
+      </node>
+      <node id="RESETS">
+         <node id="COUNTER" address="0x00000000" permission="w" description="counter reset" parameters="Table=Actions;Row=Resets;Column=Counter;Status=0" mask="0x00000002"/>
+         <node id="GENERAL" address="0x00000000" permission="w" description="general reset (ddr3 memory controller not included)" parameters="Table=Actions;Row=Resets;Column=General;Status=0" mask="0x00000001"/>
+         <node id="SDRAM" address="0x00000000" permission="w" description="reset ddr3 memory controller" parameters="Table=Actions;Row=Resets;Column=SDRAM;Status=0" mask="0x00000020"/>
+      </node>
+   </node>
+   <node id="CONF">
+      <node id="EVB">
+         <node id="ENABLE_DAQLSC" address="0x00000001" permission="rw" description="'1' enables DAQLSC" parameters="Table=Control;Row=Reg_1;Column=DAQ;Status=1" mask="0x00000002"/>
+      </node>
+      <node id="ID">
+         <node id="FED_ID" address="0x00000004" permission="rw" description="SLINK ID(bits 15-14 always '0')" parameters="Table=Config;Row=Output;Column=FED;Status=0" mask="0xffff0000"/>
+      </node>
+      <node id="RUN" address="0x00000001" permission="rw" description="run mode" parameters="Table=Control;Row=Reg_1;Column=Run;Status=1" mask="0x00000001"/>
+      <node id="SFP">
+         <node id="DISABLE_TTS" address="0x00000004" permission="rw" description="'1' disables TTS transmitter" parameters="Table=Config;Row=SFP;Column=DisableTTS;Status=0" mask="0x00008000"/>
+         <node id="DISABLE_TX_MASK" address="0x00000004" permission="rw" description="'1' disables SFP0..2 transmitter" parameters="Table=Config;Row=SFP;Column=DisableTX;Status=0" mask="0x00007000"/>
+         <node id="ENABLE_MASK" address="0x00000003" permission="rw" description="'1' enables SFP0..2" parameters="Table=Config;Row=SFP;Column=Enable;Status=0" mask="0x00007000"/>
+      </node>
+   </node>
+   <node id="FULL_MEMORY" address="0x08000000" permission="rw" description="full memory read/write access. (write disabled in run mode) thru 0xfffffff" mode="incremental" size="0x7fffff"/>
+   <node id="MONITOR_BUFFER_RAM" address="0x00004000" permission="r" description="memory read window" mode="incremental" size="0x3fff"/>
+   <node id="STATUS">
+      <node id="DIAG">
+         <node id="DDR_RESET_DONE" address="0x00000000" permission="r" description="if 0, DDR memory reset done" parameters="Table=AMC13_Errors;Row=DDR_Not_Ready;Column=V;Status=1;Show=nz" mask="0x00008000"/>
+      </node>
+      <node id="EVB">
+         <node id="OVERFLOW_WARNING" address="0x00000000" permission="r" description="L1A overflow warning" parameters="Table=TTC_Rx;Row=State;Column=OFW;Status=1;Show=nz" mask="0x00002000"/>
+         <node id="SYNC_LOST" address="0x00000000" permission="r" description="TTC sync lost (L1A buffer overflow)" parameters="Table=TTC_Rx;Row=State;Column=SYN;Status=1;Show=nz" mask="0x00000200"/>
+      </node>
+      <node id="FIRMWARE_VERS" address="0x00000001" permission="r" description="read only Virtex firmware version" parameters="Table=Board;Row=Info;Column=T1_Ver;Status=1" mask="0xffff0000"/>
+      <node id="FPGA">
+         <node id="DIE_TEMP" address="0x00000030" permission="r" description="V6 die temperature in unit of 0.1 degree Celsius" parameters="Table=Temps_Voltages;Row=T_Die_Temp;Column=Deg_C;Status=3;Format=d"/>
+         <node id="DNA_HI" address="0x0000001f" permission="r" description="FPGA DNA bits 56-32" parameters="Table=Board;Row=Info;Column=DNA_H;Status=3" mask="0x01ffffff"/>
+         <node id="DNA_LO" address="0x0000001e" permission="r" description="FPGA DNA bits 31-0" parameters="Table=Board;Row=Info;Column=DNA_L;Status=3"/>
+         <node id="MV_0V75_VREF" address="0x0000003c" permission="r" description="0.75V DDR3_Vref power voltage in millivolt" parameters="Table=Temps_Voltages;Row=0V75a;Column=mV;Status=3;Format=d"/>
+         <node id="MV_0V75_VTT" address="0x0000003b" permission="r" description="0.75V DDR3_Vtt power voltage in millivolt" parameters="Table=Temps_Voltages;Row=0V75b;Column=mV;Status=3;Format=d"/>
+         <node id="MV_12V0" address="0x00000038" permission="r" description="12V power voltage in millivolt" parameters="Table=Temps_Voltages;Row=12V0;Column=mV;Status=3;Format=d"/>
+         <node id="MV_1V0" address="0x00000031" permission="r" description="1.0V analog power voltage in millivolt" parameters="Table=Temps_Voltages;Row=1V0a;Column=mV;Status=3;Format=d"/>
+         <node id="MV_1V0_BRAM" address="0x0000003e" permission="r" description="1.0V VccBRAM power voltage in millivolt" parameters="Table=Temps_Voltages;Row=1V0b;Column=mV;Status=3;Format=d"/>
+         <node id="MV_1V0_INT" address="0x00000033" permission="r" description="1.0V Vccint power voltage in millivolt" parameters="Table=Temps_Voltages;Row=1V0c;Column=mV;Status=3;Format=d"/>
+         <node id="MV_1V2" address="0x00000032" permission="r" description="1.2V analog power voltage in millivolt" parameters="Table=Temps_Voltages;Row=1V2;Column=mV;Status=3;Format=d"/>
+         <node id="MV_1V5" address="0x00000034" permission="r" description="1.5V power voltage in millivolt" parameters="Table=Temps_Voltages;Row=1V5;Column=mV;Status=3;Format=d"/>
+         <node id="MV_1V8_AUX" address="0x0000003d" permission="r" description="1.8V VccAux power voltage in millivolt" parameters="Table=Temps_Voltages;Row=1V8a;Column=mV;Status=3;Format=d"/>
+         <node id="MV_1V8_GTX" address="0x00000039" permission="r" description="1.8V VccAuxGTX power voltage in millivolt" parameters="Table=Temps_Voltages;Row=1V8b;Column=mV;Status=3;Format=d"/>
+         <node id="MV_2V0" address="0x0000003a" permission="r" description="2.0V VccAuxIO power voltage in millivolt" parameters="Table=Temps_Voltages;Row=2V0;Column=mV;Status=3;Format=d"/>
+         <node id="MV_2V5" address="0x00000035" permission="r" description="2.5V power voltage in millivolt" parameters="Table=Temps_Voltages;Row=2V5;Column=mV;Status=3;Format=d"/>
+         <node id="MV_3V3" address="0x00000036" permission="r" description="3.3V power voltage in millivolt" parameters="Table=Temps_Voltages;Row=3V3;Column=mV;Status=3;Format=d"/>
+      </node>
+      <node id="GENERAL">
+         <node id="BUSY_TIME_HI" address="0x0000004d" permission="r" description="busy time counter bits[47:32]" parameters="Table=State_Timers;Row=Busy;Column=Count;Status=1;Show=nz" mask="0x0000ffff"/>
+         <node id="BUSY_TIME_LO" address="0x0000004c" permission="r" description="busy time counter bits[31:0]" parameters="Table=State_Timers;Row=Busy;Column=Count;Status=1;Show=nz"/>
+         <node id="L1A_COUNT_HI" address="0x00000047" permission="r" description="L1A counter bits[47:32]" parameters="Table=Event_Builder;Row=L1A;Column=Count;Status=1" mask="0x0000ffff"/>
+         <node id="L1A_COUNT_LO" address="0x00000046" permission="r" description="L1A counter bits[31:0]" parameters="Table=Event_Builder;Row=L1A;Column=Count;Status=1"/>
+         <node id="OF_WARN_TIME_HI" address="0x00000051" permission="r" description="L1A overflow warning time counter bits[47:32]" parameters="Table=State_Timers;Row=Overflow_Warning;Column=Count;Status=1;Show=nz" mask="0x0000ffff"/>
+         <node id="OF_WARN_TIME_LO" address="0x00000050" permission="r" description="L1A overflow warning time counter bits[31:0]" parameters="Table=State_Timers;Row=Overflow_Warning;Column=Count;Status=1;Show=nz"/>
+         <node id="READY_TIME_HI" address="0x0000004b" permission="r" description="ready time counter bits[47:32]" parameters="Table=State_Timers;Row=Ready;Column=Count;Status=1" mask="0x0000ffff"/>
+         <node id="READY_TIME_LO" address="0x0000004a" permission="r" description="ready time counter bits[31:0]" parameters="Table=State_Timers;Row=Ready;Column=Count;Status=1"/>
+         <node id="RUN_TIME_HI" address="0x00000049" permission="r" description="run time counter bits[47:32]" parameters="Table=State_Timers;Row=Run;Column=Count;Status=1" mask="0x0000ffff"/>
+         <node id="RUN_TIME_LO" address="0x00000048" permission="r" description="run time counter bits[31:0]" parameters="Table=State_Timers;Row=Run;Column=Count;Status=1"/>
+         <node id="SYNC_LOST_TIME_HI" address="0x0000004f" permission="r" description="L1A sync lost time counter bits[47:32]" parameters="Table=State_Timers;Row=Sync_Lost;Column=Count;Status=1;Show=nz" mask="0x0000ffff"/>
+         <node id="SYNC_LOST_TIME_LO" address="0x0000004e" permission="r" description="L1A sync lost time counter bits[31:0]" parameters="Table=State_Timers;Row=Sync_Lost;Column=Count;Status=1;Show=nz"/>
+      </node>
+      <node id="LDC">
+         <node id="ALL">
+            <node id="NEXT_BUF" address="0x000000a3" permission="r" description="Next monitor buffer for all event builders" parameters="Table=DAQLDC;Row=Next_mon_buf;Column=ALL;Status=2;Show=nz" mask="0x0fff0000"/>
+         </node>
+         <node id="MON_BUF_COUNT" address="0x000000a1" permission="r" description="Monitored buffer count" parameters="Table=DAQLDC;Row=Monitored_buffer_count;Column=Value;Status=2;Show=nz" mask="0x00001fff"/>
+         <node id="SFP0">
+            <node id="NEXT_BUF" address="0x000000a2" permission="r" description="Next monitor buffer for event builder 0" parameters="Table=DAQLDC;Row=Next_mon_buf;Column=SFP0;Status=2;Show=nz" mask="0x00000fff"/>
+         </node>
+         <node id="SFP1">
+            <node id="NEXT_BUF" address="0x000000a2" permission="r" description="Next monitor buffer for event builder 1" parameters="Table=DAQLDC;Row=Next_mon_buf;Column=SFP1;Status=2;Show=nz" mask="0x0fff0000"/>
+         </node>
+         <node id="SFP2">
+            <node id="NEXT_BUF" address="0x000000a3" permission="r" description="Next monitor buffer for event builder 2" parameters="Table=DAQLDC;Row=Next_mon_buf;Column=SFP2;Status=2;Show=nz" mask="0x00000fff"/>
+         </node>
+         <node id="STATUSA0" address="0x000000a0" permission="r" description="Mystery status 0xa0" parameters="Table=DAQLDC;Row=Status_A0;Column=Value;Status=2;Show=nz"/>
+         <node id="STATUS_A4" address="0x000000a4" permission="r" description="Value of register 0xa4" parameters="Table=DAQLDC;Row=Status_A4;Column=Value;Status=2;Show=nz" mask="0x00700000"/>
+      </node>
+      <node id="LOCAL_TRIG">
+         <node id="CONTINUOUS_ON" address="0x00000000" permission="r" description="continous local L1A on (setup with register 0x1c)" parameters="Table=Local_Trigger;Row=Continuous_On;Column=V;Status=3" mask="0x00000400"/>
+      </node>
+      <node id="LSC">
+         <node id="SFP0">
+            <node id="EVENT_COUNT" address="0x000000a5" permission="r" description="event count for SFP0" parameters="Table=DAQLDC;Row=SFP0;Column=Events;Status=1;Show=nz"/>
+            <node id="WORD_COUNT" address="0x000000a8" permission="r" description="word count for SFP0" parameters="Table=DAQLDC;Row=SFP0;Column=Words;Status=1;Show=nz"/>
+         </node>
+         <node id="SFP1">
+            <node id="EVENT_COUNT" address="0x000000a6" permission="r" description="event count for SFP1" parameters="Table=DAQLDC;Row=SFP1;Column=Events;Status=1;Show=nz"/>
+            <node id="WORD_COUNT" address="0x000000a9" permission="r" description="word count for SFP1" parameters="Table=DAQLDC;Row=SFP1;Column=Words;Status=1;Show=nz"/>
+         </node>
+         <node id="SFP2">
+            <node id="EVENT_COUNT" address="0x000000a7" permission="r" description="event count for SFP2" parameters="Table=DAQLDC;Row=SFP2;Column=Events;Status=1;Show=nz"/>
+            <node id="WORD_COUNT" address="0x000000aa" permission="r" description="word count for SFP2" parameters="Table=DAQLDC;Row=SFP2;Column=Words;Status=1;Show=nz"/>
+         </node>
+      </node>
+      <node id="MONITOR_BUFFER">
+         <node id="EMPTY" address="0x00000000" permission="r" description="monitor buffer empty" parameters="Table=Monitor_Buffer;Row=Empty;Column=V;Status=2" mask="0x00000008"/>
+         <node id="FULL" address="0x00000000" permission="r" description="monitor buffer full" parameters="Table=Monitor_Buffer;Row=Full;Column=V;Status=1;Show=nz" mask="0x00000004"/>
+         <node id="PAGE_NO" address="0x0000000c" permission="rw" description="SDRAM page number (r/w only when not in run mode)" mask="0x00001fff"/>
+         <node id="UNREAD_EVENTS" address="0x0000000e" permission="r" description="number of unread events captured by monitor" parameters="Table=Monitor_Buffer;Row=Unread_Evt;Column=Count;Status=1;Show=nz" mask="0x00000fff"/>
+         <node id="WORDS_SFP0" address="0x0000000d" permission="r" description="SFP 0 monitored event size in 32-bit word. 0 if no data available" parameters="Table=Monitor_Buffer;Row=Words;Column=SFP0;Status=1;Show=nz" mask="0x00003fff"/>
+         <node id="WORDS_SFP1" address="0x0000001d" permission="r" description="SFP 1 monitored event size in 32-bit word. 0 if no data available" parameters="Table=Monitor_Buffer;Row=Words;Column=SFP1;Status=1;Show=nz" mask="0x0000ffff"/>
+         <node id="WORDS_SFP2" address="0x0000001d" permission="r" description="SFP 2 monitored event size in 32-bit word. 0 if no data available" parameters="Table=Monitor_Buffer;Row=Words;Column=SFP2;Status=1;Show=nz" mask="0xffff0000"/>
+      </node>
+      <node id="SERIAL_NO" address="0x00000000" permission="r" description="bit 31-24 T1 board SN" parameters="Table=Board;Row=Info;Column=SerialNo;Status=1" mask="0xff000000"/>
+      <node id="SFP">
+         <node id="ANY_DOWN" address="0x00000000" permission="r" description="reads '1' when any of the enabled SFP ports is down" parameters="Table=Slink_Express;Row=Any_Down;Column=L;Status=2;Show=nz" mask="0x00000001"/>
+         <node id="RX_SIG_LOST_MASK" address="0x00000004" permission="r" description="'1' indicates SFP0..2 Receiver signal lost" mask="0x00000070"/>
+         <node id="SFP0">
+            <node id="ACK_COUNT" address="0x00000080" permission="r" description="SFP0 ack count" parameters="Table=Slink_Express;Row=ACK_Count;Column=SFP0;Status=2;Show=nz"/>
+            <node id="DAQLSC_STATUS_HI" address="0x00000087" permission="r" description="SFP0 DAQLSC status bit 63-32" parameters="Table=Slink_Express;Row=LSC_Status_Hi;Column=SFP0;Status=2;Show=nz"/>
+            <node id="DAQLSC_STATUS_LO" address="0x00000086" permission="r" description="SFP0 DAQLSC status bit 31-0" parameters="Table=Slink_Express;Row=LSC_Status_Lo;Column=SFP0;Status=2;Show=nz"/>
+            <node id="EVT_COUNT" address="0x00000083" permission="r" description="SFP0 event count" parameters="Table=Slink_Express;Row=Events;Column=SFP0;Status=2;Show=nz"/>
+            <node id="PACKET_COUNT" address="0x00000081" permission="r" description="SFP0 packet count" parameters="Table=Slink_Express;Row=Packets;Column=SFP0;Status=2;Show=nz"/>
+            <node id="RETRAN_COUNT" address="0x00000082" permission="r" description="SFP0 retransmit count" parameters="Table=Slink_Express;Row=Retran;Column=SFP0;Status=2;Show=nz"/>
+            <node id="SYNC_LOST_COUNT" address="0x00000085" permission="r" description="SFP0 sync loss count" parameters="Table=Slink_Express;Row=Sync_Lost;Column=SFP0;Status=2;Show=nz"/>
+            <node id="WORD_COUNT" address="0x00000084" permission="r" description="SFP0 word count" parameters="Table=Slink_Express;Row=Words;Column=SFP0;Status=2;Show=nz"/>
+         </node>
+         <node id="SFP1">
+            <node id="ACK_COUNT" address="0x00000088" permission="r" description="SFP1 ack count" parameters="Table=Slink_Express;Row=ACK_Count;Column=SFP1;Status=2;Show=nz"/>
+            <node id="DAQLSC_STATUS_HI" address="0x0000008f" permission="r" description="SFP1 DAQLSC status bit 63-32" parameters="Table=Slink_Express;Row=LSC_Status_Hi;Column=SFP1;Status=2;Show=nz"/>
+            <node id="DAQLSC_STATUS_LO" address="0x0000008e" permission="r" description="SFP1 DAQLSC status bit 31-0" parameters="Table=Slink_Express;Row=LSC_Status_Lo;Column=SFP1;Status=2;Show=nz"/>
+            <node id="EVT_COUNT" address="0x0000008b" permission="r" description="SFP1 event count" parameters="Table=Slink_Express;Row=Words;Column=SFP1;Status=2;Show=nz"/>
+            <node id="PACKET_COUNT" address="0x00000089" permission="r" description="SFP1 packet count" parameters="Table=Slink_Express;Row=Packets;Column=SFP1;Status=2;Show=nz"/>
+            <node id="RETRAN_COUNT" address="0x0000008a" permission="r" description="SFP1 retransmit count" parameters="Table=Slink_Express;Row=Retran;Column=SFP1;Status=2;Show=nz"/>
+            <node id="SYNC_LOST_COUNT" address="0x0000008d" permission="r" description="SFP1 sync loss count" parameters="Table=Slink_Express;Row=Sync_Lost;Column=SFP1;Status=2;Show=nz"/>
+            <node id="WORD_COUNT" address="0x0000008c" permission="r" description="SFP1 word count" parameters="Table=Slink_Express;Row=Events;Column=SFP1;Status=2;Show=nz"/>
+         </node>
+         <node id="SFP2">
+            <node id="ACK_COUNT" address="0x00000090" permission="r" description="SFP2 ack count" parameters="Table=Slink_Express;Row=ACK_Count;Column=SFP2;Status=2;Show=nz"/>
+            <node id="DAQLSC_STATUS_HI" address="0x00000097" permission="r" description="SFP2 DAQLSC status bit 63-32" parameters="Table=Slink_Express;Row=LSC_Status_Hi;Column=SFP2;Status=2;Show=nz"/>
+            <node id="DAQLSC_STATUS_LO" address="0x00000096" permission="r" description="SFP2 DAQLSC status bit 31-0" parameters="Table=Slink_Express;Row=LSC_Status_Lo;Column=SFP2;Status=2;Show=nz"/>
+            <node id="EVT_COUNT" address="0x00000093" permission="r" description="SFP2 event count" parameters="Table=Slink_Express;Row=Events;Column=SFP2;Status=2;Show=nz"/>
+            <node id="PACKET_COUNT" address="0x00000091" permission="r" description="SFP2 packet count" parameters="Table=Slink_Express;Row=Packets;Column=SFP2;Status=2;Show=nz"/>
+            <node id="RETRAN_COUNT" address="0x00000092" permission="r" description="SFP2 retransmit count" parameters="Table=Slink_Express;Row=Retran;Column=SFP2;Status=2;Show=nz"/>
+            <node id="SYNC_LOST_COUNT" address="0x00000095" permission="r" description="SFP2 sync loss count" parameters="Table=Slink_Express;Row=Sync_Lost;Column=SFP2;Status=2;Show=nz"/>
+            <node id="WORD_COUNT" address="0x00000094" permission="r" description="SFP2 word count" parameters="Table=Slink_Express;Row=Words;Column=SFP2;Status=2;Show=nz"/>
+         </node>
+         <node id="SFP_ABSENT_MASK" address="0x00000004" permission="r" description="'1' indicates SFP0..2 absent" mask="0x00000007"/>
+         <node id="TTS_LOS_LOL" address="0x00000004" permission="r" description="'1' indicates TTC_LOS or TTC_LOL" parameters="Table=Slink_Express;Row=LOS_or_LOL;Column=TTC;Status=2;Show=nz" mask="0x00000080"/>
+         <node id="TTS_SFP_ABSENT" address="0x00000004" permission="r" description="'1' indicates TTC/TTS SFP absent" parameters="Table=Slink_Express;Row=SFP_ABSENT;Column=TTC;Status=2;Show=nz" mask="0x00000008"/>
+         <node id="TTS_TX_FAULT" address="0x00000004" permission="r" description="'1' indicates TTS TxFault" parameters="Table=Slink_Express;Row=TX_FAULT;Column=TTC;Status=2;Show=nz" mask="0x00000800"/>
+         <node id="TX_FAULT_MASK" address="0x00000004" permission="r" description="'1' indicates SFP0..2 TxFault" mask="0x00000700"/>
+      </node>
+      <node id="SFP0">
+         <node id="ROM" address="0x00000100" permission="r" description="SFP0 ROM data(first 128 bytes, little endian)" size="0x1f" parameters="Table=SFP_ROM;Row=ROM_Data;Column=SFP0;Status=9"/>
+         <node id="RX_SIG_LOST_MASK" address="0x00000004" permission="r" description="'1' indicates SFP0..2 Receiver signal lost" parameters="Table=Slink_Express;Row=RX_SIG_LOST;Column=SFP0;Status=1;Show=nz" mask="0x00000010"/>
+         <node id="SFP_ABSENT_MASK" address="0x00000004" permission="r" description="'1' indicates SFP0..2 absent" parameters="Table=Slink_Express;Row=SFP_ABSENT;Column=SFP0;Status=1;Show=nz" mask="0x00000001"/>
+         <node id="SFP_LSC_DOWN_MASK" address="0x00000003" permission="r" description="'1' when DAQLSC of SFP0..2 is down" parameters="Table=Slink_Express;Row=SFP_LSC_DOWN;Column=SFP0;Status=1" mask="0x10000000"/>
+         <node id="TX_FAULT_MASK" address="0x00000004" permission="r" description="'1' indicates SFP0..2 TxFault" parameters="Table=Slink_Express;Row=TX_FAULT;Column=SFP0;Status=1;Show=nz" mask="0x00000100"/>
+      </node>
+      <node id="SFP1">
+         <node id="ROM" address="0x00000120" permission="r" description="SFP1 ROM data(first 128 bytes, little endian)" size="0x1f" parameters="Table=SFP_ROM;Row=ROM_Data;Column=SFP1;Status=9"/>
+         <node id="RX_SIG_LOST_MASK" address="0x00000004" permission="r" description="'1' indicates SFP0..2 Receiver signal lost" parameters="Table=Slink_Express;Row=RX_SIG_LOST;Column=SFP1;Status=1;Show=nz" mask="0x00000020"/>
+         <node id="SFP_ABSENT_MASK" address="0x00000004" permission="r" description="'1' indicates SFP0..2 absent" parameters="Table=Slink_Express;Row=SFP_ABSENT;Column=SFP1;Status=1;Show=nz" mask="0x00000002"/>
+         <node id="SFP_LSC_DOWN_MASK" address="0x00000003" permission="r" description="'1' when DAQLSC of SFP0..2 is down" parameters="Table=Slink_Express;Row=SFP_LSC_DOWN;Column=SFP1;Status=1" mask="0x20000000"/>
+         <node id="TX_FAULT_MASK" address="0x00000004" permission="r" description="'1' indicates SFP0..2 TxFault" parameters="Table=Slink_Express;Row=TX_FAULT;Column=SFP1;Status=1;Show=nz" mask="0x00000200"/>
+      </node>
+      <node id="SFP2">
+         <node id="ROM" address="0x00000140" permission="r" description="SFP2 ROM data(first 128 bytes, little endian)" size="0x1f" parameters="Table=SFP_ROM;Row=ROM_Data;Column=SFP2;Status=9"/>
+         <node id="RX_SIG_LOST_MASK" address="0x00000004" permission="r" description="'1' indicates SFP0..2 Receiver signal lost" parameters="Table=Slink_Express;Row=RX_SIG_LOST;Column=SFP2;Status=1;Show=nz" mask="0x00000040"/>
+         <node id="SFP_ABSENT_MASK" address="0x00000004" permission="r" description="'1' indicates SFP0..2 absent" parameters="Table=Slink_Express;Row=SFP_ABSENT;Column=SFP2;Status=1;Show=nz" mask="0x00000004"/>
+         <node id="SFP_LSC_DOWN_MASK" address="0x00000003" permission="r" description="'1' when DAQLSC of SFP0..2 is down" parameters="Table=Slink_Express;Row=SFP_LSC_DOWN;Column=SFP2;Status=1" mask="0x40000000"/>
+         <node id="TX_FAULT_MASK" address="0x00000004" permission="r" description="'1' indicates SFP0..2 TxFault" parameters="Table=Slink_Express;Row=TX_FAULT;Column=SFP2;Status=1;Show=nz" mask="0x00000400"/>
+      </node>
+      <node id="SFP_LSC_DOWN_MASK" address="0x00000003" permission="r" description="'1' when DAQLSC of SFP0..2 is down" parameters="Table=Slink_Express;Row=LSC_Down_Mask;Column=L;Status=2;Show=nz" mask="0x70000000"/>
+      <node id="TTC">
+         <node id="BCNT_ERROR" address="0x00000000" permission="r" description="TTC bcnt error" parameters="Table=TTC_Rx;Row=State;Column=BCNT;Status=1;Show=nz" mask="0x00000040"/>
+         <node id="BCNT_ERRORS_HI" address="0x00000045" permission="r" description="bit 15-0 TTC BC0 error counter bits[47:32]" parameters="Table=TTC_Rx;Row=Bcnt_Error;Column=Count;Status=1;Show=nz" mask="0x0000ffff"/>
+         <node id="BCNT_ERRORS_LO" address="0x00000044" permission="r" description="TTC BC0 error counter bits[31:0]" parameters="Table=TTC_Rx;Row=Bcnt_Error;Column=Count;Status=1;Show=nz"/>
+         <node id="MULT_BIT_ERROR" address="0x00000000" permission="r" description="TTC multi-bit error" parameters="Table=TTC_Rx;Row=State;Column=MULT;Status=1;Show=nz" mask="0x00000100"/>
+         <node id="MULT_BIT_ERRORS_HI" address="0x00000043" permission="r" description="TTC multi-bit error counter bits[47:32]" parameters="Table=TTC_Rx;Row=Mult_Bit_error;Column=Count;Status=1;Show=nz" mask="0x0000ffff"/>
+         <node id="MULT_BIT_ERRORS_LO" address="0x00000042" permission="r" description="TTC multi-bit error counter bits[31:0]" parameters="Table=TTC_Rx;Row=Mult_Bit_error;Column=Count;Status=1;Show=nz"/>
+         <node id="NOT_READY" address="0x00000000" permission="r" description="TTC not ready" parameters="Table=TTC_Rx;Row=State;Column=nRDY;Status=1;Show=nz" mask="0x00000020"/>
+         <node id="ROM" address="0x00000160" permission="r" description="TTC/TTS SFP ROM data(first 128 bytes, little endian)" parameters="Table=SFP_ROM;Row=ROM_Data;Column=TTC;Status=9"/>
+         <node id="SGL_BIT_ERROR" address="0x00000000" permission="r" description="TTC single bit error" parameters="Table=TTC_Rx;Row=State;Column=SGL;Status=1;Show=nz" mask="0x00000080"/>
+         <node id="SGL_BIT_ERRORS_HI" address="0x00000041" permission="r" description="TTC single bit error counter bits[47:32]" parameters="Table=TTC_Rx;Row=Sgl_Bit_Error;Column=Count;Status=1;Show=nz" mask="0x0000ffff"/>
+         <node id="SGL_BIT_ERRORS_LO" address="0x00000040" permission="r" description="TTC single bit error counter bits[31:0]" parameters="Table=TTC_Rx;Row=Sgl_Bit_Error;Column=Count;Status=1;Show=nz"/>
+      </node>
+   </node>
+</node>

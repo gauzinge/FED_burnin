@@ -119,6 +119,7 @@ public:
 
     void ConfigureFitel(const Fitel* pFitel, bool pVerifLoop = true);
 
+    void ReadLightOnFibre(const Fitel* pFitel);
 
     /////////////////////////////////////
     // PixFED System Methods
@@ -142,6 +143,10 @@ public:
      * \param pFED
      */
     void ConfigureFED( const PixFED* pFED );
+    /*!
+     * \brief: Halt the FED and put it back into safe mode
+     */
+    void HaltFED( const PixFED* pFED );
     /*!
      * \brief: find Phases for input data stream
      * \param: pScopeFIFOCh: channel for Phase Stability monitoring

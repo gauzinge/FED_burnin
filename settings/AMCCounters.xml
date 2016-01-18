@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- Generated from temp.csv -->
+<!-- Input fields:  Address LoBit HiBit Permission Name Description P_Status P_Show P_Table P_Row P_Column P_Format-->
+<node id="TOP">
+   <node id="ACCEPT_COUNTER_HI" address="0x4d" permission="r" description="Accept counter"/>
+   <node id="ACCEPT_COUNTER_LO" address="0x4c" permission="r" description=""/>
+   <node id="ALMOSTFULL" address="0x2e" permission="r" description="AMC DAQ_Link status: AlmostFull" mask="0x00000001"/>
+   <node id="AMC13_ACKS_HI" address="0x51" permission="r" description=""/>
+   <node id="AMC13_ACKS_LO" address="0x50" permission="r" description="ACK counter"/>
+   <node id="AMC13_AMC_EVENTS_HI" address="0x53" permission="r" description="" parameters="Table=AMC_Links;Row=AMC13_Events;Column=_2;Status=2"/>
+   <node id="AMC13_AMC_EVENTS_LO" address="0x52" permission="r" description="Receive Event counter" parameters="Table=AMC_Links;Row=AMC13_Events;Column=_2;Status=2"/>
+   <node id="AMC13_BAD_LENGTH_HI" address="0x71" permission="r" description="" parameters="Table=AMC_Links;Row=AMC13_bad_length;Column=_2;Status=1;Show=nz"/>
+   <node id="AMC13_BAD_LENGTH_LO" address="0x70" permission="r" description="AMC bad event length counter" parameters="Table=AMC_Links;Row=AMC13_bad_length;Column=_2;Status=1;Show=nz"/>
+   <node id="AMC13_BCN_MISMATCH_HI" address="0x6d" permission="r" description="" parameters="Table=AMC_Links;Row=AMC13_BcN_mismatch;Column=_2;Status=1;Show=nz"/>
+   <node id="AMC13_BCN_MISMATCH_LO" address="0x6c" permission="r" description="HTR event BCN mismatch counter" parameters="Table=AMC_Links;Row=AMC13_BcN_mismatch;Column=_2;Status=1;Show=nz"/>
+   <node id="AMC13_EVB_EVENTS_HI" address="0x55" permission="r" description="" parameters="Table=AMC_Links;Row=EVB_Events;Column=_2;Status=2"/>
+   <node id="AMC13_EVB_EVENTS_LO" address="0x54" permission="r" description="Read Event counter" parameters="Table=AMC_Links;Row=EVB_Events;Column=_2;Status=2"/>
+   <node id="AMC13_EVN_MISMATCH_HI" address="0x6b" permission="r" description="" parameters="Table=AMC_Links;Row=AMC13_EvN_mismatch;Column=_2;Status=1;Show=nz"/>
+   <node id="AMC13_EVN_MISMATCH_LO" address="0x6a" permission="r" description="HTR event EVN mismatch counter" parameters="Table=AMC_Links;Row=AMC13_EvN_mismatch;Column=_2;Status=1;Show=nz"/>
+   <node id="AMC13_ORN_MISMATCH_HI" address="0x6f" permission="r" description="" parameters="Table=AMC_Links;Row=AMC13_OrN_mismatch;Column=_2;Status=1;Show=nz"/>
+   <node id="AMC13_ORN_MISMATCH_LO" address="0x6e" permission="r" description="HTR event OCN mismatch counter" parameters="Table=AMC_Links;Row=AMC13_OrN_mismatch;Column=_2;Status=1;Show=nz"/>
+   <node id="AMC_ACCEPT_COUNTER_HI" address="0x01" permission="r" description=""/>
+   <node id="AMC_ACCEPT_COUNTER_LO" address="0x00" permission="r" description="AMC accept counter"/>
+   <node id="AMC_ACK_COUNTER_HI" address="0x03" permission="r" description=""/>
+   <node id="AMC_ACK_COUNTER_LO" address="0x02" permission="r" description="AMC ACK counter"/>
+   <node id="AMC_RESEND_COUNTER_HI" address="0x11" permission="r" description=""/>
+   <node id="AMC_RESEND_COUNTER_LO" address="0x10" permission="r" description="AMC Resend counter"/>
+   <node id="AMC_TTS_DISC_COUNTER_HI" address="0x7b" permission="r" description="" parameters="Table=AMC_Links;Row=TTS_Disconnected;Column=_2;Status=1;Show=nz"/>
+   <node id="AMC_TTS_DISC_COUNTER_LO" address="0x7a" permission="r" description="TTS state 'disconnected' from AMC" parameters="Table=AMC_Links;Row=TTS_Disconnected;Column=_2;Status=1;Show=nz"/>
+   <node id="AMC_TTS_ERR_COUNTER_HI" address="0x7f" permission="r" description="" parameters="Table=AMC_Links;Row=TTS_Error;Column=_2;Status=1;Show=nz"/>
+   <node id="AMC_TTS_ERR_COUNTER_LO" address="0x7e" permission="r" description="TTS state 'error' from AMC" parameters="Table=AMC_Links;Row=TTS_Error;Column=_2;Status=1;Show=nz"/>
+   <node id="AMC_TTS_SYNC_COUNTER_HI" address="0x7d" permission="r" description="" parameters="Table=AMC_Links;Row=TTS_Sync_Lost;Column=_2;Status=1;Show=nz"/>
+   <node id="AMC_TTS_SYNC_COUNTER_LO" address="0x7c" permission="r" description="TTS state 'sync lost' from AMC" parameters="Table=AMC_Links;Row=TTS_Sync_Lost;Column=_2;Status=1;Show=nz"/>
+   <node id="BAD_AMC_CRC_COUNTER_HI" address="0x79" permission="r" description="" parameters="Table=AMC_Links;Row=Bad_CRC;Column=_2;Status=2;Show=nz"/>
+   <node id="BAD_AMC_CRC_COUNTER_LO" address="0x78" permission="r" description="Bad CRC on event from AMC" parameters="Table=AMC_Links;Row=Bad_CRC;Column=_2;Status=2;Show=nz"/>
+   <node id="BAD_EVENTLENGTH_COUNTER_HI" address="0x13" permission="r" description="" parameters="Table=AMC_Links;Row=AMC_bad_length;Column=_2;Status=1;Show=nz"/>
+   <node id="BAD_EVENTLENGTH_COUNTER_LO" address="0x12" permission="r" description="AMC bad event length counter" parameters="Table=AMC_Links;Row=AMC_bad_length;Column=_2;Status=1;Show=nz"/>
+   <node id="BC0_MISMATCH_HI" address="0x47" permission="r" description="" parameters="Table=AMC_Trigger;Row=AMC13_BC0_err;Column=_2;Status=2;Show=nz"/>
+   <node id="BC0_MISMATCH_LO" address="0x46" permission="r" description="AMC13 trigger BC0 mismatch error counter" parameters="Table=AMC_Trigger;Row=AMC13_BC0_err;Column=_2;Status=2;Show=nz"/>
+   <node id="BCNT_MISMATCH_HI" address="0x49" permission="r" description="" parameters="Table=AMC_Trigger;Row=AMC13_bcnt_err;Column=_2;Status=2;Show=nz"/>
+   <node id="BCNT_MISMATCH_LO" address="0x48" permission="r" description="AMC13 trigger bcnt mismatch error counter" parameters="Table=AMC_Trigger;Row=AMC13_bcnt_err;Column=_2;Status=2;Show=nz"/>
+   <node id="BCN_MISMATCH_COUNTER_HI" address="0x0b" permission="r" description="" parameters="Table=AMC_Links;Row=AMC_BcN_Mismatch;Column=_2;Status=1;Show=nz"/>
+   <node id="BCN_MISMATCH_COUNTER_LO" address="0x0a" permission="r" description="AMC BcN mismatch counter" parameters="Table=AMC_Links;Row=AMC_BcN_Mismatch;Column=_2;Status=1;Show=nz"/>
+   <node id="COUNTER_ACCEPT_COUNTER_HI" address="0x4f" permission="r" description=""/>
+   <node id="COUNTER_ACCEPT_COUNTER_LO" address="0x4e" permission="r" description="Counter Accept counter"/>
+   <node id="COUNTER_ACK_COUNTER_HI" address="0x0f" permission="r" description=""/>
+   <node id="COUNTER_ACK_COUNTER_LO" address="0x0e" permission="r" description="AMC Counter ACK counter"/>
+   <node id="DAQ_DATABUF_RA" address="0x24" permission="r" description="AMC DAQ_Link status: DataBuf_ra" mask="0x00007fff"/>
+   <node id="DAQ_DATABUF_WA" address="0x22" permission="r" description="AMC DAQ_Link status: DataBuf_wa" mask="0x00007fff"/>
+   <node id="DAQ_EVT_STATUS_RA" address="0x20" permission="r" description="AMC DAQ_Link status: EventStatus_ra" mask="0x00001f00"/>
+   <node id="DAQ_EVT_STATUS_WA" address="0x20" permission="r" description="AMC DAQ_Link status: EventStatus_wa" mask="0x0000001f"/>
+   <node id="DAQ_FIFO_OVF" address="0x20" permission="r" description="AMC DAQ_Link status: FIFO_ovf" mask="0x00008000"/>
+   <node id="DATAFIFO_EMPTY" address="0x2e" permission="r" description="AMC DAQ_Link status: dataFIFO_Empty" mask="0x00000001"/>
+   <node id="EVENTCNT" address="0x2e" permission="r" description="AMC DAQ_Link status: EventCnt" mask="0x000001f0"/>
+   <node id="EVN_ERRORS_AT_LINK_INPUT_HI" address="0x1f" permission="r" description="" parameters="Table=AMC_Links;Row=AMC_EvN_Errors;Column=_2;Status=1;Show=nz"/>
+   <node id="EVN_ERRORS_AT_LINK_INPUT_LO" address="0x1e" permission="r" description="event number error counter at link input" parameters="Table=AMC_Links;Row=AMC_EvN_Errors;Column=_2;Status=1;Show=nz"/>
+   <node id="EVN_MISMATCH_COUNTER_HI" address="0x07" permission="r" description="" parameters="Table=AMC_Links;Row=AMC_EvN_Mismatch;Column=_2;Status=1;Show=nz"/>
+   <node id="EVN_MISMATCH_COUNTER_LO" address="0x06" permission="r" description="AMC Evn mismatch counter" parameters="Table=AMC_Links;Row=AMC_EvN_Mismatch;Column=_2;Status=1;Show=nz"/>
+   <node id="EV_BUFR_ALMOST_FULL_TIME_HI" address="0x17" permission="r" description=""/>
+   <node id="EV_BUFR_ALMOST_FULL_TIME_LO" address="0x16" permission="r" description="AMC event buffer almost full time counter"/>
+   <node id="HEADERS_AT_LINK_INPUT_HI" address="0x1b" permission="r" description="" parameters="Table=AMC_Links;Row=AMC_Headers;Column=_2;Status=2;Show=nz"/>
+   <node id="HEADERS_AT_LINK_INPUT_LO" address="0x1a" permission="r" description="header word counter at link input" parameters="Table=AMC_Links;Row=AMC_Headers;Column=_2;Status=2;Show=nz"/>
+   <node id="HTRINFO_RA" address="0x2c" permission="r" description="AMC DAQ_Link status: HTRinfo_ra" mask="0x000003ff"/>
+   <node id="HTRINFO_WA" address="0x2a" permission="r" description="AMC DAQ_Link status: HTRinfo_wa" mask="0x000003ff"/>
+   <node id="L1AINFO_RA" address="0x28" permission="r" description="AMC DAQ_Link status: L1Ainfo_ra" mask="0x000003ff"/>
+   <node id="L1AINFO_WA" address="0x26" permission="r" description="AMC DAQ_Link status: L1Ainfo_wa" mask="0x000003ff"/>
+   <node id="L1A_ABORT_COUNTER_HI" address="0x05" permission="r" description="AMC L1A abort counter HI"/>
+   <node id="L1A_ABORT_COUNTER_LO" address="0x04" permission="r" description="AMC L1A abort counter LO"/>
+   <node id="MULTI_BIT_ERR_HI" address="0x45" permission="r" description="" parameters="Table=AMC_Trigger;Row=AMC13_dbl_err;Column=_2;Status=1;Show=nz"/>
+   <node id="MULTI_BIT_ERR_LO" address="0x44" permission="r" description="AMC13 trigger data multi-bit error counter" parameters="Table=AMC_Trigger;Row=AMC13_dbl_err;Column=_2;Status=1;Show=nz"/>
+   <node id="ORN_MISMATCH_COUNTER_HI" address="0x09" permission="r" description="" parameters="Table=AMC_Links;Row=AMC_OrN_Mismatch;Column=_2;Status=1;Show=nz"/>
+   <node id="ORN_MISMATCH_COUNTER_LO" address="0x08" permission="r" description="AMC OrN mismatch counter" parameters="Table=AMC_Links;Row=AMC_OrN_Mismatch;Column=_2;Status=1;Show=nz"/>
+   <node id="RECEIVED_EVENT_COUNTER_HI" address="0x0d" permission="r" description="" parameters="Table=AMC_Links;Row=AMC_Events;Column=_2;Status=1;Show=nz"/>
+   <node id="RECEIVED_EVENT_COUNTER_LO" address="0x0c" permission="r" description="AMC received event counter" parameters="Table=AMC_Links;Row=AMC_Events;Column=_2;Status=1;Show=nz"/>
+   <node id="RESEND_COUNTER_HI" address="0x4b" permission="r" description=""/>
+   <node id="RESEND_COUNTER_LO" address="0x4a" permission="r" description="ReSend counter"/>
+   <node id="RESETQUE_A" address="0x2e" permission="r" description="AMC DAQ_Link status: ReSendQue_a" mask="0x0000000c"/>
+   <node id="SINGLE_BIT_ERR_HI" address="0x43" permission="r" description="" parameters="Table=AMC_Trigger;Row=AMC13_sgl_err;Column=_2;Status=1;Show=nz"/>
+   <node id="SINGLE_BIT_ERR_LO" address="0x42" permission="r" description="AMC13 trigger data single bit error counter" parameters="Table=AMC_Trigger;Row=AMC13_sgl_err;Column=_2;Status=1;Show=nz"/>
+   <node id="TRAILERS_AT_LINK_INPUT_HI" address="0x1d" permission="r" description="" parameters="Table=AMC_Links;Row=AMC_Trailers;Column=_2;Status=2;Show=nz"/>
+   <node id="TRAILERS_AT_LINK_INPUT_LO" address="0x1c" permission="r" description="trailer word counter at link input" parameters="Table=AMC_Links;Row=AMC_Trailers;Column=_2;Status=2;Show=nz"/>
+   <node id="TRAILER_EVN_MISMATCH_COUNTER_HI" address="0x15" permission="r" description="" parameters="Table=AMC_Links;Row=AMC_trailer_EvN_bad;Column=_2;Status=1;Show=nz"/>
+   <node id="TRAILER_EVN_MISMATCH_COUNTER_LO" address="0x14" permission="r" description="AMC event trailer Evn mismatch error counter" parameters="Table=AMC_Links;Row=AMC_trailer_EvN_bad;Column=_2;Status=1;Show=nz"/>
+   <node id="TTC_UPDATE_COUNTER_HI" address="0x77" permission="r" description="" parameters="Table=AMC_Links;Row=TTC_Update;Column=_2;Status=2;Show=nz"/>
+   <node id="TTC_UPDATE_COUNTER_LO" address="0x76" permission="r" description="TTC update from AMC cards counter" parameters="Table=AMC_Links;Row=TTC_Update;Column=_2;Status=2;Show=nz"/>
+   <node id="TTS_UPDATE_COUNTER_HI" address="0x75" permission="r" description="" parameters="Table=AMC_Links;Row=TTS_Update;Column=_2;Status=2;Show=nz"/>
+   <node id="TTS_UPDATE_COUNTER_LO" address="0x74" permission="r" description="TTS update from AMC cards counter" parameters="Table=AMC_Links;Row=TTS_Update;Column=_2;Status=2;Show=nz"/>
+   <node id="WORDS_AT LINK_INPUT_HI" address="0x19" permission="r" description="" parameters="Table=AMC_Links;Row=AMC_words;Column=_2;Status=2;Show=nz"/>
+   <node id="WORDS_AT LINK_INPUT_LO" address="0x18" permission="r" description="total word counter at link input" parameters="Table=AMC_Links;Row=AMC_words;Column=_2;Status=2;Show=nz"/>
+   <node id="WORD_COUNTER_HI" address="0x41" permission="r" description="" parameters="Table=AMC_Links;Row=AMC13_Words;Column=_2;Status=2;Show=nz"/>
+   <node id="WORD_COUNTER_LO" address="0x40" permission="r" description="AMC13 total word counter" parameters="Table=AMC_Links;Row=AMC13_Words;Column=_2;Status=2;Show=nz"/>
+</node>

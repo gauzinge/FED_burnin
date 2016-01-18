@@ -95,6 +95,10 @@ public:
     * \param pPixFED
     */
     bool ConfigureBoard( const PixFED* pPixFED );
+    /*!
+     * \brief: Halt Board and put it back to safe state with internal Clock and golden Image FW
+     */
+    void HaltBoard();
     // Methods for management of FMCs
     /*!
      * \brief Disable FMC power
@@ -202,6 +206,7 @@ private:
     uint32_t computeBlockSize();
 
     void prettyprintFIFO1( const std::vector<uint32_t>& pFifoVec, const std::vector<uint32_t>& pMarkerVec, std::ostream& os = std::cout);
+    void prettyprintPhase( const std::vector<uint32_t>& pData, int pChannel );
 
     // FPGA CONFIG METHODS
 public:

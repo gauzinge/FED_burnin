@@ -4,7 +4,7 @@
         <connection id="board0" uri="chtcp-2.0://cmsuppixch:10203?target=192.168.000.21:50001" address_table="file://settings/address_table.xml" />
         <!-- Trigger -->
         <Register name="pixfed_ctrl_regs.TRIGGER_SEL">0</Register>
-        <Register name="pixfed_ctrl_regs.INT_TRIGGER_FREQ_SEL">5</Register>
+        <Register name="pixfed_ctrl_regs.INT_TRIGGER_FREQ_SEL">9</Register>
         <!-- TBM MASK -->
         <Register name="pixfed_ctrl_regs.TBM_MASK_1">0b00000000</Register>
         <Register name="pixfed_ctrl_regs.TBM_MASK_2">0b00000000</Register>
@@ -22,7 +22,7 @@
         <connection id="board1" uri="chtcp-2.0://cmsuppixch:10203?target=192.168.000.22:50001" address_table="file://settings/address_table.xml" />
         <!-- Trigger -->
         <Register name="pixfed_ctrl_regs.TRIGGER_SEL">0</Register>
-        <Register name="pixfed_ctrl_regs.INT_TRIGGER_FREQ_SEL">5</Register>
+        <Register name="pixfed_ctrl_regs.INT_TRIGGER_FREQ_SEL">9</Register>
         <!-- TBM MASK -->
         <Register name="pixfed_ctrl_regs.TBM_MASK_1">0b00000000</Register>
         <Register name="pixfed_ctrl_regs.TBM_MASK_2">0b00000000</Register>
@@ -34,7 +34,7 @@
         <connection id="board2" uri="chtcp-2.0://cmsuppixch:10203?target=192.168.000.23:50001" address_table="file://settings/address_table.xml" />
         <!-- Trigger -->
         <Register name="pixfed_ctrl_regs.TRIGGER_SEL">0</Register>
-        <Register name="pixfed_ctrl_regs.INT_TRIGGER_FREQ_SEL">5</Register>
+        <Register name="pixfed_ctrl_regs.INT_TRIGGER_FREQ_SEL">9</Register>
         <!-- TBM MASK -->
         <Register name="pixfed_ctrl_regs.TBM_MASK_1">0b00000000</Register>
         <Register name="pixfed_ctrl_regs.TBM_MASK_2">0b00000000</Register>
@@ -46,7 +46,7 @@
         <connection id="board3" uri="chtcp-2.0://cmsuppixch:10203?target=192.168.000.25:50001" address_table="file://settings/address_table.xml" />
         <!-- Trigger -->
         <Register name="pixfed_ctrl_regs.TRIGGER_SEL">0</Register>
-        <Register name="pixfed_ctrl_regs.INT_TRIGGER_FREQ_SEL">5</Register>
+        <Register name="pixfed_ctrl_regs.INT_TRIGGER_FREQ_SEL">9</Register>
         <!-- TBM MASK -->
         <Register name="pixfed_ctrl_regs.TBM_MASK_1">0b00000000</Register>
         <Register name="pixfed_ctrl_regs.TBM_MASK_2">0b00000000</Register>
@@ -58,7 +58,7 @@
         <connection id="board4" uri="chtcp-2.0://cmsuppixch:10203?target=192.168.000.26:50001" address_table="file://settings/address_table.xml" />
         <!-- Trigger -->
         <Register name="pixfed_ctrl_regs.TRIGGER_SEL">0</Register>
-        <Register name="pixfed_ctrl_regs.INT_TRIGGER_FREQ_SEL">5</Register>
+        <Register name="pixfed_ctrl_regs.INT_TRIGGER_FREQ_SEL">9</Register>
         <!-- TBM MASK -->
         <Register name="pixfed_ctrl_regs.TBM_MASK_1">0b00000000</Register>
         <Register name="pixfed_ctrl_regs.TBM_MASK_2">0b00000000</Register>
@@ -70,5 +70,5 @@
 <Settings>
     <Setting name="NTBM">48</Setting>
     <!--if set to 0, loop will run forever-->
-    <Setting name="NAcq">0</Setting>
+    <Setting name="NAcq">500000</Setting>
 </Settings>

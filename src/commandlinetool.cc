@@ -108,6 +108,7 @@ int main(int argc, char* argv[] )
 	    // READ data from DAQ
 	    splitUserInput.erase(splitUserInput.begin());
 	    std::cout << "readDAQ()" <<  std::endl;
+	    readDAQ();
 	  }
 	else if(splitUserInput[0] == "a")
 	  {

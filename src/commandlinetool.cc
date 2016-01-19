@@ -76,128 +76,154 @@ int main(int argc, char* argv[] )
 	else if(splitUserInput[0] == "i" || splitUserInput[0] == "info")
 	  {
 	    splitUserInput.erase(splitUserInput.begin());
-	    //	    std::cout << "DAQinfo()" <<  std::endl;
+	    std::cout << "DAQinfo()" <<  std::endl;
 	    DAQinfo();
 	  }
 	else if(splitUserInput[0] == "s" || splitUserInput[0] == "start")
 	  {
 	    splitUserInput.erase(splitUserInput.begin());
+	    std::cout << "startDAQ()" <<  std::endl;
 	    startDAQ();
 	  }
 	else if(splitUserInput[0] == "x" || splitUserInput[0] == "stop")
 	  {
 	    splitUserInput.erase(splitUserInput.begin());
+	    std::cout << "stopDAQ()" <<  std::endl;
 	    stopDAQ();
 	  }
 	else if(splitUserInput[0] == "p" || splitUserInput[0] == "pause")
 	  {
 	    splitUserInput.erase(splitUserInput.begin());
+	    std::cout << "pauseDAQ()" <<  std::endl;
 	    pauseDAQ();
 	  }
 	else if(splitUserInput[0] == "r" || splitUserInput[0] == "resume")
 	  {
 	    splitUserInput.erase(splitUserInput.begin());
+	    std::cout << "resumeDAQ()" <<  std::endl;
 	    resumeDAQ();
 	  }
 	else if(splitUserInput[0] == "read")
 	  {
 	    // READ data from DAQ
+	    splitUserInput.erase(splitUserInput.begin());
+	    std::cout << "readDAQ()" <<  std::endl;
 	  }
 	else if(splitUserInput[0] == "a")
 	  {
 	    //check if a value for loops was supplied
 	    std::string::size_type sz;
-	    int loops = stoi(splitUserInput[1], &sz);
-	    if(splitUserInput[1].substr(sz) == "\0")
+	    int loops;
+	    if(splitUserInput.size() > 1 && !(checkInput(splitUserInput[1])))
 	      {
-		std::cout << "The data acquisition will be performed for " << loops << " loops" << std::endl;
-		cNAcq = loops;
+		try
+		  {
+		    loops = stoi(splitUserInput[1], &sz);
+		  }
+		catch(std::invalid_argument&)
+		  {
+		    std::cout << "There must have been an error in the command string. Try again!" << std::endl;
+		    splitUserInput.clear();
+		    continue;
+		  }
 
-		splitUserInput.erase(splitUserInput.begin(), splitUserInput.begin()+1);
+		if(splitUserInput[1].substr(sz) == "\0")
+		  {
+		    cNAcq = loops;
+		    splitUserInput.erase(splitUserInput.begin(), splitUserInput.begin()+1);
+		  }
+		else
+		  {
+		    std::cout << "There must have been an error in the command string. Try again!" << std::endl;
+		    splitUserInput.clear();
+		    continue;
+		  }
 	      }
-	    else
-	      {
-		std::cout << "There must have been an error in the command string. Try again!" << std::endl;
-		splitUserInput.clear();
-	      }
-	    
 	    splitUserInput.erase(splitUserInput.begin());
+	    std::cout << "loopDAQ() || cNAcq =" << cNAcq <<  std::endl;
 	    loopDAQ(cNAcq);
 	  }
 	else if(splitUserInput[0] == "c" || splitUserInput[0] == "conf" || splitUserInput[0] == "configure" )
 	  {
-	    if(splitUserInput.size() > 1)
+	    if(splitUserInput.size() > 1 && !checkInput(splitUserInput[1]))
 	      {
-		//check if next argument is a valid command
-		if ( checkInput(splitUserInput[1]))
+		if(fileexists(splitUserInput[1]))
 		  {
-		    // The command is valid and will be processed next.
-		    // We load the previously specified file
-		    configDAQ(cHWFile);
-	    	    splitUserInput.erase(splitUserInput.begin());
-		  }
-		// Either we have a false command or a file name.
-		// So we check if the specified file exists or not
-		else if(fileexists(splitUserInput[1]))
-		  {
-		    //do something
+		    //the configuration is loaded from a valid file path
 		    const char* newHWFile = splitUserInput[1].c_str();
-		    configDAQ(newHWFile);
 	    	    splitUserInput.erase(splitUserInput.begin(),splitUserInput.begin()+1);
+		    std::cout << "configDAQ() with " << newHWFile <<  std::endl;
+		    configDAQ(newHWFile);
 		  }
 		else
 		  {
 		    //neither the command after the configure is valid,
 		    //nor can an existing file be found.
 		    //we terminate the loop for now
-		    std::cout << splitUserInput[0]<<" is an invalid command! Try again" << std::endl;
+		    std::cout << splitUserInput[0] << " " <<  splitUserInput[1] <<" Error: HWdescription file does not exist" << std::endl;
 		    splitUserInput.clear();
 		  }
 	      }
 	    //no additional argument is presented
 	    else
 	      {
-		configDAQ(cHWFile);
 		splitUserInput.erase(splitUserInput.begin());
+		std::cout << "configDAQ() with " << cHWFile <<  std::endl;
+		configDAQ(cHWFile);
 	      }
 	  }
 	else if(splitUserInput[0] == "list" )
 	  {
 	    // LIST firmware images
-	    listFW();
 	    splitUserInput.erase(splitUserInput.begin());
+	    std::cout << "listFW()" <<  std::endl;
+	    listFW();
 	  }
 	else if(splitUserInput[0] == "flash" )
 	  {
 	    // FLASH FPGA
+	    splitUserInput.erase(splitUserInput.begin());
+	    std::cout << "flashFPGA()" <<  std::endl;	    
+	    flashFPGA();
 	  }
 	else if(splitUserInput[0] == "fpgaconf" )
 	  {
-	    // jump to an FPGA configuration
+	    // jump to an FPGA configuration (this could be a bit trickier)
+	    splitUserInput.erase(splitUserInput.begin());
+	    std::cout << "switchFW()" <<  std::endl;	    
+	    switchFW();
 	  }
 	else if(splitUserInput[0] == "trans")
 	  {
 	    // TRANSPARENT buffer dump
-	    getTransparent();
+	    //	    getTransparent();
 	    splitUserInput.erase(splitUserInput.begin());
+	    std::cout << "getTransparent()" <<  std::endl;
+	    getTransparent();
 	  }
 	else if(splitUserInput[0] == "spy")
 	  {
 	    // SPY FIFO dump
-	    getSpy();
+	    //	    getSpy();
 	    splitUserInput.erase(splitUserInput.begin());
+	    std::cout << "getSpy()" <<  std::endl;	    
+	    getSpy();
 	  }
 	else if(splitUserInput[0] == "fifo1" || splitUserInput[0] == "one")
 	  {
 	    // FIFO1 dump
-	    getFIFO1();
+	    //	    getFIFO1();
 	    splitUserInput.erase(splitUserInput.begin());
+	    std::cout << "getFIFO1()" <<  std::endl;	    
+	    getFIFO1();
 	  }
-	else if(splitUserInput[0] == "dumpallfifo")
+	else if(splitUserInput[0] == "dumpallfifo" || splitUserInput[0] == "dump")
 	  {
 	    // dump all FIFOs and transparent buffer
-	    dumpAll();
+	    //	    dumpAll();
 	    splitUserInput.erase(splitUserInput.begin());
+	    std::cout << "dumpAll()" <<  std::endl;	    
+	    dumpAll();
 	  }
 	else if(splitUserInput[0] == "q" || splitUserInput[0] == "quit")
 	  {
@@ -209,7 +235,6 @@ int main(int argc, char* argv[] )
     //    logger.close();
 
 }
-
 
 void defineValidInput(){
 
@@ -250,6 +275,7 @@ void defineValidInput(){
   validInput.push_back("one");
   // dump all FIFOs
   validInput.push_back("dumpallfifo");
+  validInput.push_back("dump");
   // flash PROM
   validInput.push_back("flash");
   // Jump to FPGA Config
@@ -259,8 +285,6 @@ void defineValidInput(){
  
 }
 
-
-
 void splitInput(std::string userInput){
 
   //split into different words
@@ -269,19 +293,10 @@ void splitInput(std::string userInput){
     {
       std::string uI;
       getline(iss,uI,' ');
-      std::cout << uI << std::endl;
-      // if(checkInput(uI))
-      // 	{
-      // 	  std::cout << "True for " << uI << std::endl; 
-      // 	}
-      // else
-      // 	{
-      // 	  std::cout << "False for " << uI << std::endl; 
-      // 	}
+      //      std::cout << uI << std::endl;
       splitUserInput.push_back(uI);
     }
 }
-
 
 bool checkInput(std::string userInput){
 
@@ -332,7 +347,6 @@ bool fileexists(std::string filename){
   return ifile;
 }
 
-
 void DAQinfo(){
   // get the board INFO of all boards and start the acquistion
   std::cout << "DAQ info" << std::endl;
@@ -341,6 +355,7 @@ void DAQinfo(){
       cSystemController.fFEDInterface->getBoardInfo(cFED);
     }
 }
+
 void startDAQ(){
   // START DAQ on all FEDs
   for (auto& cFED : cSystemController.fPixFEDVector)
@@ -348,6 +363,7 @@ void startDAQ(){
       cSystemController.fFEDInterface->Start(cFED);
     }
 }
+
 void stopDAQ(){
   // STOP DAQ on all FEDs
   for (auto& cFED : cSystemController.fPixFEDVector)
@@ -355,6 +371,7 @@ void stopDAQ(){
       cSystemController.fFEDInterface->Stop(cFED);
     }
 }
+
 void pauseDAQ(){
   // PAUSE DAQ on all FEDs
   for (auto& cFED : cSystemController.fPixFEDVector)
@@ -362,6 +379,7 @@ void pauseDAQ(){
       cSystemController.fFEDInterface->Pause(cFED);
     }
 }
+
 void resumeDAQ(){
   // RESUME DAQ on all FEDs
   for (auto& cFED : cSystemController.fPixFEDVector)
@@ -371,8 +389,14 @@ void resumeDAQ(){
 }
 
 
-void readData(){}
-
+void readData(){
+  //READ a single data acquisition
+  Data cData;
+  for (auto& cFED : cSystemController.fPixFEDVector)
+    {
+      cData.add(0, cSystemController.fFEDInterface->ReadData(cFED));
+    }
+}
 
 
 void loopDAQ(int loops){
@@ -466,6 +490,7 @@ void listFW(){
 	}
     }
 }
+
 void getTransparent(){
   for (auto& cFED : cSystemController.fPixFEDVector)
     {
@@ -473,6 +498,7 @@ void getTransparent(){
       cSystemController.fFEDInterface->readTransparentFIFO(cFED);
     }
 }
+
 void getSpy(){
   for (auto& cFED : cSystemController.fPixFEDVector)
     {
@@ -480,6 +506,7 @@ void getSpy(){
       cSystemController.fFEDInterface->readSpyFIFO(cFED);
     }
 }
+
 void getFIFO1(){
   for (auto& cFED : cSystemController.fPixFEDVector)
     {
@@ -487,6 +514,7 @@ void getFIFO1(){
       cSystemController.fFEDInterface->readFIFO1(cFED);
     }
 }
+
 void dumpAll(){
   for (auto& cFED : cSystemController.fPixFEDVector)
     {

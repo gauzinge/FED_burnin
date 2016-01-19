@@ -30,9 +30,6 @@ std::string userInput;
 std::vector<std::string> splitUserInput;
 std::vector<std::string> validInput;
 
-
-
-
 //my functions
 
 void defineValidInput();

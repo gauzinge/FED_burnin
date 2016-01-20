@@ -60,7 +60,7 @@ int main(int argc, char* argv[] )
             cSystemController.fFEDInterface->readTransparentFIFO(cFED);
             cSystemController.fFEDInterface->readSpyFIFO(cFED);
             cSystemController.fFEDInterface->readFIFO1(cFED);
-            //cSystemController.fFEDInterface->ReadData(cFED);
+            cSystemController.fFEDInterface->ReadData(cFED);
         }
     }
     cSystemController.HaltHw();

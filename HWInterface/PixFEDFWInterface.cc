@@ -280,6 +280,7 @@ void PixFEDFWInterface::prettyprintSpyFIFO(std::vector<uint32_t> pVec)
             if (((cWord & cMask) >> 4) == 7 ) std::cout << " " << std::endl;
             if (((cWord & cMask) >> 4) == 15 ) std::cout << " " << std::endl;
         }
+
     }
 }
 std::string PixFEDFWInterface::readFIFO1()
@@ -413,7 +414,7 @@ void PixFEDFWInterface::Start()
     //set fNthAcq to 0 since I am starting from scratch and thus start with DDR0
     fNthAcq = 0;
     std::vector< std::pair<std::string, uint32_t> > cVecReg;
-    cVecReg.push_back( {"pixfed_ctrl_regs.CMD_START_BY_PC", 1} );
+    //cVecReg.push_back( {"pixfed_ctrl_regs.CMD_START_BY_PC", 1} );
     cVecReg.push_back( {"pixfed_ctrl_regs.INT_TRIGGER_EN", 1} );
 
     WriteStackReg( cVecReg );
@@ -423,10 +424,10 @@ void PixFEDFWInterface::Stop()
 {
     //Stop the DAQ
     std::vector< std::pair<std::string, uint32_t> > cVecReg;
-    cVecReg.push_back( {"pixfed_ctrl_regs.CMD_START_BY_PC", 0} );
+    //cVecReg.push_back( {"pixfed_ctrl_regs.CMD_START_BY_PC", 0} );
     cVecReg.push_back( {"pixfed_ctrl_regs.INT_TRIGGER_EN", 0} );
     cVecReg.push_back( {"pixfed_ctrl_regs.PC_CONFIG_OK", 0} );
-    cVecReg.push_back( {"pixfed_ctrl_regs.rx_index_sel_en", 0} );
+    //cVecReg.push_back( {"pixfed_ctrl_regs.rx_index_sel_en", 0} );
 
     WriteStackReg( cVecReg );
     cVecReg.clear();
@@ -513,6 +514,7 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData( PixFED* pPixFED )
 
 uint32_t PixFEDFWInterface::computeBlockSize( )
 {
+    //fBlockSize = 16000;
     // this is the number of bits to read from DDR
     fBlockSize = fNTBM * fNCh * fNPattern * fPacketSize;
     // since the DDR data widt is 256 this is the number of 32 bit words I have to read

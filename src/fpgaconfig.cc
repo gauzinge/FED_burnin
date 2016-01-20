@@ -58,7 +58,7 @@ int main( int argc, char* argv[] )
         std::cout << cmd.parseErrorDescription( result );
         exit( 1 );
     }
-    std::string cHWFile = ( cmd.foundOption( "config" ) ) ? cmd.optionValue( "config" ) : "settings/HWDescription.xml";
+    std::string cHWFile = ( cmd.foundOption( "config" ) ) ? cmd.optionValue( "config" ) : "settings/FWUpload.xml";
     cSystemController.InitializeHw( cHWFile );
     //cSystemController.ConfigureHw( std::cout);
 

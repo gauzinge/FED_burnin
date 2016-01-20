@@ -256,7 +256,7 @@
     </node>
 
     <!-- HEPHY SPY FIFOs -->
-    <node id="fifo" permission="rw" >
+    <node id="fifo" permission="r" >
         <node id="bit_stream" address="0x40040000" mode="non-incremental" size="32" />
         <node id="spy_A" address="0x40040001" mode="non-incremental" size="4096" />
         <node id="spy_B" address="0x40040002" mode="non-incremental" size="4096" />

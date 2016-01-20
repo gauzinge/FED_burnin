@@ -50,12 +50,17 @@ int main(int argc, char* argv[] )
         cSystemController.fFEDInterface->findPhases(cFED, 0);
     }
 
-    mypause();
-
-    for (auto& cFED : cSystemController.fPixFEDVector)
+    for (int i = 0; i < 11; i++)
     {
-        cSystemController.fFEDInterface->readTransparentFIFO(cFED);
-        cSystemController.fFEDInterface->readSpyFIFO(cFED);
+
+        for (auto& cFED : cSystemController.fPixFEDVector)
+        {
+            cSystemController.fFEDInterface->WriteBoardReg(cFED, "fe_ctrl_regs.decode_reg_reset", 1);
+            mypause();
+            cSystemController.fFEDInterface->readTransparentFIFO(cFED);
+            cSystemController.fFEDInterface->readSpyFIFO(cFED);
+            cSystemController.fFEDInterface->readFIFO1(cFED);
+        }
     }
     cSystemController.HaltHw();
     cAmc13Controller.HaltAmc13();

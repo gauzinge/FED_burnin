@@ -244,7 +244,7 @@ void PixFEDInterface::ReadLightOnFibre( const Fitel* pFitel )
         FitelRegItem cRegItemRead;
         DecodeFitelReg( cRegItemRead, cFMCId, cFitelId, cVecRead.at(cItem) );
         if (cRegItemRead.fValue == 0x80)
-            std::cout << RED <<  "Detected Light on FMC: " << +cFMCId <<  " Fitel Id: " << +cFitelId  << " Fibre: " << cItem << RESET << std::endl;
+            std::cout << RED <<  "Detected Light on FMC: " << +cFMCId <<  " Fitel Id: " << +cFitelId  << " Fibre: " << cItem << " Value: " << +cRegItemRead.fValue <<  RESET << std::endl;
 
     }
 }

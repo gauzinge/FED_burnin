@@ -367,8 +367,8 @@ bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED )
 
 
     // the FW needs to be aware of the true 32 bit workd Block size for some reason! This is the Packet_nb_true in the python script?!
-    computeBlockSize();
-    cVecReg.push_back( {"pixfed_ctrl_regs.PACKET_NB", ( fBlockSize32 - 1 )  } );
+    //computeBlockSize();
+    //cVecReg.push_back( {"pixfed_ctrl_regs.PACKET_NB", ( fBlockSize32 - 1 )  } );
 
     //WriteStackReg( cVecReg );
 
@@ -465,9 +465,10 @@ void PixFEDFWInterface::Resume()
     WriteReg( "pixfed_ctrl_regs.INT_TRIGGER_EN", 1 );
 }
 
-std::vector<uint32_t> PixFEDFWInterface::ReadData( PixFED* pPixFED )
+std::vector<uint32_t> PixFEDFWInterface::ReadData( PixFED* pPixFED, uint32_t pBlockSize )
 {
-
+	int cBlockSize;
+	if(pBlockSize == 0) cBlockSize = fBlockSize;
     std::chrono::milliseconds cWait( 10 );
     // the fNthAcq variable is automatically used to determine which DDR FIFO to read - so it has to be incremented in this method!
     // first find which DDR bank to read
@@ -489,7 +490,7 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData( PixFED* pPixFED )
     std::this_thread::sleep_for( cWait );
     //std::cout << "Starting block read of " << fStrDDR << std::endl;
 
-    std::vector<uint32_t> cData = ReadBlockRegValue( fStrDDR, fBlockSize );
+    std::vector<uint32_t> cData = ReadBlockRegValue( fStrDDR, cBlockSize );
     WriteReg( fStrDDRControl , 1 );
     std::this_thread::sleep_for( cWait );
     WriteReg( fStrReadout, 1 );
@@ -501,11 +502,25 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData( PixFED* pPixFED )
     WriteReg( fStrReadout, 0 );
 
     //now I need to do something with the Data that I read into cData
-
+    int cIndex=0;
+    uint32_t cPreviousWord;
     for ( auto& cWord : cData )
     {
-        std::cout << std::hex << std::setw(8) << std::setfill('0');
-        std::cout << cWord << std::dec << std::endl;
+      //      std::cout << std::hex << std::setw(8) << std::setfill('0');
+      if(cIndex%2 == 0)
+	{    
+	  if(cWord == 0x8) std::cout << "Evt Header: \n";
+	  else if(cWord == 0xC) std::cout << "ROC Header: \n"; 
+	  else if(cWord == 0x1) std::cout << "PXL    Hit: ";
+	  else if(cWord == 0x4) std::cout << "TBM Trailer: \n";
+	  else if(cWord == 0x6) std::cout << "Evt Trailer: \n";
+	  cPreviousWord = cWord;
+	}
+      else if(cPreviousWord == 0x1)
+	{
+	  std::cout << "CH: " << ((cWord >> 26) &0x3f) << " ROC: " << ((cWord >> 21) & 0x1f) << " DC: " << ((cWord >> 16) & 0x1f) << " ROW: " << ((cWord >>8) & 0xff) << " PH: " << (cWord & 0xff) << std::dec << std::endl;
+	}
+      cIndex++;
     }
 
     fNthAcq++;
@@ -514,12 +529,11 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData( PixFED* pPixFED )
 
 uint32_t PixFEDFWInterface::computeBlockSize( )
 {
-    //fBlockSize = 16000;
-    // this is the number of bits to read from DDR
-    fBlockSize = fNTBM * fNCh * fNPattern * fPacketSize;
-    // since the DDR data widt is 256 this is the number of 32 bit words I have to read
-    fBlockSize32 = static_cast<uint32_t>( fBlockSize / 8 );
-    return fBlockSize;
+   // this is the number of bits to read from DDR
+   fBlockSize = fNTBM * fNCh * fNPattern * fPacketSize;
+   // since the DDR data widt is 256 this is the number of 32 bit words I have to read
+   fBlockSize32 = static_cast<uint32_t>( fBlockSize / 8 );
+   return fBlockSize;
 }
 
 std::vector<uint32_t> PixFEDFWInterface::ReadBlockRegValue( const std::string& pRegNode, const uint32_t& pBlocksize )

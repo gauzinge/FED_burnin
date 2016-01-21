@@ -114,8 +114,8 @@ void SystemController::parseHWxml( const std::string& pFilename, std::ostream& o
         for ( pugi::xml_node cBeBoardRegNode = cBeBoardNode.child( "Register" ); cBeBoardRegNode; cBeBoardRegNode = cBeBoardRegNode.next_sibling("Register") )
         {
             std::string nodename = cBeBoardRegNode.name();
-            if (nodename == "Register") os << BOLDCYAN << "|" << "----" << cBeBoardRegNode.name() << "  " << cBeBoardRegNode.first_attribute().name() << " :" << cBeBoardRegNode.attribute( "name" ).value() << " " << BOLDRED << atoi(cBeBoardRegNode.first_child().value()) << RESET << std:: endl;
-            cPixFED->setReg( std::string( cBeBoardRegNode.attribute( "name" ).value() ), atoi( cBeBoardRegNode.first_child().value() ) );
+            if (nodename == "Register") os << BOLDCYAN << "|" << "----" << cBeBoardRegNode.name() << "  " << cBeBoardRegNode.first_attribute().name() << " :" << cBeBoardRegNode.attribute( "name" ).value() << " " << BOLDRED << convertAnyInt(cBeBoardRegNode.first_child().value()) << RESET << std:: endl;
+            cPixFED->setReg( std::string( cBeBoardRegNode.attribute( "name" ).value() ), convertAnyInt( cBeBoardRegNode.first_child().value() ) );
         }
 
         // here I need to crate the Fitels and push them back in the fFitelVector of PixFED

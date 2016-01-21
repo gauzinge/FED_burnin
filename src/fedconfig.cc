@@ -38,6 +38,11 @@ int main(int argc, char* argv[] )
 
     auto cSetting = cSystemController.fSettingsMap.find("NAcq");
     int cNAcq = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 10;
+cSetting = cSystemController.fSettingsMap.find("BlockSize");
+	int cBlockSize = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 2;
+
+cSetting = cSystemController.fSettingsMap.find("ChannelOfInterest");
+	int cChannelOfInterest = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 0;
 
     // get the board info of all boards and start the acquistion
     for (auto& cFED : cSystemController.fPixFEDVector)
@@ -47,7 +52,7 @@ int main(int argc, char* argv[] )
             cSystemController.fFEDInterface->ReadLightOnFibre(cFitel);
         }
         //cSystemController.fFEDInterface->getBoardInfo(cFED);
-        cSystemController.fFEDInterface->findPhases(cFED, 0);
+        cSystemController.fFEDInterface->findPhases(cFED, cChannelOfInterest);
     }
 
     for (int i = 0; i < 11; i++)
@@ -60,7 +65,7 @@ int main(int argc, char* argv[] )
             cSystemController.fFEDInterface->readTransparentFIFO(cFED);
             cSystemController.fFEDInterface->readSpyFIFO(cFED);
             cSystemController.fFEDInterface->readFIFO1(cFED);
-            cSystemController.fFEDInterface->ReadData(cFED);
+            cSystemController.fFEDInterface->ReadData(cFED, cBlockSize);
         }
     }
     cSystemController.HaltHw();

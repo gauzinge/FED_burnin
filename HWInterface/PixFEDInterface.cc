@@ -467,10 +467,10 @@ void PixFEDInterface::Resume( PixFED * pFED )
 }
 
 
-std::vector<uint32_t> PixFEDInterface::ReadData( PixFED * pFED )
+std::vector<uint32_t> PixFEDInterface::ReadData( PixFED * pFED, uint32_t pBlockSize )
 {
     setBoard( pFED->getBeId() );
-    return fFEDFW->ReadData( pFED );
+    return fFEDFW->ReadData( pFED, pBlockSize );
 }
 
 

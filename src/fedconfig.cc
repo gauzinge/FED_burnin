@@ -38,11 +38,11 @@ int main(int argc, char* argv[] )
 
     auto cSetting = cSystemController.fSettingsMap.find("NAcq");
     int cNAcq = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 10;
-cSetting = cSystemController.fSettingsMap.find("BlockSize");
-	int cBlockSize = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 2;
+    cSetting = cSystemController.fSettingsMap.find("BlockSize");
+    int cBlockSize = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 2;
 
-cSetting = cSystemController.fSettingsMap.find("ChannelOfInterest");
-	int cChannelOfInterest = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 0;
+    cSetting = cSystemController.fSettingsMap.find("ChannelOfInterest");
+    int cChannelOfInterest = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 0;
 
     // get the board info of all boards and start the acquistion
     for (auto& cFED : cSystemController.fPixFEDVector)

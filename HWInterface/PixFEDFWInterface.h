@@ -205,6 +205,7 @@ private:
      * \return Number of 32-bit words to be read at each iteration */
     uint32_t computeBlockSize();
 
+    void prettyprintSpyFIFO(std::vector<uint32_t> pVec);
     void prettyprintFIFO1( const std::vector<uint32_t>& pFifoVec, const std::vector<uint32_t>& pMarkerVec, std::ostream& os = std::cout);
     void prettyprintPhase( const std::vector<uint32_t>& pData, int pChannel );
 

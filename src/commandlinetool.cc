@@ -108,7 +108,7 @@ int main(int argc, char* argv[] )
 	    // READ data from DAQ
 	    splitUserInput.erase(splitUserInput.begin());
 	    std::cout << "readDAQ()" <<  std::endl;
-	    readDAQ();
+	    readData();
 	  }
 	else if(splitUserInput[0] == "a")
 	  {
@@ -422,25 +422,6 @@ void loopDAQ(int loops){
       if (iAcq < cNAcq && cNAcq > 0 )running = true;
       else if (cNAcq == 0 ) running = true;
       else running = false;
-
-
-      if (iAcq % 1000 == 0)
-	{
-	  cData.check();
-	  tbm_index_error_ctr += cData.getTBM_index_errors();
-	  tbm_core_error_ctr += cData.getTBM_core_errors();
-	  payload_error_ctr += cData.getPayload_errors();
-	  std::stringstream output;
-	  std::time_t result = std::time(nullptr);
-	  output <<  " Acquisition: " <<  iAcq << " ERROR summary: "
-		 << " TBM index errors: " << tbm_index_error_ctr
-		 << " TBM core errors:  " << tbm_core_error_ctr
-		 << " Payload errors:   " << payload_error_ctr << " ";
-	  std::cout << output.str() << "\r";
-	  logger << output.str() << " " << std::asctime(std::localtime(&result));
-	  logger.close();
-	  logger.open(logfilename, std::ofstream::app);
-	}
     }
   std::cout << std::endl << "Finished recording " << iAcq << " events!" << std::endl;
   for (auto& cFED : cSystemController.fPixFEDVector)
@@ -479,17 +460,25 @@ void switchFW(){}
 
 void listFW(){
   // list all saved firmware images for all FEDs
+
+  //TODO: this is a dirty bug fix and needs to be removed at some point
+  cSystemController.InitializeHw("settings/FWUpload.xml");
+
   for (auto& cFED : cSystemController.fPixFEDVector)
     {
       // I print the board info until I know a better way to identify the FED
       cSystemController.fFEDInterface->getBoardInfo(cFED);
-      std::vector<std::string> FWNames = cSystemController.fFEDInterface->getFpgaConfigList(cFED);
-      std::cout << FWNames.size() << " firmware imaged on SD card:" << std::endl;
+      std::vector<std::string> FWNames;
+      FWNames = cSystemController.fFEDInterface->getFpgaConfigList(cFED);
+      std::cout << FWNames.size() << " firmware images on SD card:" << std::endl;
       for (auto &name : FWNames)
 	{
 	  std::cout <<"\t -" << name << std::endl;
 	}
     }
+  //restore the original settings
+  cSystemController.InitializeHw(cHWFile);
+
 }
 
 void getTransparent(){
@@ -517,6 +506,7 @@ void getFIFO1(){
 }
 
 void dumpAll(){
+  Data cData;
   for (auto& cFED : cSystemController.fPixFEDVector)
     {
       // read TRANSPARENT fifo
@@ -525,6 +515,8 @@ void dumpAll(){
       cSystemController.fFEDInterface->readSpyFIFO(cFED);
       // read fifo 1
       cSystemController.fFEDInterface->readFIFO1(cFED);
+      // read data
+      cData.add(0, cSystemController.fFEDInterface->ReadData(cFED));
     }
 }
 

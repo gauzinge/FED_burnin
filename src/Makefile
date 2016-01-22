@@ -51,5 +51,9 @@ fedconfig: fedconfig.cc
 	$(CXX) -std=c++11 $(CCFlags) -o $@ $< $(IncludePaths) $(ExternalObjects)
 	cp $@ ../bin
 
+fpgaconfig: fpgaconfig.cc
+	$(CXX) -std=c++11 $(CCFlags) -o $@ $< $(IncludePaths) $(ExternalObjects)
+	cp $@ ../bin
+
 clean:
 	rm -f $(binaries) *.o

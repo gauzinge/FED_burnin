@@ -6,3 +6,4 @@ src/amc13test
 src/fedconfig
 logifle*
 *.txt
+.ycm_extra_conf.pyc

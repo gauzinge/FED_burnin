@@ -253,8 +253,8 @@ std::vector<uint32_t> PixFEDFWInterface::readSpyFIFO()
     std::vector<uint32_t> cSpyA;
     std::vector<uint32_t> cSpyB;
 
-    cSpyA = ReadBlockRegValue( "fifo.spy_A", 180 );
-    cSpyB = ReadBlockRegValue( "fifo.spy_B", 180 );
+    cSpyA = ReadBlockRegValue( "fifo.spy_A", fBlockSize / 2 );
+    cSpyB = ReadBlockRegValue( "fifo.spy_B", fBlockSize / 2 );
 
 
     std::cout  << std::endl << BOLDBLUE << "TBM_SPY FIFO A: " << RESET << std::endl;
@@ -291,10 +291,10 @@ std::string PixFEDFWInterface::readFIFO1()
     std::vector<uint32_t> cMarkerA;
     std::vector<uint32_t> cMarkerB;
 
-    cFifo1A = ReadBlockRegValue("fifo.spy_1_A", 64);
-    cMarkerA = ReadBlockRegValue("fifo.spy_1_A_marker", 64);
-    cFifo1B = ReadBlockRegValue("fifo.spy_1_B", 64);
-    cMarkerB = ReadBlockRegValue("fifo.spy_1_B_marker", 64);
+    cFifo1A = ReadBlockRegValue("fifo.spy_1_A", fBlockSize / 4);
+    cMarkerA = ReadBlockRegValue("fifo.spy_1_A_marker", fBlockSize / 4);
+    cFifo1B = ReadBlockRegValue("fifo.spy_1_B", fBlockSize / 4);
+    cMarkerB = ReadBlockRegValue("fifo.spy_1_B_marker", fBlockSize / 4);
     // pass cFIFO1Str as ostream to prettyPrint for later FileIo
     std::cout << std::endl << BOLDBLUE <<  "FIFO 1 Channel A: " << RESET << std::endl;
     cFIFO1Str << "FIFO 1 Channel A: " << std::endl;
@@ -346,7 +346,7 @@ void PixFEDFWInterface::prettyprintFIFO1( const std::vector<uint32_t>& pFifoVec,
     os << "----------------------------------------------------------------------------------" << std::endl;
 }
 
-bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED )
+bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED, bool pFakeData )
 {
     std::vector< std::pair<std::string, uint32_t> > cVecReg;
 
@@ -367,10 +367,8 @@ bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED )
 
 
     // the FW needs to be aware of the true 32 bit workd Block size for some reason! This is the Packet_nb_true in the python script?!
-    //computeBlockSize();
-    //cVecReg.push_back( {"pixfed_ctrl_regs.PACKET_NB", ( fBlockSize32 - 1 )  } );
-
-    //WriteStackReg( cVecReg );
+    computeBlockSize( pFakeData );
+    cVecReg.push_back( {"pixfed_ctrl_regs.PACKET_NB", fBlockSize32 } );
 
     PixFEDRegMap cPixFEDRegMap = pPixFED->getPixFEDRegMap();
     for ( auto const& it : cPixFEDRegMap )
@@ -468,79 +466,19 @@ void PixFEDFWInterface::Resume()
 
 std::vector<uint32_t> PixFEDFWInterface::ReadData( PixFED* pPixFED, uint32_t pBlockSize )
 {
-    int cBlockSize;
+    uint32_t cBlockSize = 0;
     if (pBlockSize == 0) cBlockSize = fBlockSize;
-    std::cout << "DEBUG " << +cBlockSize << std::endl;
+    else cBlockSize = pBlockSize;
     std::chrono::milliseconds cWait( 10 );
     // the fNthAcq variable is automatically used to determine which DDR FIFO to read - so it has to be incremented in this method!
     // first find which DDR bank to read
 
 
     // TODO: for debug purposes, read both srams every time with a user defined block size
-    for (int i = 0; i < 2; i++)
-    {
-        SelectDaqDDR( i );
-        std::cout << "Querying " << fStrDDR << " for FULL condition!" << std::endl;
-
-        uhal::ValWord<uint32_t> cVal;
-        do
-        {
-            cVal = ReadReg( fStrFull );
-            if ( cVal == 0 ) std::this_thread::sleep_for( cWait );
-        }
-        while ( cVal == 0 );
-        std::cout << fStrDDR << " full: " << ReadReg( fStrFull ) << std::endl;
-
-        // DDR control: 0 = ipbus, 1 = user
-        WriteReg( fStrDDRControl, 0 );
-        std::this_thread::sleep_for( cWait );
-        std::cout << "Starting block read of " << fStrDDR << std::endl;
-
-        std::vector<uint32_t> cData = ReadBlockRegValue( fStrDDR, cBlockSize );
-        std::cout << "End block read of " << fStrDDR << std::endl;
-
-        WriteReg( fStrDDRControl , 1 );
-        std::this_thread::sleep_for( cWait );
-        WriteReg( fStrReadout, 1 );
-        std::this_thread::sleep_for( cWait );
-
-        // full handshake between SW & FW
-        while ( ReadReg( fStrFull ) == 1 )
-            std::this_thread::sleep_for( cWait );
-        WriteReg( fStrReadout, 0 );
-
-        //now I need to do something with the Data that I read into cData
-        int cIndex = 0;
-        uint32_t cPreviousWord;
-        for ( auto& cWord : cData )
-        {
-            //      std::cout << std::hex << std::setw(8) << std::setfill('0');
-            if (cIndex % 2 == 0)
-            {
-                if (cWord == 0x8) std::cout << "Evt Header: \n";
-                else if (cWord == 0xC) std::cout << "ROC Header: \n";
-                else if (cWord == 0x1) std::cout << "PXL    Hit: ";
-                else if (cWord == 0x4) std::cout << "TBM Trailer: \n";
-                else if (cWord == 0x6) std::cout << "Evt Trailer: \n";
-                cPreviousWord = cWord;
-            }
-            else if (cPreviousWord == 0x1)
-            {
-                std::cout << cWord <<  std::endl;
-                std::cout << "CH: " << ((cWord >> 26) & 0x3f) << " ROC: " << ((cWord >> 21) & 0x1f) << " DC: " << ((cWord >> 16) & 0x1f) << " ROW: " << ((cWord >> 8) & 0xff) << " PH: " << (cWord & 0xff) << std::dec << std::endl;
-            }
-            else if (cPreviousWord == 0x8)
-            {
-                std::cout << cWord <<  std::endl;
-                std::cout << "CH: " << ((cWord >> 26) & 0x3f) << " ID: " << ((cWord >> 21) & 0x1f) << " TBM H: " << ((cWord >> 16) & 0x1f) << " ROW: " << ((cWord >> 9) & 0xff) << " EventNumber: " << (cWord & 0xff) << std::dec << std::endl;
-            }
-            cIndex++;
-        }
-    }
-
-    //TODO: this is the original code with alternating acquisitions for emulated DATA mode!
-    //SelectDaqDDR( fNthAcq );
-    ////std::cout << "Querying " << fStrDDR << " for FULL condition!" << std::endl;
+    //for (int i = 0; i < 2; i++)
+    //{
+    //SelectDaqDDR( i );
+    //std::cout << "Querying " << fStrDDR << " for FULL condition!" << std::endl;
 
     //uhal::ValWord<uint32_t> cVal;
     //do
@@ -554,9 +492,10 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData( PixFED* pPixFED, uint32_t pBl
     //// DDR control: 0 = ipbus, 1 = user
     //WriteReg( fStrDDRControl, 0 );
     //std::this_thread::sleep_for( cWait );
-    //std::cout << "Starting block read of " << fStrDDR << std::endl;
+    //std::cout << RED << "Starting block read of " << fStrDDR << RESET << std::endl;
 
     //std::vector<uint32_t> cData = ReadBlockRegValue( fStrDDR, cBlockSize );
+
     //WriteReg( fStrDDRControl , 1 );
     //std::this_thread::sleep_for( cWait );
     //WriteReg( fStrReadout, 1 );
@@ -584,27 +523,105 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData( PixFED* pPixFED, uint32_t pBl
     //}
     //else if (cPreviousWord == 0x1)
     //{
-    //std::cout << cWord <<  std::endl;
+    ////std::cout << cWord <<  std::endl;
     //std::cout << "CH: " << ((cWord >> 26) & 0x3f) << " ROC: " << ((cWord >> 21) & 0x1f) << " DC: " << ((cWord >> 16) & 0x1f) << " ROW: " << ((cWord >> 8) & 0xff) << " PH: " << (cWord & 0xff) << std::dec << std::endl;
     //}
     //else if (cPreviousWord == 0x8)
     //{
-    //std::cout << cWord <<  std::endl;
+    ////std::cout << cWord <<  std::endl;
     //std::cout << "CH: " << ((cWord >> 26) & 0x3f) << " ID: " << ((cWord >> 21) & 0x1f) << " TBM H: " << ((cWord >> 16) & 0x1f) << " ROW: " << ((cWord >> 9) & 0xff) << " EventNumber: " << (cWord & 0xff) << std::dec << std::endl;
     //}
     //cIndex++;
     //}
+    //std::cout << RED << "End block read of " << fStrDDR << RESET << std::endl;
+    //}
+
+    //TODO: this is the original code with alternating acquisitions for emulated DATA mode!
+    SelectDaqDDR( fNthAcq );
+    //std::cout << "Querying " << fStrDDR << " for FULL condition!" << std::endl;
+
+    uhal::ValWord<uint32_t> cVal;
+    do
+    {
+        cVal = ReadReg( fStrFull );
+        if ( cVal == 0 ) std::this_thread::sleep_for( cWait );
+    }
+    while ( cVal == 0 );
+    std::cout << fStrDDR << " full: " << ReadReg( fStrFull ) << std::endl;
+
+    // DDR control: 0 = ipbus, 1 = user
+    WriteReg( fStrDDRControl, 0 );
+    std::this_thread::sleep_for( cWait );
+    std::cout << "Starting block read of " << fStrDDR << std::endl;
+
+    std::vector<uint32_t> cData = ReadBlockRegValue( fStrDDR, cBlockSize );
+    WriteReg( fStrDDRControl , 1 );
+    std::this_thread::sleep_for( cWait );
+    WriteReg( fStrReadout, 1 );
+    std::this_thread::sleep_for( cWait );
+
+    // full handshake between SW & FW
+    while ( ReadReg( fStrFull ) == 1 )
+        std::this_thread::sleep_for( cWait );
+    WriteReg( fStrReadout, 0 );
+
+    //now I need to do something with the Data that I read into cData
+    int cIndex = 0;
+    uint32_t cPreviousWord;
+    for ( auto& cWord : cData )
+    {
+        //      std::cout << std::hex << std::setw(8) << std::setfill('0');
+        if (cIndex % 2 == 0)
+        {
+            //if (cWord == 0x8) std::cout << "Evt Header: \n";
+            //else if (cWord == 0xC) std::cout << "ROC Header: \n";
+            //else if (cWord == 0x1) std::cout << "PXL    Hit: ";
+            //else if (cWord == 0x4) std::cout << "TBM Trailer: \n";
+            //else if (cWord == 0x6) std::cout << "Evt Trailer: \n";
+            cPreviousWord = cWord;
+        }
+        else if (cPreviousWord == 0x1)
+        {
+            //std::cout << cWord <<  std::endl;
+            std::cout << "    Pixel Hit: CH: " << ((cWord >> 26) & 0x3f) << " ROC: " << ((cWord >> 21) & 0x1f) << " DC: " << ((cWord >> 16) & 0x1f) << " ROW: " << ((cWord >> 8) & 0xff) << " PH: " << (cWord & 0xff) << std::dec << std::endl;
+        }
+        else if (cPreviousWord == 0x6)
+        {
+            //std::cout << cWord <<  std::endl;
+            std::cout << "Event Trailer: CH: " << ((cWord >> 26) & 0x3f) << " ID: " << ((cWord >> 21) & 0x1f) << " marker: " << (cWord & 0x1fffff) << " ROW: " << ((cWord >> 8) & 0xff) << " PH: " << (cWord & 0xff) << std::dec << std::endl;
+        }
+        else if (cPreviousWord == 0x8)
+        {
+            //std::cout << cWord <<  std::endl;
+            std::cout << " Event Header: CH: " << ((cWord >> 26) & 0x3f) << " ID: " << ((cWord >> 21) & 0x1f) << " TBM H: " << ((cWord >> 16) & 0x1f) << " ROW: " << ((cWord >> 9) & 0xff) << " EventNumber: " << (cWord & 0xff) << std::dec << std::endl;
+        }
+        else if (cPreviousWord == 0xC)
+        {
+            //std::cout << cWord <<  std::endl;
+            std::cout << "   ROC Header: CH: " << ((cWord >> 26) & 0x3f) << " ROC Nr: " << ((cWord >> 21) & 0x1f) << " Status : " << (cWord  & 0xff) << std::dec << std::endl;
+        }
+        else if (cPreviousWord == 0x4)
+        {
+            //std::cout << cWord <<  std::endl;
+            std::cout << "  TBM Trailer: CH: " << ((cWord >> 26) & 0x3f) << " ID: " << ((cWord >> 21) & 0x1f) << " TBM T2: " << ((cWord >> 12) & 0xff) << " TBM_T1: " << (cWord & 0xff) << std::dec << std::endl;
+        }
+        cIndex++;
+    }
 
     fNthAcq++;
     return cData;
 }
 
-uint32_t PixFEDFWInterface::computeBlockSize( )
+uint32_t PixFEDFWInterface::computeBlockSize( bool pFakeData )
 {
-    // this is the number of bits to read from DDR
-    fBlockSize = fNTBM * fNCh * fNPattern * fPacketSize;
+    if (pFakeData)
+    {
+        // this is the number of bits to read from DDR
+        fBlockSize = fNTBM * fNCh * fNPattern * fPacketSize;
+    }
+
     // since the DDR data widt is 256 this is the number of 32 bit words I have to read
-    fBlockSize32 = static_cast<uint32_t>( fBlockSize / 8 );
+    fBlockSize32 = static_cast<uint32_t>( ceil(fBlockSize / double(8 )) - 1);
     return fBlockSize;
 }
 

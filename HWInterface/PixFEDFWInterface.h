@@ -41,7 +41,7 @@ private:
     uint32_t fNumAcq;       // the number of acquisitions
     uint32_t fNTBM;         // the number of TBMs
     uint32_t fNCh = 2;          // the number of Channels per TBM = 2
-    uint32_t fNPattern = 18;     // the number of Patterns to send per channel = 8 (8 ROCs per TBM channel)
+    uint32_t fNPattern = 8;     // the number of Patterns to send per channel = 8 (8 ROCs per TBM channel)
     uint32_t fPacketSize = 2;   // the size of a packet for each acquisition = 2;
 
     // to be computed internally
@@ -80,6 +80,15 @@ public:
     {
         fNTBM = pNTBM;
     };
+    /*!
+     * \brief set the blocksize for the FIFO (incl. TBM FIFO reads)
+     * \param pBlockSize : number of 32 bit words to read from global TBM FIFO, all other FIFO depths are adapted correspondingly
+     */
+    void setBlockSize(uint32_t pBlockSize)
+    {
+        fBlockSize = pBlockSize;
+        //fBlockSize32 = ceil(pBlockSize / double(8) ) - 1;
+    };
 
     //DAQ METHODS
     /*!
@@ -94,7 +103,7 @@ public:
     * \brief Configure the board with its Config File
     * \param pPixFED
     */
-    bool ConfigureBoard( const PixFED* pPixFED );
+    bool ConfigureBoard( const PixFED* pPixFED, bool pFakeData = false );
     /*!
      * \brief: Halt Board and put it back to safe state with internal Clock and golden Image FW
      */
@@ -202,8 +211,9 @@ private:
     bool polli2cAcknowledge(uint32_t pTries);
 
     /*! Compute the size of an acquisition data block
+     * \param pFakeData: boolean flag to determine whether deterministic fake data or not
      * \return Number of 32-bit words to be read at each iteration */
-    uint32_t computeBlockSize();
+    uint32_t computeBlockSize(bool pFakeData = false);
 
     void prettyprintSpyFIFO(std::vector<uint32_t> pVec);
     void prettyprintFIFO1( const std::vector<uint32_t>& pFifoVec, const std::vector<uint32_t>& pMarkerVec, std::ostream& os = std::cout);

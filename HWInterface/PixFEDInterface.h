@@ -121,6 +121,7 @@ public:
 
     void ReadLightOnFibre(const Fitel* pFitel);
 
+    void ReadRSSI( const Fitel* pFitel );
     /////////////////////////////////////
     // PixFED System Methods
     /////////////////////////////////////

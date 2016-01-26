@@ -342,7 +342,7 @@ bool PixFEDInterface::WriteFitelReg(Fitel * pFitel, const std::string & pRegNode
     else return true;
 }
 
-void PixFEDInterface::ReadRSSI( Fitel* pFitel )
+void PixFEDInterface::ReadRSSI( const Fitel* pFitel )
 {
     setBoard(pFitel->getBeId());
     //first, write the correct registers to configure the ADC
@@ -352,14 +352,9 @@ void PixFEDInterface::ReadRSSI( Fitel* pFitel )
     std::vector<uint32_t> cVecWrite;
     std::vector<uint32_t> cVecRead;
 
-    // here create an array of Addresses and Values for the I2C write
-    uint8_t cValue = 0x1;
-    uint8_t cAddress[2] = {0x01, 0x02};
-    uint8_t cWrData[2] = {((cValue >> 6) & 0x1f), 0x01};
-
     //encode them in a 32 bit word and write, no readback yet
-    pVecWrite.push_back(  pFitel->getFMCId()  << 24 |  pFitel->getFitelId() << 20 |  cAddress[0] << 8 | cValue[0] );
-    pVecWrite.push_back(  pFitel->getFMCId()  << 24 |  pFitel->getFitelId() << 20 |  cAddress[1] << 8 | cValue[1] );
+    cVecWrite.push_back(  pFitel->getFMCId()  << 24 |  pFitel->getFitelId() << 20 |  0x1 << 8 | 0x5f );
+    cVecWrite.push_back(  pFitel->getFMCId()  << 24 |  pFitel->getFitelId() << 20 |  0x2 << 8 | 0x01 );
     fFEDFW->WriteFitelBlockReg(cVecWrite);
 
     //now prepare the read-back of the values
@@ -375,15 +370,17 @@ void PixFEDInterface::ReadRSSI( Fitel* pFitel )
     // each value is hidden in 2 I2C words
     for (int cMeasurement = 0; cMeasurement < cNWord / 2; cMeasurement++)
     {
+        std::cout << "Index " << cMeasurement <<  std::hex << cVecRead.at(2 * cMeasurement) << " " << cVecRead.at(2 * cMeasurement + 1) << std::endl;
         // build the values
         uint16_t cValue = ((cVecRead.at(2 * cMeasurement) & 0x7F) << 8) + (cVecRead.at(2 * cMeasurement + 1) & 0xFF);
-        uint8_t cSign = (cValue >> 14);
-
+        uint8_t cSign = (cValue >> 14) & 0x1;
+        std::cout << +cSign << "  " <<  cValue << std::endl;
         //now the conversions are different for each of the voltages, so check by cMeasurement
         if (cMeasurement == 4)
-            cLTCValues.at(cMeasurement) = (cSign == 0b1) ? -( pow(2, 15) - cValue ) * cConstant + 2.5 : cValue * cConstant + 2.5;
-        else if
-        cLTCValues.at(cMeasurement) = (cSign == 0b1) ? -( pow(2, 15) - cValue ) * cConstant : cValue * cConstant;
+            cLTCValues.at(cMeasurement) = (cSign == 0b1) ? (-( 32768 - cValue ) * cConstant + 2.5) : (cValue * cConstant + 2.5);
+
+        else
+            cLTCValues.at(cMeasurement) = (cSign == 0b1) ? (-( 32768 - cValue ) * cConstant) : (cValue * cConstant);
 
         std::cout << "V" << cMeasurement + 1 << " = " << cLTCValues.at(cMeasurement) << std::endl;
     }

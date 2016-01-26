@@ -471,9 +471,8 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData( PixFED* pPixFED, uint32_t pBl
     else cBlockSize = pBlockSize;
     std::chrono::milliseconds cWait( 10 );
     // the fNthAcq variable is automatically used to determine which DDR FIFO to read - so it has to be incremented in this method!
-    // first find which DDR bank to read
 
-    //TODO: this is the original code with alternating acquisitions for emulated DATA mode!
+    // first find which DDR bank to read
     SelectDaqDDR( fNthAcq );
     //std::cout << "Querying " << fStrDDR << " for FULL condition!" << std::endl;
 
@@ -484,12 +483,12 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData( PixFED* pPixFED, uint32_t pBl
         if ( cVal == 0 ) std::this_thread::sleep_for( cWait );
     }
     while ( cVal == 0 );
-    std::cout << fStrDDR << " full: " << ReadReg( fStrFull ) << std::endl;
+    //std::cout << fStrDDR << " full: " << ReadReg( fStrFull ) << std::endl;
 
     // DDR control: 0 = ipbus, 1 = user
     WriteReg( fStrDDRControl, 0 );
     std::this_thread::sleep_for( cWait );
-    std::cout << "Starting block read of " << fStrDDR << std::endl;
+    //std::cout << "Starting block read of " << fStrDDR << std::endl;
 
     std::vector<uint32_t> cData = ReadBlockRegValue( fStrDDR, cBlockSize );
     WriteReg( fStrDDRControl , 1 );
@@ -509,6 +508,7 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData( PixFED* pPixFED, uint32_t pBl
 
 void PixFEDFWInterface::prettyprintTBMFIFO(const std::vector<uint32_t>& pData )
 {
+    std::cout << BOLDBLUE << "Global TBM Readout FIFO: " << RESET << std::endl;
     //now I need to do something with the Data that I read into cData
     int cIndex = 0;
     uint32_t cPreviousWord;

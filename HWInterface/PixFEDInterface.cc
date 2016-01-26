@@ -94,6 +94,11 @@ void PixFEDInterface::ReadBoardMultReg( PixFED* pFED, std::vector < std::pair< s
     }
 }
 
+std::vector<uint32_t> PixFEDInterface::ReadBlockBoardReg( PixFED * pFED, const std::string & pRegNode, uint32_t pSize )
+{
+    setBoard( pFED->getBeId() );
+    return fFEDFW->ReadBlockRegValue( pRegNode, pSize );
+}
 //////////////////////////
 //FITEL METHODS
 /////////////////////////
@@ -215,7 +220,7 @@ void PixFEDInterface::ReadLightOnFibre( const Fitel* pFitel )
 {
     setBoard( pFitel->getBeId() );
 
-    std::vector<uint32_t> cVecWrite;
+    //std::vector<uint32_t> cVecWrite;
     std::vector<uint32_t> cVecRead;
 
     uint32_t cCounter = 0;
@@ -337,6 +342,63 @@ bool PixFEDInterface::WriteFitelReg(Fitel * pFitel, const std::string & pRegNode
     else return true;
 }
 
+void PixFEDInterface::ReadRSSI( Fitel* pFitel )
+{
+    setBoard(pFitel->getBeId());
+    //first, write the correct registers to configure the ADC
+    //the values are: Address 0x01 -> 0x1<<6 & 0x1f
+    //                Address 0x02 -> 0x1
+
+    std::vector<uint32_t> cVecWrite;
+    std::vector<uint32_t> cVecRead;
+
+    // here create an array of Addresses and Values for the I2C write
+    uint8_t cValue = 0x1;
+    uint8_t cAddress[2] = {0x01, 0x02};
+    uint8_t cWrData[2] = {((cValue >> 6) & 0x1f), 0x01};
+
+    //encode them in a 32 bit word and write, no readback yet
+    pVecWrite.push_back(  pFitel->getFMCId()  << 24 |  pFitel->getFitelId() << 20 |  cAddress[0] << 8 | cValue[0] );
+    pVecWrite.push_back(  pFitel->getFMCId()  << 24 |  pFitel->getFitelId() << 20 |  cAddress[1] << 8 | cValue[1] );
+    fFEDFW->WriteFitelBlockReg(cVecWrite);
+
+    //now prepare the read-back of the values
+    uint8_t cNWord = 10;
+    for (uint8_t cIndex = 0; cIndex < cNWord; cIndex++)
+    {
+        cVecRead.push_back( pFitel->getFMCId() << 24 | pFitel->getFitelId() << 20 | (0x6 + cIndex ) << 8 | 0 );
+    }
+    fFEDFW->ReadFitelBlockReg( cVecRead );
+
+    std::vector<double> cLTCValues(cNWord / 2, 0);
+    double cConstant = 0.00030518;
+    // each value is hidden in 2 I2C words
+    for (int cMeasurement = 0; cMeasurement < cNWord / 2; cMeasurement++)
+    {
+        // build the values
+        uint16_t cValue = ((cVecRead.at(2 * cMeasurement) & 0x7F) << 8) + (cVecRead.at(2 * cMeasurement + 1) & 0xFF);
+        uint8_t cSign = (cValue >> 14);
+
+        //now the conversions are different for each of the voltages, so check by cMeasurement
+        if (cMeasurement == 4)
+            cLTCValues.at(cMeasurement) = (cSign == 0b1) ? -( pow(2, 15) - cValue ) * cConstant + 2.5 : cValue * cConstant + 2.5;
+        else if
+        cLTCValues.at(cMeasurement) = (cSign == 0b1) ? -( pow(2, 15) - cValue ) * cConstant : cValue * cConstant;
+
+        std::cout << "V" << cMeasurement + 1 << " = " << cLTCValues.at(cMeasurement) << std::endl;
+    }
+
+    // now I have all 4 voltage values in a vector of size 5
+    // V1 = cLTCValues[0]
+    // V2 = cLTCValues[1]
+    // V3 = cLTCValues[2]
+    // V4 = cLTCValues[3]
+    // Vcc = cLTCValues[4]
+    //
+    // the RSSI value = fabs(V3-V4) / R=150 Ohm
+    std::cout << BOLDBLUE << "FMC " << +pFitel->getFMCId() << " Fitel " << +pFitel->getFitelId() << " RSSI " << fabs(cLTCValues.at(3) - cLTCValues.at(4)) / double(150) << RESET << std::endl;
+}
+
 uint8_t PixFEDInterface::ReadFitelReg( Fitel * pFitel, const std::string & pRegNode )
 {
     FitelRegItem cRegItem = pFitel->getRegItem( pRegNode );
@@ -354,11 +416,6 @@ uint8_t PixFEDInterface::ReadFitelReg( Fitel * pFitel, const std::string & pRegN
     return cRegItem.fValue;
 }
 
-std::vector<uint32_t> PixFEDInterface::ReadBlockBoardReg( PixFED * pFED, const std::string & pRegNode, uint32_t pSize )
-{
-    setBoard( pFED->getBeId() );
-    return fFEDFW->ReadBlockRegValue( pRegNode, pSize );
-}
 
 ///////////////
 // Startup  Methods

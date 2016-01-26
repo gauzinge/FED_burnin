@@ -518,7 +518,13 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData( PixFED* pPixFED, uint32_t pBl
         }
         else if (cPreviousWord == 0x1)
         {
+	  std::cout << cWord <<  std::endl;
             std::cout << "CH: " << ((cWord >> 26) & 0x3f) << " ROC: " << ((cWord >> 21) & 0x1f) << " DC: " << ((cWord >> 16) & 0x1f) << " ROW: " << ((cWord >> 8) & 0xff) << " PH: " << (cWord & 0xff) << std::dec << std::endl;
+        }
+        else if (cPreviousWord == 0x8)
+        {
+	  std::cout << cWord <<  std::endl;
+            std::cout << "CH: " << ((cWord >> 26) & 0x3f) << " ID: " << ((cWord >> 21) & 0x1f) << " TBM H: " << ((cWord >> 16) & 0x1f) << " ROW: " << ((cWord >> 9) & 0xff) << " EventNumber: " << (cWord & 0xff) << std::dec << std::endl;
         }
         cIndex++;
     }

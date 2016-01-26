@@ -20,7 +20,8 @@
         <!--<Register name="pixfed_ctrl_regs.INT_TRIGGER_FREQ_SEL">9</Register>-->
         <!--<Register name="pixfed_ctrl_regs.PACKET_NB">10</Register>-->
         <!-- TBM MASK -->
-        <Register name="pixfed_ctrl_regs.TBM_MASK_1">0xFFFFFFFC</Register>
+        <!--<Register name="pixfed_ctrl_regs.TBM_MASK_1">0xFFFFFFFC</Register>-->
+        <Register name="pixfed_ctrl_regs.TBM_MASK_1">0xFF3FFFFF</Register>
         <Register name="pixfed_ctrl_regs.TBM_MASK_2">0xFFFFFFFF</Register>
         <Register name="pixfed_ctrl_regs.TBM_MASK_3">0xFFFFFFFF</Register>
         <!-- FITELS -->
@@ -33,8 +34,9 @@
 </HwDescription>
 <Settings>
     <Setting name="NTBM">2</Setting>
-    <Setting name="ChannelOfInterest">0</Setting>
-    <Setting name="BlockSize">40</Setting>
+    <!--<Setting name="ChannelOfInterest">0</Setting>-->
+    <Setting name="ChannelOfInterest">11</Setting>
+    <Setting name="BlockSize">200</Setting>
     <!--if set to 0, loop will run forever-->
     <Setting name="NAcq">100</Setting>
 </Settings>

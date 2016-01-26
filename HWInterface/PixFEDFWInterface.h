@@ -41,7 +41,7 @@ private:
     uint32_t fNumAcq;       // the number of acquisitions
     uint32_t fNTBM;         // the number of TBMs
     uint32_t fNCh = 2;          // the number of Channels per TBM = 2
-    uint32_t fNPattern = 8;     // the number of Patterns to send per channel = 8 (8 ROCs per TBM channel)
+    uint32_t fNPattern = 18;     // the number of Patterns to send per channel = 8 (8 ROCs per TBM channel)
     uint32_t fPacketSize = 2;   // the size of a packet for each acquisition = 2;
 
     // to be computed internally

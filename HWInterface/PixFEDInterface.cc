@@ -342,58 +342,22 @@ bool PixFEDInterface::WriteFitelReg(Fitel * pFitel, const std::string & pRegNode
     else return true;
 }
 
-void PixFEDInterface::ReadRSSI( const Fitel* pFitel )
+std::vector<double> PixFEDInterface::ReadADC( Fitel* pFitel, uint32_t pChan, bool pPrintAll)
 {
+    std::cout << "Reading ADC Values on FMC " << +pFitel->getFMCId() << " Fitel " << +pFitel->getFitelId() << " Channel " << pChan + 1 << std::endl;
     setBoard(pFitel->getBeId());
-    //first, write the correct registers to configure the ADC
-    //the values are: Address 0x01 -> 0x1<<6 & 0x1f
-    //                Address 0x02 -> 0x1
+    // in order to read the ADV values for a given channel (a group of channels, the Channel needs to be configured in the Fitel I2C register space)
+    // I could do this via the files, but it is easier to just do it here
+    // therefore: write AllChConfig Register 0x02 = disable channel for RSSI
+    // write the selected Channel 0x0c to enable that specific channel
+    WriteFitelReg(pFitel, "AllCh_ConfigReg", 0x02, false);
+    char tmp[25];
+    snprintf( tmp, sizeof(tmp), "Ch%02d_ConfigReg", pChan + 1);
+    WriteFitelReg(pFitel, std::string(tmp), 0x0c, false);
 
-    std::vector<uint32_t> cVecWrite;
-    std::vector<uint32_t> cVecRead;
+    // now read the actual ADC value
+    return fFEDFW->ReadADC(pFitel->getFMCId(), pFitel->getFitelId(), pPrintAll);
 
-    //encode them in a 32 bit word and write, no readback yet
-    cVecWrite.push_back(  pFitel->getFMCId()  << 24 |  pFitel->getFitelId() << 20 |  0x1 << 8 | 0x5f );
-    cVecWrite.push_back(  pFitel->getFMCId()  << 24 |  pFitel->getFitelId() << 20 |  0x2 << 8 | 0x01 );
-    fFEDFW->WriteFitelBlockReg(cVecWrite);
-
-    //now prepare the read-back of the values
-    uint8_t cNWord = 10;
-    for (uint8_t cIndex = 0; cIndex < cNWord; cIndex++)
-    {
-        cVecRead.push_back( pFitel->getFMCId() << 24 | pFitel->getFitelId() << 20 | (0x6 + cIndex ) << 8 | 0 );
-    }
-    fFEDFW->ReadFitelBlockReg( cVecRead );
-
-    std::vector<double> cLTCValues(cNWord / 2, 0);
-    double cConstant = 0.00030518;
-    // each value is hidden in 2 I2C words
-    for (int cMeasurement = 0; cMeasurement < cNWord / 2; cMeasurement++)
-    {
-        std::cout << "Index " << cMeasurement <<  std::hex << cVecRead.at(2 * cMeasurement) << " " << cVecRead.at(2 * cMeasurement + 1) << std::endl;
-        // build the values
-        uint16_t cValue = ((cVecRead.at(2 * cMeasurement) & 0x7F) << 8) + (cVecRead.at(2 * cMeasurement + 1) & 0xFF);
-        uint8_t cSign = (cValue >> 14) & 0x1;
-        std::cout << +cSign << "  " <<  cValue << std::endl;
-        //now the conversions are different for each of the voltages, so check by cMeasurement
-        if (cMeasurement == 4)
-            cLTCValues.at(cMeasurement) = (cSign == 0b1) ? (-( 32768 - cValue ) * cConstant + 2.5) : (cValue * cConstant + 2.5);
-
-        else
-            cLTCValues.at(cMeasurement) = (cSign == 0b1) ? (-( 32768 - cValue ) * cConstant) : (cValue * cConstant);
-
-        std::cout << "V" << cMeasurement + 1 << " = " << cLTCValues.at(cMeasurement) << std::endl;
-    }
-
-    // now I have all 4 voltage values in a vector of size 5
-    // V1 = cLTCValues[0]
-    // V2 = cLTCValues[1]
-    // V3 = cLTCValues[2]
-    // V4 = cLTCValues[3]
-    // Vcc = cLTCValues[4]
-    //
-    // the RSSI value = fabs(V3-V4) / R=150 Ohm
-    std::cout << BOLDBLUE << "FMC " << +pFitel->getFMCId() << " Fitel " << +pFitel->getFitelId() << " RSSI " << fabs(cLTCValues.at(3) - cLTCValues.at(4)) / double(150) << RESET << std::endl;
 }
 
 uint8_t PixFEDInterface::ReadFitelReg( Fitel * pFitel, const std::string & pRegNode )

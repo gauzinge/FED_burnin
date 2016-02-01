@@ -391,8 +391,6 @@ bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED, bool pFakeData )
 
     std::this_thread::sleep_for( cPause );
 
-    // read FITEL I2C address
-    std::cout << "FITEL I2C address: " << ReadReg("pixfed_ctrl_regs.fitel_i2c_addr") << std::endl;
     // Read back the DDR3 calib done flag
     bool cDDR3calibrated = ( ReadReg( "pixfed_stat_regs.ddr3_init_calib_done" ) & 0x00000001 );
     if ( cDDR3calibrated ) std::cout << "DDR3 calibrated, board configured!" << std::endl;
@@ -665,11 +663,14 @@ bool PixFEDFWInterface::WriteFitelBlockReg(std::vector<uint32_t>& pVecReq)
     // wait for command acknowledge
     while (ReadReg("pixfed_stat_regs.fitel_config_ack") == 0) usleep(100);
 
-    if (ReadReg("pixfed_stat_regs.fitel_config_ack") == 1)
+    uint32_t cVal = ReadReg("pixfed_stat_regs.fitel_config_ack");
+    //if (ReadReg("pixfed_stat_regs.fitel_config_ack") == 1)
+    if (cVal == 1)
     {
         cSuccess = true;
     }
-    else if (ReadReg("pixfed_stat_regs.fitel_config_ack") == 3)
+    //else if (ReadReg("pixfed_stat_regs.fitel_config_ack") == 3)
+    else if (cVal == 3)
     {
         std::cout << "Error writing Registers!" << std::endl;
         cSuccess = false;
@@ -693,11 +694,14 @@ bool PixFEDFWInterface::ReadFitelBlockReg(std::vector<uint32_t>& pVecReq)
     // wait for command acknowledge
     while (ReadReg("pixfed_stat_regs.fitel_config_ack") == 0) usleep(100);
 
-    if (ReadReg("pixfed_stat_regs.fitel_config_ack") == 1)
+    uint32_t cVal = ReadReg("pixfed_stat_regs.fitel_config_ack");
+    //if (ReadReg("pixfed_stat_regs.fitel_config_ack") == 1)
+    if (cVal == 1)
     {
         cSuccess = true;
     }
-    else if (ReadReg("pixfed_stat_regs.fitel_config_ack") == 3)
+    //else if (ReadReg("pixfed_stat_regs.fitel_config_ack") == 3)
+    else if (cVal == 3)
     {
         cSuccess = false;
         std::cout << "Error reading registers!" << std::endl;
@@ -709,6 +713,83 @@ bool PixFEDFWInterface::ReadFitelBlockReg(std::vector<uint32_t>& pVecReq)
     // clear the vector & read the data from the fifo
     pVecReq = ReadBlockRegValue("fitel_config_fifo_rx", pVecReq.size());
     return cSuccess;
+}
+
+
+
+std::vector<double> PixFEDFWInterface::ReadADC( const uint8_t pFMCId, const uint8_t pFitelId, bool pPrintAll)
+{
+    // the Fitel FMC needs to be set up to be able to read the RSSI on a given Channel:
+    // I2C register 0x1: set to 0x4 for RSSI, set to 0x5 for Die Temperature of the Fitel
+    // Channel Control Registers: set to 0x02 to disable RSSI for this channel, set to 0x0c to enable RSSI for this channel
+    // the ADC always reads the sum of all the enabled channels!
+    //initial FW setup
+    WriteReg("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 1);
+
+    std::vector<std::pair<std::string, uint32_t> > cVecReg;
+    cVecReg.push_back({"pixfed_ctrl_regs.fitel_i2c_cmd_reset", 0});
+    cVecReg.push_back({"pixfed_ctrl_regs.fitel_config_req", 0});
+    //Laurent is a Bastard because he changes the i2c addr register!
+    cVecReg.push_back({"pixfed_ctrl_regs.fitel_i2c_addr", 0x77});
+
+    WriteStackReg(cVecReg);
+
+    //first, write the correct registers to configure the ADC
+    //the values are: Address 0x01 -> 0x1<<6 & 0x1f
+    //                Address 0x02 -> 0x1
+
+    // Vectors for write and read data!
+    std::vector<uint32_t> cVecWrite;
+    std::vector<uint32_t> cVecRead;
+
+    //encode them in a 32 bit word and write, no readback yet
+    cVecWrite.push_back(  pFMCId  << 24 |  pFitelId << 20 |  0x1 << 8 | 0x5f );
+    cVecWrite.push_back(  pFMCId  << 24 |  pFitelId << 20 |  0x2 << 8 | 0x01 );
+    WriteFitelBlockReg(cVecWrite);
+
+    //now prepare the read-back of the values
+    uint8_t cNWord = 10;
+    for (uint8_t cIndex = 0; cIndex < cNWord; cIndex++)
+    {
+        cVecRead.push_back( pFMCId << 24 | pFitelId << 20 | (0x6 + cIndex ) << 8 | 0 );
+    }
+    //Laurent is a Bastard because he changes the i2c addr register!
+    WriteReg("pixfed_ctrl_regs.fitel_i2c_addr", 0x4c);
+
+    ReadFitelBlockReg( cVecRead );
+
+    // now convert to Voltages!
+    std::vector<double> cLTCValues(cNWord / 2, 0);
+
+    double cConstant = 0.00030518;
+    // each value is hidden in 2 I2C words
+    for (int cMeasurement = 0; cMeasurement < cNWord / 2; cMeasurement++)
+    {
+        // build the values
+        uint16_t cValue = ((cVecRead.at(2 * cMeasurement) & 0x7F) << 8) + (cVecRead.at(2 * cMeasurement + 1) & 0xFF);
+        uint8_t cSign = (cValue >> 14) & 0x1;
+
+        //now the conversions are different for each of the voltages, so check by cMeasurement
+        if (cMeasurement == 4)
+            cLTCValues.at(cMeasurement) = (cSign == 0b1) ? (-( 32768 - cValue ) * cConstant + 2.5) : (cValue * cConstant + 2.5);
+
+        else
+            cLTCValues.at(cMeasurement) = (cSign == 0b1) ? (-( 32768 - cValue ) * cConstant) : (cValue * cConstant);
+        if (pPrintAll)
+            std::cout << "V " << cMeasurement + 1 << " = " << cLTCValues.at(cMeasurement) << std::endl;
+    }
+
+// now I have all 4 voltage values in a vector of size 5
+// V1 = cLTCValues[0]
+// V2 = cLTCValues[1]
+// V3 = cLTCValues[2]
+// V4 = cLTCValues[3]
+// Vcc = cLTCValues[4]
+//
+// the RSSI value = fabs(V3-V4) / R=150 Ohm [in Amps]
+    double cADCVal = fabs(cLTCValues.at(2) - cLTCValues.at(3)) / 150.0;
+    std::cout << BOLDBLUE << "FMC " << +pFMCId << " Fitel " << +pFitelId << " RSSI " << cADCVal * 1000  << " mA" << RESET << std::endl;
+    return cLTCValues;
 }
 
 /////////////////////////////////////////////

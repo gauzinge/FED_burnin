@@ -198,6 +198,12 @@ public:
     */
     bool ReadFitelBlockReg( std::vector<uint32_t>& pVecReq );
 
+    /*!
+     * \brief Read the ADC values for a given FITEL Receiver
+     * \return Vector of 5 ADC values
+     */
+    std::vector<double> ReadADC( const uint8_t pFMCId, const uint8_t pFitelId, bool pPrintAll);
+
 private:
     void getFEDNetworkParameters();
     /*!

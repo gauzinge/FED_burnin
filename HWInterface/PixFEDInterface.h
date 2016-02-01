@@ -121,7 +121,7 @@ public:
 
     void ReadLightOnFibre(const Fitel* pFitel);
 
-    void ReadRSSI( const Fitel* pFitel );
+    std::vector<double> ReadADC( Fitel* pFitel, uint32_t pChan, bool pPrintAll = false );
     /////////////////////////////////////
     // PixFED System Methods
     /////////////////////////////////////

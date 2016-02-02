@@ -3,7 +3,7 @@
     <AMC13>
         <connection id="T1" uri="chtcp-2.0://cmsuppixch:10203?target=amc13T101:50001" address_table="file://settings/AMC13XG_T1.xml" />
         <connection id="T2" uri="chtcp-2.0://cmsuppixch:10203?target=amc13T201:50001" address_table="file://settings/AMC13XG_T2.xml" />
-        <AMCmask enable="9" />
+        <AMCmask enable="9,5"/>
         <!--<Register tounge="T1" name="test.test">0</Register>-->
         <!--<BGO command="15" repeat="1" prescale="0" bx="100" />-->
         <!--<Trigger local="1" mode="1" rate="100" burst="100" rules="0" />-->
@@ -16,7 +16,7 @@
         <Register name="ctrl.ttc_xpoint_A_out3">0</Register>
         <Register name="pixfed_ctrl_regs.TRIGGER_SEL">0</Register>
         <!--<Register name="pixfed_ctrl_regs.INTERNAL_TRIG_EN">0</Register>-->
-        <Register name="pixfed_ctrl_regs.data_type">0</Register>
+        <Register name="pixfed_ctrl_regs.data_type">2</Register>
         <!--<Register name="pixfed_ctrl_regs.INT_TRIGGER_FREQ_SEL">9</Register>-->
         <!--<Register name="pixfed_ctrl_regs.PACKET_NB">10</Register>-->
         <!-- TBM MASK -->

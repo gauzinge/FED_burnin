@@ -243,8 +243,14 @@ std::vector<uint32_t> PixFEDFWInterface::readTransparentFIFO()
     {
         uint32_t cWord = ReadReg("fifo.bit_stream");
         cFifoVec.push_back(cWord);
-        std::cout << GREEN << std::bitset<30>(cWord) << RESET << std::endl;
+//        std::cout << GREEN << std::bitset<30>(cWord) << RESET << std::endl;
+	for(int iBit = 29; iBit >=0; iBit--)
+	{
+		if(std::bitset<30>(cWord)[iBit] == 0) std::cout << GREEN << "_";
+		else std::cout << "-";
+	}
     }
+	std::cout << RESET << std::endl; 
     return cFifoVec;
 }
 
@@ -253,9 +259,11 @@ std::vector<uint32_t> PixFEDFWInterface::readSpyFIFO()
     std::vector<uint32_t> cSpyA;
     std::vector<uint32_t> cSpyB;
 
-    cSpyA = ReadBlockRegValue( "fifo.spy_A", fBlockSize / 2 );
-    cSpyB = ReadBlockRegValue( "fifo.spy_B", fBlockSize / 2 );
+   // cSpyA = ReadBlockRegValue( "fifo.spy_A", fBlockSize / 2 );
+   // cSpyB = ReadBlockRegValue( "fifo.spy_B", fBlockSize / 2 );
 
+    cSpyA = ReadBlockRegValue( "fifo.spy_A", 1024 );
+    cSpyB = ReadBlockRegValue( "fifo.spy_B", 1024 );
 
     std::cout  << std::endl << BOLDBLUE << "TBM_SPY FIFO A: " << RESET << std::endl;
     prettyprintSpyFIFO(cSpyA);

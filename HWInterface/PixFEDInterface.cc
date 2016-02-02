@@ -346,7 +346,7 @@ std::vector<double> PixFEDInterface::ReadADC( Fitel* pFitel, uint32_t pChan, boo
 {
     std::cout << "Reading ADC Values on FMC " << +pFitel->getFMCId() << " Fitel " << +pFitel->getFitelId() << " Channel " << pChan + 1 << std::endl;
     setBoard(pFitel->getBeId());
-    // in order to read the ADV values for a given channel (a group of channels, the Channel needs to be configured in the Fitel I2C register space)
+    // in order to read the ADC values for a given channel (a group of channels, the Channel needs to be configured in the Fitel I2C register space)
     // I could do this via the files, but it is easier to just do it here
     // therefore: write AllChConfig Register 0x02 = disable channel for RSSI
     // write the selected Channel 0x0c to enable that specific channel

@@ -382,7 +382,6 @@ bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED, bool pFakeData )
 
     cVecReg.push_back({"pixfed_ctrl_regs.fitel_i2c_cmd_reset", 0});
     cVecReg.push_back({"pixfed_ctrl_regs.fitel_config_req", 0});
-    cVecReg.push_back({"pixfed_ctrl_regs.fitel_i2c_addr", 0x4d});
     cVecReg.push_back( {"pixfed_ctrl_regs.PC_CONFIG_OK", 1} );
     WriteStackReg( cVecReg );
 
@@ -654,6 +653,7 @@ bool PixFEDFWInterface::polli2cAcknowledge(uint32_t pTries)
 
 bool PixFEDFWInterface::WriteFitelBlockReg(std::vector<uint32_t>& pVecReq)
 {
+    WriteReg("pixfed_ctrl_regs.fitel_i2c_addr", 0x4d);
     bool cSuccess = false;
     // write the encoded registers in the tx fifo
     WriteBlockReg("fitel_config_fifo_tx", pVecReq);
@@ -683,6 +683,7 @@ bool PixFEDFWInterface::WriteFitelBlockReg(std::vector<uint32_t>& pVecReq)
 
 bool PixFEDFWInterface::ReadFitelBlockReg(std::vector<uint32_t>& pVecReq)
 {
+    WriteReg("pixfed_ctrl_regs.fitel_i2c_addr", 0x4d);
     bool cSuccess = false;
     //uint32_t cVecSize = pVecReq.size();
 
@@ -745,7 +746,22 @@ std::vector<double> PixFEDFWInterface::ReadADC( const uint8_t pFMCId, const uint
     //encode them in a 32 bit word and write, no readback yet
     cVecWrite.push_back(  pFMCId  << 24 |  pFitelId << 20 |  0x1 << 8 | 0x5f );
     cVecWrite.push_back(  pFMCId  << 24 |  pFitelId << 20 |  0x2 << 8 | 0x01 );
-    WriteFitelBlockReg(cVecWrite);
+    WriteBlockReg("fitel_config_fifo_tx", cVecWrite);
+
+    // sent an I2C write request
+    WriteReg("pixfed_ctrl_regs.fitel_config_req", 1);
+
+    // wait for command acknowledge
+    while (ReadReg("pixfed_stat_regs.fitel_config_ack") == 0) usleep(100);
+
+    uint32_t cVal = ReadReg("pixfed_stat_regs.fitel_config_ack");
+    if (cVal == 3)
+    {
+        std::cout << "Error reading registers!" << std::endl;
+    }
+
+    // release
+    i2cRelease(10);
 
     //now prepare the read-back of the values
     uint8_t cNWord = 10;
@@ -756,7 +772,24 @@ std::vector<double> PixFEDFWInterface::ReadADC( const uint8_t pFMCId, const uint
     //Laurent is a Bastard because he changes the i2c addr register!
     WriteReg("pixfed_ctrl_regs.fitel_i2c_addr", 0x4c);
 
-    ReadFitelBlockReg( cVecRead );
+    WriteBlockReg( "fitel_config_fifo_tx", cVecRead );
+    // sent an I2C write request
+    WriteReg("pixfed_ctrl_regs.fitel_config_req", 3);
+
+    // wait for command acknowledge
+    while (ReadReg("pixfed_stat_regs.fitel_config_ack") == 0) usleep(100);
+
+    cVal = ReadReg("pixfed_stat_regs.fitel_config_ack");
+    if (cVal == 3)
+    {
+        std::cout << "Error reading registers!" << std::endl;
+    }
+
+    // release
+    i2cRelease(10);
+
+    // clear the vector & read the data from the fifo
+    cVecRead = ReadBlockRegValue("fitel_config_fifo_rx", cVecRead.size());
 
     // now convert to Voltages!
     std::vector<double> cLTCValues(cNWord / 2, 0);

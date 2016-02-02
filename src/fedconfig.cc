@@ -50,7 +50,7 @@ int main(int argc, char* argv[] )
         for (auto& cFitel : cFED->fFitelVector)
         {
             cSystemController.fFEDInterface->ReadLightOnFibre(cFitel);
-            cSystemController.fFEDInterface->ReadADC(cFitel, cChannelOfInterest);
+            cSystemController.fFEDInterface->ReadADC(cFitel, cChannelOfInterest, true);
         }
         //cSystemController.fFEDInterface->getBoardInfo(cFED);
         cSystemController.fFEDInterface->findPhases(cFED, cChannelOfInterest);

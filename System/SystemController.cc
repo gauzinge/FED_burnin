@@ -144,8 +144,12 @@ void SystemController::parseHWxml( const std::string& pFilename, std::ostream& o
 
         auto cSetting = fSettingsMap.find("NTBM");
         uint32_t cNTBM = (cSetting != std::end(fSettingsMap)) ? cSetting->second : 8;
-        if (cSetting == std::end(fSettingsMap)) std::cout << "Settings Map not yet initialized!, reverting to default value (8)" << std::endl;
+        cSetting = fSettingsMap.find("BlockSize");
+        uint32_t cBlockSize = (cSetting != std::end(fSettingsMap)) ? cSetting->second : 256;
+
+        if (cSetting == std::end(fSettingsMap)) std::cout << "Settings Map not yet initialized!, reverting to default value for Block Size (=256 Words)" << std::endl;
         cTmpFWInterface->setNTBM(cNTBM);
+        cTmpFWInterface->setBlockSize( cBlockSize );
         /////////////////////////////////
         fFWMap[cPixFED->getBeId()] = cTmpFWInterface;
     }

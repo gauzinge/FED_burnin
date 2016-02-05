@@ -94,6 +94,11 @@ void PixFEDInterface::ReadBoardMultReg( PixFED* pFED, std::vector < std::pair< s
     }
 }
 
+std::vector<uint32_t> PixFEDInterface::ReadBlockBoardReg( PixFED * pFED, const std::string & pRegNode, uint32_t pSize )
+{
+    setBoard( pFED->getBeId() );
+    return fFEDFW->ReadBlockRegValue( pRegNode, pSize );
+}
 //////////////////////////
 //FITEL METHODS
 /////////////////////////
@@ -215,7 +220,7 @@ void PixFEDInterface::ReadLightOnFibre( const Fitel* pFitel )
 {
     setBoard( pFitel->getBeId() );
 
-    std::vector<uint32_t> cVecWrite;
+    //std::vector<uint32_t> cVecWrite;
     std::vector<uint32_t> cVecRead;
 
     uint32_t cCounter = 0;
@@ -337,6 +342,24 @@ bool PixFEDInterface::WriteFitelReg(Fitel * pFitel, const std::string & pRegNode
     else return true;
 }
 
+std::vector<double> PixFEDInterface::ReadADC( Fitel* pFitel, uint32_t pChan, bool pPrintAll)
+{
+    std::cout << "Reading ADC Values on FMC " << +pFitel->getFMCId() << " Fitel " << +pFitel->getFitelId() << " Channel " << pChan + 1 << std::endl;
+    setBoard(pFitel->getBeId());
+    // in order to read the ADC values for a given channel (a group of channels, the Channel needs to be configured in the Fitel I2C register space)
+    // I could do this via the files, but it is easier to just do it here
+    // therefore: write AllChConfig Register 0x02 = disable channel for RSSI
+    // write the selected Channel 0x0c to enable that specific channel
+    WriteFitelReg(pFitel, "AllCh_ConfigReg", 0x02, false);
+    char tmp[25];
+    snprintf( tmp, sizeof(tmp), "Ch%02d_ConfigReg", pChan + 1);
+    WriteFitelReg(pFitel, std::string(tmp), 0x0c, false);
+
+    // now read the actual ADC value
+    return fFEDFW->ReadADC(pFitel->getFMCId(), pFitel->getFitelId(), pPrintAll);
+
+}
+
 uint8_t PixFEDInterface::ReadFitelReg( Fitel * pFitel, const std::string & pRegNode )
 {
     FitelRegItem cRegItem = pFitel->getRegItem( pRegNode );
@@ -354,11 +377,6 @@ uint8_t PixFEDInterface::ReadFitelReg( Fitel * pFitel, const std::string & pRegN
     return cRegItem.fValue;
 }
 
-std::vector<uint32_t> PixFEDInterface::ReadBlockBoardReg( PixFED * pFED, const std::string & pRegNode, uint32_t pSize )
-{
-    setBoard( pFED->getBeId() );
-    return fFEDFW->ReadBlockRegValue( pRegNode, pSize );
-}
 
 ///////////////
 // Startup  Methods
@@ -470,6 +488,7 @@ void PixFEDInterface::Resume( PixFED * pFED )
 std::vector<uint32_t> PixFEDInterface::ReadData( PixFED * pFED, uint32_t pBlockSize )
 {
     setBoard( pFED->getBeId() );
+    std::cout << pBlockSize << std::endl;
     return fFEDFW->ReadData( pFED, pBlockSize );
 }
 

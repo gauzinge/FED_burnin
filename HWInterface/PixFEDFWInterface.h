@@ -80,6 +80,15 @@ public:
     {
         fNTBM = pNTBM;
     };
+    /*!
+     * \brief set the blocksize for the FIFO (incl. TBM FIFO reads)
+     * \param pBlockSize : number of 32 bit words to read from global TBM FIFO, all other FIFO depths are adapted correspondingly
+     */
+    void setBlockSize(uint32_t pBlockSize)
+    {
+        fBlockSize = pBlockSize;
+        //fBlockSize32 = ceil(pBlockSize / double(8) ) - 1;
+    };
 
     //DAQ METHODS
     /*!
@@ -94,7 +103,7 @@ public:
     * \brief Configure the board with its Config File
     * \param pPixFED
     */
-    bool ConfigureBoard( const PixFED* pPixFED );
+    bool ConfigureBoard( const PixFED* pPixFED, bool pFakeData = false );
     /*!
      * \brief: Halt Board and put it back to safe state with internal Clock and golden Image FW
      */
@@ -189,6 +198,12 @@ public:
     */
     bool ReadFitelBlockReg( std::vector<uint32_t>& pVecReq );
 
+    /*!
+     * \brief Read the ADC values for a given FITEL Receiver
+     * \return Vector of 5 ADC values
+     */
+    std::vector<double> ReadADC( const uint8_t pFMCId, const uint8_t pFitelId, bool pPrintAll);
+
 private:
     void getFEDNetworkParameters();
     /*!
@@ -202,11 +217,13 @@ private:
     bool polli2cAcknowledge(uint32_t pTries);
 
     /*! Compute the size of an acquisition data block
+     * \param pFakeData: boolean flag to determine whether deterministic fake data or not
      * \return Number of 32-bit words to be read at each iteration */
-    uint32_t computeBlockSize();
+    uint32_t computeBlockSize(bool pFakeData = false);
 
-    void prettyprintSpyFIFO(std::vector<uint32_t> pVec);
+    void prettyprintSpyFIFO(const std::vector<uint32_t>& pVec);
     void prettyprintFIFO1( const std::vector<uint32_t>& pFifoVec, const std::vector<uint32_t>& pMarkerVec, std::ostream& os = std::cout);
+    void prettyprintTBMFIFO(const std::vector<uint32_t>& pData);
     void prettyprintPhase( const std::vector<uint32_t>& pData, int pChannel );
 
     // FPGA CONFIG METHODS

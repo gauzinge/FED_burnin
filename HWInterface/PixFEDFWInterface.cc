@@ -243,8 +243,14 @@ std::vector<uint32_t> PixFEDFWInterface::readTransparentFIFO()
     {
         uint32_t cWord = ReadReg("fifo.bit_stream");
         cFifoVec.push_back(cWord);
-        std::cout << GREEN << std::bitset<30>(cWord) << RESET << std::endl;
+//        std::cout << GREEN << std::bitset<30>(cWord) << RESET << std::endl;
+	for(int iBit = 29; iBit >=0; iBit--)
+	{
+		if(std::bitset<30>(cWord)[iBit] == 0) std::cout << GREEN << "_";
+		else std::cout << "-";
+	}
     }
+	std::cout << RESET << std::endl; 
     return cFifoVec;
 }
 
@@ -253,9 +259,11 @@ std::vector<uint32_t> PixFEDFWInterface::readSpyFIFO()
     std::vector<uint32_t> cSpyA;
     std::vector<uint32_t> cSpyB;
 
-    cSpyA = ReadBlockRegValue( "fifo.spy_A", 180 );
-    cSpyB = ReadBlockRegValue( "fifo.spy_B", 180 );
+   // cSpyA = ReadBlockRegValue( "fifo.spy_A", fBlockSize / 2 );
+   // cSpyB = ReadBlockRegValue( "fifo.spy_B", fBlockSize / 2 );
 
+    cSpyA = ReadBlockRegValue( "fifo.spy_A", 1024 );
+    cSpyB = ReadBlockRegValue( "fifo.spy_B", 1024 );
 
     std::cout  << std::endl << BOLDBLUE << "TBM_SPY FIFO A: " << RESET << std::endl;
     prettyprintSpyFIFO(cSpyA);
@@ -267,7 +275,7 @@ std::vector<uint32_t> PixFEDFWInterface::readSpyFIFO()
     return cAppendedSPyFifo;
 }
 
-void PixFEDFWInterface::prettyprintSpyFIFO(std::vector<uint32_t> pVec)
+void PixFEDFWInterface::prettyprintSpyFIFO(const std::vector<uint32_t>& pVec)
 {
     uint32_t cMask = 0xf0;
     for (auto& cWord : pVec )
@@ -291,10 +299,10 @@ std::string PixFEDFWInterface::readFIFO1()
     std::vector<uint32_t> cMarkerA;
     std::vector<uint32_t> cMarkerB;
 
-    cFifo1A = ReadBlockRegValue("fifo.spy_1_A", 64);
-    cMarkerA = ReadBlockRegValue("fifo.spy_1_A_marker", 64);
-    cFifo1B = ReadBlockRegValue("fifo.spy_1_B", 64);
-    cMarkerB = ReadBlockRegValue("fifo.spy_1_B_marker", 64);
+    cFifo1A = ReadBlockRegValue("fifo.spy_1_A", fBlockSize / 4);
+    cMarkerA = ReadBlockRegValue("fifo.spy_1_A_marker", fBlockSize / 4);
+    cFifo1B = ReadBlockRegValue("fifo.spy_1_B", fBlockSize / 4);
+    cMarkerB = ReadBlockRegValue("fifo.spy_1_B_marker", fBlockSize / 4);
     // pass cFIFO1Str as ostream to prettyPrint for later FileIo
     std::cout << std::endl << BOLDBLUE <<  "FIFO 1 Channel A: " << RESET << std::endl;
     cFIFO1Str << "FIFO 1 Channel A: " << std::endl;
@@ -346,7 +354,7 @@ void PixFEDFWInterface::prettyprintFIFO1( const std::vector<uint32_t>& pFifoVec,
     os << "----------------------------------------------------------------------------------" << std::endl;
 }
 
-bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED )
+bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED, bool pFakeData )
 {
     std::vector< std::pair<std::string, uint32_t> > cVecReg;
 
@@ -367,10 +375,8 @@ bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED )
 
 
     // the FW needs to be aware of the true 32 bit workd Block size for some reason! This is the Packet_nb_true in the python script?!
-    //computeBlockSize();
-    //cVecReg.push_back( {"pixfed_ctrl_regs.PACKET_NB", ( fBlockSize32 - 1 )  } );
-
-    //WriteStackReg( cVecReg );
+    computeBlockSize( pFakeData );
+    cVecReg.push_back( {"pixfed_ctrl_regs.PACKET_NB", fBlockSize32 } );
 
     PixFEDRegMap cPixFEDRegMap = pPixFED->getPixFEDRegMap();
     for ( auto const& it : cPixFEDRegMap )
@@ -384,7 +390,6 @@ bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED )
 
     cVecReg.push_back({"pixfed_ctrl_regs.fitel_i2c_cmd_reset", 0});
     cVecReg.push_back({"pixfed_ctrl_regs.fitel_config_req", 0});
-    cVecReg.push_back({"pixfed_ctrl_regs.fitel_i2c_addr", 0x4d});
     cVecReg.push_back( {"pixfed_ctrl_regs.PC_CONFIG_OK", 1} );
     WriteStackReg( cVecReg );
 
@@ -393,8 +398,6 @@ bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED )
 
     std::this_thread::sleep_for( cPause );
 
-    // read FITEL I2C address
-    std::cout << "FITEL I2C address: " << ReadReg("pixfed_ctrl_regs.fitel_i2c_addr") << std::endl;
     // Read back the DDR3 calib done flag
     bool cDDR3calibrated = ( ReadReg( "pixfed_stat_regs.ddr3_init_calib_done" ) & 0x00000001 );
     if ( cDDR3calibrated ) std::cout << "DDR3 calibrated, board configured!" << std::endl;
@@ -415,9 +418,10 @@ void PixFEDFWInterface::Start()
     fNthAcq = 0;
     std::vector< std::pair<std::string, uint32_t> > cVecReg;
     //cVecReg.push_back( {"pixfed_ctrl_regs.CMD_START_BY_PC", 1} );
-    cVecReg.push_back( {"pixfed_ctrl_regs.INT_TRIGGER_EN", 1} );
+    cVecReg.push_back( {"pixfed_ctrl_regs.PC_CONFIG_OK", 1} );
+    cVecReg.push_back( {"pixfed_ctrl_regs.INT_TRIGGER_EN", 0} );
 
-    WriteStackReg( cVecReg );
+    //WriteStackReg( cVecReg );
 }
 
 void PixFEDFWInterface::Stop()
@@ -425,7 +429,7 @@ void PixFEDFWInterface::Stop()
     //Stop the DAQ
     std::vector< std::pair<std::string, uint32_t> > cVecReg;
     //cVecReg.push_back( {"pixfed_ctrl_regs.CMD_START_BY_PC", 0} );
-    cVecReg.push_back( {"pixfed_ctrl_regs.INT_TRIGGER_EN", 0} );
+    //cVecReg.push_back( {"pixfed_ctrl_regs.INT_TRIGGER_EN", 0} );
     cVecReg.push_back( {"pixfed_ctrl_regs.PC_CONFIG_OK", 0} );
     //cVecReg.push_back( {"pixfed_ctrl_regs.rx_index_sel_en", 0} );
 
@@ -467,12 +471,13 @@ void PixFEDFWInterface::Resume()
 
 std::vector<uint32_t> PixFEDFWInterface::ReadData( PixFED* pPixFED, uint32_t pBlockSize )
 {
-    int cBlockSize;
+    uint32_t cBlockSize = 0;
     if (pBlockSize == 0) cBlockSize = fBlockSize;
+    else cBlockSize = pBlockSize;
     std::chrono::milliseconds cWait( 10 );
     // the fNthAcq variable is automatically used to determine which DDR FIFO to read - so it has to be incremented in this method!
-    // first find which DDR bank to read
 
+    // first find which DDR bank to read
     SelectDaqDDR( fNthAcq );
     //std::cout << "Querying " << fStrDDR << " for FULL condition!" << std::endl;
 
@@ -501,38 +506,62 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData( PixFED* pPixFED, uint32_t pBl
         std::this_thread::sleep_for( cWait );
     WriteReg( fStrReadout, 0 );
 
-    //now I need to do something with the Data that I read into cData
-    int cIndex = 0;
-    uint32_t cPreviousWord;
-    for ( auto& cWord : cData )
-    {
-        //      std::cout << std::hex << std::setw(8) << std::setfill('0');
-        if (cIndex % 2 == 0)
-        {
-            if (cWord == 0x8) std::cout << "Evt Header: \n";
-            else if (cWord == 0xC) std::cout << "ROC Header: \n";
-            else if (cWord == 0x1) std::cout << "PXL    Hit: ";
-            else if (cWord == 0x4) std::cout << "TBM Trailer: \n";
-            else if (cWord == 0x6) std::cout << "Evt Trailer: \n";
-            cPreviousWord = cWord;
-        }
-        else if (cPreviousWord == 0x1)
-        {
-            std::cout << "CH: " << ((cWord >> 26) & 0x3f) << " ROC: " << ((cWord >> 21) & 0x1f) << " DC: " << ((cWord >> 16) & 0x1f) << " ROW: " << ((cWord >> 8) & 0xff) << " PH: " << (cWord & 0xff) << std::dec << std::endl;
-        }
-        cIndex++;
-    }
-
+    prettyprintTBMFIFO(cData);
     fNthAcq++;
     return cData;
 }
 
-uint32_t PixFEDFWInterface::computeBlockSize( )
+void PixFEDFWInterface::prettyprintTBMFIFO(const std::vector<uint32_t>& pData )
 {
-    // this is the number of bits to read from DDR
-    fBlockSize = fNTBM * fNCh * fNPattern * fPacketSize;
+    std::cout << BOLDBLUE << "Global TBM Readout FIFO: " << RESET << std::endl;
+    //now I need to do something with the Data that I read into cData
+    int cIndex = 0;
+    uint32_t cPreviousWord;
+    for ( auto& cWord : pData )
+    {
+        //      std::cout << std::hex << std::setw(8) << std::setfill('0');
+        if (cIndex % 2 == 0)
+            cPreviousWord = cWord;
+
+        else if (cPreviousWord == 0x1)
+        {
+            //std::cout << cWord <<  std::endl;
+            std::cout << "    Pixel Hit: CH: " << ((cWord >> 26) & 0x3f) << " ROC: " << ((cWord >> 21) & 0x1f) << " DC: " << ((cWord >> 16) & 0x1f) << " ROW: " << ((cWord >> 8) & 0xff) << " PH: " << (cWord & 0xff) << std::dec << std::endl;
+        }
+        //else if (cPreviousWord == 0x6)
+        //{
+        ////std::cout << cWord <<  std::endl;
+        //std::cout << "Event Trailer: CH: " << ((cWord >> 26) & 0x3f) << " ID: " << ((cWord >> 21) & 0x1f) << " marker: " << (cWord & 0x1fffff) << " ROW: " << ((cWord >> 8) & 0xff) << " PH: " << (cWord & 0xff) << std::dec << std::endl;
+        //}
+        else if (cPreviousWord == 0x8)
+        {
+            //std::cout << cWord <<  std::endl;
+            std::cout << "Event Header: CH: " << ((cWord >> 26) & 0x3f) << " ID: " << ((cWord >> 21) & 0x1f) << " TBM H: " << ((cWord >> 16) & 0x1f) << " ROW: " << ((cWord >> 9) & 0xff) << " EventNumber: " << (cWord & 0xff) << std::dec << std::endl;
+        }
+        else if (cPreviousWord == 0xC)
+        {
+            //std::cout << cWord <<  std::endl;
+            std::cout << " ROC Header: CH: " << ((cWord >> 26) & 0x3f) << " ROC Nr: " << ((cWord >> 21) & 0x1f) << " Status : " << (cWord  & 0xff) << std::dec << std::endl;
+        }
+        else if (cPreviousWord == 0x4)
+        {
+            //std::cout << cWord <<  std::endl;
+            std::cout << " TBM Trailer: CH: " << ((cWord >> 26) & 0x3f) << " ID: " << ((cWord >> 21) & 0x1f) << " TBM T2: " << ((cWord >> 12) & 0xff) << " TBM_T1: " << (cWord & 0xff) << std::dec << std::endl;
+        }
+        cIndex++;
+    }
+}
+
+uint32_t PixFEDFWInterface::computeBlockSize( bool pFakeData )
+{
+    if (pFakeData)
+    {
+        // this is the number of bits to read from DDR
+        fBlockSize = fNTBM * fNCh * fNPattern * fPacketSize;
+    }
+
     // since the DDR data widt is 256 this is the number of 32 bit words I have to read
-    fBlockSize32 = static_cast<uint32_t>( fBlockSize / 8 );
+    fBlockSize32 = static_cast<uint32_t>( ceil(fBlockSize / double(8 )) - 1);
     return fBlockSize;
 }
 
@@ -632,6 +661,7 @@ bool PixFEDFWInterface::polli2cAcknowledge(uint32_t pTries)
 
 bool PixFEDFWInterface::WriteFitelBlockReg(std::vector<uint32_t>& pVecReq)
 {
+    WriteReg("pixfed_ctrl_regs.fitel_i2c_addr", 0x4d);
     bool cSuccess = false;
     // write the encoded registers in the tx fifo
     WriteBlockReg("fitel_config_fifo_tx", pVecReq);
@@ -641,11 +671,14 @@ bool PixFEDFWInterface::WriteFitelBlockReg(std::vector<uint32_t>& pVecReq)
     // wait for command acknowledge
     while (ReadReg("pixfed_stat_regs.fitel_config_ack") == 0) usleep(100);
 
-    if (ReadReg("pixfed_stat_regs.fitel_config_ack") == 1)
+    uint32_t cVal = ReadReg("pixfed_stat_regs.fitel_config_ack");
+    //if (ReadReg("pixfed_stat_regs.fitel_config_ack") == 1)
+    if (cVal == 1)
     {
         cSuccess = true;
     }
-    else if (ReadReg("pixfed_stat_regs.fitel_config_ack") == 3)
+    //else if (ReadReg("pixfed_stat_regs.fitel_config_ack") == 3)
+    else if (cVal == 3)
     {
         std::cout << "Error writing Registers!" << std::endl;
         cSuccess = false;
@@ -658,6 +691,7 @@ bool PixFEDFWInterface::WriteFitelBlockReg(std::vector<uint32_t>& pVecReq)
 
 bool PixFEDFWInterface::ReadFitelBlockReg(std::vector<uint32_t>& pVecReq)
 {
+    WriteReg("pixfed_ctrl_regs.fitel_i2c_addr", 0x4d);
     bool cSuccess = false;
     //uint32_t cVecSize = pVecReq.size();
 
@@ -669,11 +703,14 @@ bool PixFEDFWInterface::ReadFitelBlockReg(std::vector<uint32_t>& pVecReq)
     // wait for command acknowledge
     while (ReadReg("pixfed_stat_regs.fitel_config_ack") == 0) usleep(100);
 
-    if (ReadReg("pixfed_stat_regs.fitel_config_ack") == 1)
+    uint32_t cVal = ReadReg("pixfed_stat_regs.fitel_config_ack");
+    //if (ReadReg("pixfed_stat_regs.fitel_config_ack") == 1)
+    if (cVal == 1)
     {
         cSuccess = true;
     }
-    else if (ReadReg("pixfed_stat_regs.fitel_config_ack") == 3)
+    //else if (ReadReg("pixfed_stat_regs.fitel_config_ack") == 3)
+    else if (cVal == 3)
     {
         cSuccess = false;
         std::cout << "Error reading registers!" << std::endl;
@@ -685,6 +722,115 @@ bool PixFEDFWInterface::ReadFitelBlockReg(std::vector<uint32_t>& pVecReq)
     // clear the vector & read the data from the fifo
     pVecReq = ReadBlockRegValue("fitel_config_fifo_rx", pVecReq.size());
     return cSuccess;
+}
+
+
+
+std::vector<double> PixFEDFWInterface::ReadADC( const uint8_t pFMCId, const uint8_t pFitelId, bool pPrintAll)
+{
+    // the Fitel FMC needs to be set up to be able to read the RSSI on a given Channel:
+    // I2C register 0x1: set to 0x4 for RSSI, set to 0x5 for Die Temperature of the Fitel
+    // Channel Control Registers: set to 0x02 to disable RSSI for this channel, set to 0x0c to enable RSSI for this channel
+    // the ADC always reads the sum of all the enabled channels!
+    //initial FW setup
+    WriteReg("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 1);
+
+    std::vector<std::pair<std::string, uint32_t> > cVecReg;
+    cVecReg.push_back({"pixfed_ctrl_regs.fitel_i2c_cmd_reset", 0});
+    cVecReg.push_back({"pixfed_ctrl_regs.fitel_config_req", 0});
+    //Laurent is a Bastard because he changes the i2c addr register!
+    cVecReg.push_back({"pixfed_ctrl_regs.fitel_i2c_addr", 0x77});
+
+    WriteStackReg(cVecReg);
+
+    //first, write the correct registers to configure the ADC
+    //the values are: Address 0x01 -> 0x1<<6 & 0x1f
+    //                Address 0x02 -> 0x1
+
+    // Vectors for write and read data!
+    std::vector<uint32_t> cVecWrite;
+    std::vector<uint32_t> cVecRead;
+
+    //encode them in a 32 bit word and write, no readback yet
+    cVecWrite.push_back(  pFMCId  << 24 |  pFitelId << 20 |  0x1 << 8 | 0x5f );
+    cVecWrite.push_back(  pFMCId  << 24 |  pFitelId << 20 |  0x2 << 8 | 0x01 );
+    WriteBlockReg("fitel_config_fifo_tx", cVecWrite);
+
+    // sent an I2C write request
+    WriteReg("pixfed_ctrl_regs.fitel_config_req", 1);
+
+    // wait for command acknowledge
+    while (ReadReg("pixfed_stat_regs.fitel_config_ack") == 0) usleep(100);
+
+    uint32_t cVal = ReadReg("pixfed_stat_regs.fitel_config_ack");
+    if (cVal == 3)
+    {
+        std::cout << "Error reading registers!" << std::endl;
+    }
+
+    // release
+    i2cRelease(10);
+
+    //now prepare the read-back of the values
+    uint8_t cNWord = 10;
+    for (uint8_t cIndex = 0; cIndex < cNWord; cIndex++)
+    {
+        cVecRead.push_back( pFMCId << 24 | pFitelId << 20 | (0x6 + cIndex ) << 8 | 0 );
+    }
+    //Laurent is a Bastard because he changes the i2c addr register!
+    WriteReg("pixfed_ctrl_regs.fitel_i2c_addr", 0x4c);
+
+    WriteBlockReg( "fitel_config_fifo_tx", cVecRead );
+    // sent an I2C write request
+    WriteReg("pixfed_ctrl_regs.fitel_config_req", 3);
+
+    // wait for command acknowledge
+    while (ReadReg("pixfed_stat_regs.fitel_config_ack") == 0) usleep(100);
+
+    cVal = ReadReg("pixfed_stat_regs.fitel_config_ack");
+    if (cVal == 3)
+    {
+        std::cout << "Error reading registers!" << std::endl;
+    }
+
+    // release
+    i2cRelease(10);
+
+    // clear the vector & read the data from the fifo
+    cVecRead = ReadBlockRegValue("fitel_config_fifo_rx", cVecRead.size());
+
+    // now convert to Voltages!
+    std::vector<double> cLTCValues(cNWord / 2, 0);
+
+    double cConstant = 0.00030518;
+    // each value is hidden in 2 I2C words
+    for (int cMeasurement = 0; cMeasurement < cNWord / 2; cMeasurement++)
+    {
+        // build the values
+        uint16_t cValue = ((cVecRead.at(2 * cMeasurement) & 0x7F) << 8) + (cVecRead.at(2 * cMeasurement + 1) & 0xFF);
+        uint8_t cSign = (cValue >> 14) & 0x1;
+
+        //now the conversions are different for each of the voltages, so check by cMeasurement
+        if (cMeasurement == 4)
+            cLTCValues.at(cMeasurement) = (cSign == 0b1) ? (-( 32768 - cValue ) * cConstant + 2.5) : (cValue * cConstant + 2.5);
+
+        else
+            cLTCValues.at(cMeasurement) = (cSign == 0b1) ? (-( 32768 - cValue ) * cConstant) : (cValue * cConstant);
+        if (pPrintAll)
+            std::cout << "V " << cMeasurement + 1 << " = " << cLTCValues.at(cMeasurement) << std::endl;
+    }
+
+// now I have all 4 voltage values in a vector of size 5
+// V1 = cLTCValues[0]
+// V2 = cLTCValues[1]
+// V3 = cLTCValues[2]
+// V4 = cLTCValues[3]
+// Vcc = cLTCValues[4]
+//
+// the RSSI value = fabs(V3-V4) / R=150 Ohm [in Amps]
+    double cADCVal = fabs(cLTCValues.at(2) - cLTCValues.at(3)) / 150.0;
+    std::cout << BOLDBLUE << "FMC " << +pFMCId << " Fitel " << +pFitelId << " RSSI " << cADCVal * 1000  << " mA" << RESET << std::endl;
+    return cLTCValues;
 }
 
 /////////////////////////////////////////////

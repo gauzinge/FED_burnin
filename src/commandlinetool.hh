@@ -11,11 +11,13 @@
 #include "../HWDescription/PixFED.h"
 #include "../HWInterface/PixFEDInterface.h"
 #include "../System/SystemController.h"
+#include "../AMC13/Amc13Controller.h"
 #include "../Utils/Data.h"
 
 //my variables
 const char* cHWFile;
 SystemController cSystemController;
+Amc13Controller cAmc13Controller;
 
 int cNAcq;
 int tbm_index_error_ctr;
@@ -57,6 +59,9 @@ void getTransparent();
 void getSpy();
 void getFIFO1();
 void dumpAll();
+
+void findLight();
+void findPhases();
 
 void quit();
 

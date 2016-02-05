@@ -35,9 +35,11 @@ int main(int argc, char* argv[] )
     cSystemController.InitializeSettings(cHWFile, std::cout);
 
     // initialize HWdescription from XML, beware, settings have to be read first
+    cAmc13Controller.InitializeAmc13( cHWFile, std::cout );
     cSystemController.InitializeHw(cHWFile, std::cout);
 
     // configure the HW
+    cAmc13Controller.ConfigureAmc13( std::cout );
     cSystemController.ConfigureHw(std::cout );
     auto cSetting = cSystemController.fSettingsMap.find("NAcq");
     cNAcq = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 10;
@@ -226,6 +228,18 @@ int main(int argc, char* argv[] )
 	    std::cout << "dumpAll()" <<  std::endl;	    
 	    dumpAll();
 	  }
+	else if(splitUserInput[0] == "findphase" || splitUserInput[0] == "phase")
+	  {
+	    // find good phase
+	    splitUserInput.erase(splitUserInput.begin());	    
+	    findPhases();
+	  }
+	else if(splitUserInput[0] == "light")
+	  {
+	    // find light on fibres
+	    splitUserInput.erase(splitUserInput.begin());
+	    findLight();
+	  }
 	else if(splitUserInput[0] == "q" || splitUserInput[0] == "quit")
 	  {
 	    // QUIT/END program
@@ -283,6 +297,12 @@ void defineValidInput(){
   validInput.push_back("fpgaconf");
   // List all firmware images
   validInput.push_back("list");
+  // Check for light on fibres
+  validInput.push_back("light");
+  // Find good phases for readout
+  validInput.push_back("findphase");
+  validInput.push_back("phase");
+
  
 }
 
@@ -395,7 +415,7 @@ void readData(){
   Data cData;
   for (auto& cFED : cSystemController.fPixFEDVector)
     {
-      cData.add(0, cSystemController.fFEDInterface->ReadData(cFED));
+      cData.add(0, cSystemController.fFEDInterface->ReadData(cFED,2));
     }
 }
 
@@ -516,8 +536,31 @@ void dumpAll(){
       // read fifo 1
       cSystemController.fFEDInterface->readFIFO1(cFED);
       // read data
-      cData.add(0, cSystemController.fFEDInterface->ReadData(cFED));
+      cData.add(0, cSystemController.fFEDInterface->ReadData(cFED,2));
     }
 }
+
+void findLight(){
+    for (auto& cFED : cSystemController.fPixFEDVector)
+    {
+      for (auto& cFitel : cFED->fFitelVector)
+	{
+	  cSystemController.fFEDInterface->ReadLightOnFibre(cFitel);
+        }
+    }
+}
+
+void findPhases(){
+
+  for (auto& cFED : cSystemController.fPixFEDVector)
+    {
+      //TODO: make the channel of interest (here 11) a variable that can be changed
+
+      cSystemController.fFEDInterface->getBoardInfo(cFED);
+      cSystemController.fFEDInterface->findPhases(cFED, 0xb);
+    }
+  
+}
+
 
 void quit(){}

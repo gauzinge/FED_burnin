@@ -133,6 +133,12 @@ public:
      * \brief: read the contents of FIFO 1 for TBM cores A & B
      */
     std::string readFIFO1();
+    /*
+     * \brief: read the OSD readback word from ROCs
+     * \param: ROC Number
+     * \return: the joined 16bit OSD words for both TBM cores A is bits [0:15], B is bits [16:31]
+     */
+    uint32_t readOSDWord( uint32_t pROCId, uint32_t pScopeFIFOCh )
     /*!
      * \brief Start a DAQ
      */

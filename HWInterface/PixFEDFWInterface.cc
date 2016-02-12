@@ -182,7 +182,7 @@ void PixFEDFWInterface::findPhases(uint32_t pScopeFIFOCh)
 
     std::cout <<  "Phase finding Results: " << std::endl;
 
-    uint32_t cNChannel = 12;
+    uint32_t cNChannel = 24;
     std::vector<uint32_t> cReadValues = ReadBlockRegValue( "idel_individual_stat_block", cNChannel * 4 );
 
     std::cout << BOLDGREEN << "FIBRE CTRL_RDY CNTVAL_Hi CNTVAL_Lo   pattern:                     S H1 L1 H0 L0   W R" << RESET << std::endl;
@@ -244,13 +244,13 @@ std::vector<uint32_t> PixFEDFWInterface::readTransparentFIFO()
         uint32_t cWord = ReadReg("fifo.bit_stream");
         cFifoVec.push_back(cWord);
 //        std::cout << GREEN << std::bitset<30>(cWord) << RESET << std::endl;
-	for(int iBit = 29; iBit >=0; iBit--)
-	{
-		if(std::bitset<30>(cWord)[iBit] == 0) std::cout << GREEN << "_";
-		else std::cout << "-";
-	}
+        for (int iBit = 29; iBit >= 0; iBit--)
+        {
+            if (std::bitset<30>(cWord)[iBit] == 0) std::cout << GREEN << "_";
+            else std::cout << "-";
+        }
     }
-	std::cout << RESET << std::endl; 
+    std::cout << RESET << std::endl;
     return cFifoVec;
 }
 
@@ -259,8 +259,8 @@ std::vector<uint32_t> PixFEDFWInterface::readSpyFIFO()
     std::vector<uint32_t> cSpyA;
     std::vector<uint32_t> cSpyB;
 
-   // cSpyA = ReadBlockRegValue( "fifo.spy_A", fBlockSize / 2 );
-   // cSpyB = ReadBlockRegValue( "fifo.spy_B", fBlockSize / 2 );
+    // cSpyA = ReadBlockRegValue( "fifo.spy_A", fBlockSize / 2 );
+    // cSpyB = ReadBlockRegValue( "fifo.spy_B", fBlockSize / 2 );
 
     cSpyA = ReadBlockRegValue( "fifo.spy_A", 1024 );
     cSpyB = ReadBlockRegValue( "fifo.spy_B", 1024 );
@@ -353,6 +353,36 @@ void PixFEDFWInterface::prettyprintFIFO1( const std::vector<uint32_t>& pFifoVec,
     }
     os << "----------------------------------------------------------------------------------" << std::endl;
 }
+
+
+uint32_t PixFEDFWInterface::ReadOSDWord(uint32_t pROCId, uint32_t pScopeFIFOCh)
+{
+    std::cout << BOLDBLUE << "OSD Readback enabled for ROC " << pROCId << RESET << std::endl;
+    // first, tell the FW which ROC to consider
+    WriteReg("fifo_config.OSD_ROC_Nr", pROCId);
+
+    // now read back the OSD bit - note that 16 triggers are required for a full 16 bit word
+
+    // use this to read the OSD word for all channels
+    uint16_t cOSD_word_A = 0;
+    uint16_t cOSD_word_B = 0;
+
+    //std::vector<uint32_t> cReadValues = ReadBlockRegValue( "idel_individual_stat_block", cNChannel * 4 );
+
+    // use this to read for an individual channel
+    std::string cRegname = "idel_individual_stat.CH" + std::to_string(pScopeFIFOCh);
+    std::vector<uint32_t> cReadValues = ReadBlockRegValue( cRegname, 4 );
+
+    cOSD_word_A = cReadValues.at(3) & 0xffff;
+    cOSD_word_B = (cReadValues.at(3) >> 16) & 0xffff;
+
+    std::cout << GREEN << "TBM Core A: " << std::bitset<16>(cOSD_word_A) << RESET << std::endl;
+
+    std::cout << GREEN << "TBM Core B: " << std::bitset<16>(cOSD_word_B) << RESET << std::endl;
+
+    return cReadValues.at(3);
+}
+
 
 bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED, bool pFakeData )
 {

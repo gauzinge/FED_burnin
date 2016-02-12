@@ -169,6 +169,14 @@ public:
      */
     std::string readFIFO1( const PixFED* pFED );
     /*!
+     * \brief: read ROC OSD readback word
+     * \param: pFED
+     * \param: pROCId
+     * \param: pChannelOfInteres
+     * \return: 32 bit word containing OSD words both both TBM cores
+     */
+    uint32_t readOSDWord(const PixFED* pFED, uint32_t pROCId, uint32_t pChannelOfInterest);
+    /*!
      * \brief Start a DAQ
      * \param pFED
      */

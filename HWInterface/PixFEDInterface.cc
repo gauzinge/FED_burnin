@@ -453,6 +453,13 @@ std::string PixFEDInterface::readFIFO1( const PixFED * pFED )
     return fFEDFW->readFIFO1();
 }
 
+
+uint32_t PixFEDInterface::readOSDWord( const PixFED* pFED, uint32_t pROCId, uint32_t pChannelOfInterest )
+{
+    setBoard( pFED->getBeId() );
+    return fFEDFW->readOSDWord(pROCId, pChannelOfInterest);
+}
+
 ///////////////
 // Readout  Methods
 //////////////

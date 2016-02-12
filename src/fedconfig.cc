@@ -66,7 +66,8 @@ int main(int argc, char* argv[] )
             cSystemController.fFEDInterface->readTransparentFIFO(cFED);
             cSystemController.fFEDInterface->readSpyFIFO(cFED);
             cSystemController.fFEDInterface->readFIFO1(cFED);
-           // cSystemController.fFEDInterface->ReadData(cFED, 0 );
+            cSystemController.fFEDInterface->readOSDWord(cFED, 1, cChannelOfInterest);
+            // cSystemController.fFEDInterface->ReadData(cFED, 0 );
         }
     }
     cSystemController.HaltHw();

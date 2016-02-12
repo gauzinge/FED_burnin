@@ -363,11 +363,16 @@ uint32_t PixFEDFWInterface::ReadOSDWord(uint32_t pROCId, uint32_t pScopeFIFOCh)
 
     // now read back the OSD bit - note that 16 triggers are required for a full 16 bit word
 
-    // use this to read the OSD word for all channels
     uint16_t cOSD_word_A = 0;
     uint16_t cOSD_word_B = 0;
 
+    // use this to read the OSD word for all channels, obviously need a loop to pick the correct word for all channels then
     //std::vector<uint32_t> cReadValues = ReadBlockRegValue( "idel_individual_stat_block", cNChannel * 4 );
+    //for(uint32_t iChannel = 0; iChannel = 24; i++)
+    //{
+    //  word = cReadValues.at((iChannel * 4)) + 3;
+    //  std::cout << A << B << etc...
+    //}
 
     // use this to read for an individual channel
     std::string cRegname = "idel_individual_stat.CH" + std::to_string(pScopeFIFOCh);

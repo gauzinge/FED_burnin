@@ -381,9 +381,9 @@ uint32_t PixFEDFWInterface::readOSDWord(uint32_t pROCId, uint32_t pScopeFIFOCh)
     cOSD_word_A = cReadValues.at(3) & 0xffff;
     cOSD_word_B = (cReadValues.at(3) >> 16) & 0xffff;
 
-    std::cout << GREEN << "TBM Core A: " << std::bitset<16>(cOSD_word_A) << RESET << std::endl;
+    std::cout << GREEN << "TBM Core A: " << std::endl << "aaaarrrr87654321" << std::endl << std::bitset<16>(cOSD_word_A) << RESET << std::endl;
 
-    std::cout << GREEN << "TBM Core B: " << std::bitset<16>(cOSD_word_B) << RESET << std::endl;
+    std::cout << GREEN << "TBM Core B: " << std::endl << "aaaarrrr87654321" << std::endl << std::bitset<16>(cOSD_word_B) << RESET << std::endl;
 
     return cReadValues.at(3);
 }

@@ -344,7 +344,8 @@ bool PixFEDInterface::WriteFitelReg(Fitel * pFitel, const std::string & pRegNode
 
 std::vector<double> PixFEDInterface::ReadADC( Fitel* pFitel, uint32_t pChan, bool pPrintAll)
 {
-    std::cout << "Reading ADC Values on FMC " << +pFitel->getFMCId() << " Fitel " << +pFitel->getFitelId() << " Channel " << pChan + 1 << std::endl;
+    pChan = (pChan % 12 ) + 1;
+    std::cout << "Reading ADC Values on FMC " << +pFitel->getFMCId() << " Fitel " << +pFitel->getFitelId() << " Channel " << pChan << std::endl;
     setBoard(pFitel->getBeId());
     // in order to read the ADC values for a given channel (a group of channels, the Channel needs to be configured in the Fitel I2C register space)
     // I could do this via the files, but it is easier to just do it here
@@ -352,12 +353,14 @@ std::vector<double> PixFEDInterface::ReadADC( Fitel* pFitel, uint32_t pChan, boo
     // write the selected Channel 0x0c to enable that specific channel
     WriteFitelReg(pFitel, "AllCh_ConfigReg", 0x02, false);
     char tmp[25];
-    snprintf( tmp, sizeof(tmp), "Ch%02d_ConfigReg", pChan + 1);
+    snprintf( tmp, sizeof(tmp), "Ch%02d_ConfigReg", pChan);
     WriteFitelReg(pFitel, std::string(tmp), 0x0c, false);
 
     // now read the actual ADC value
-    return fFEDFW->ReadADC(pFitel->getFMCId(), pFitel->getFitelId(), pPrintAll);
+    std::vector<double> cADCValues = fFEDFW->ReadADC(pFitel->getFMCId(), pFitel->getFitelId(), pPrintAll);
 
+    WriteFitelReg(pFitel, "AllCh_ConfigReg", 0x0c, false);
+    return cADCValues;
 }
 
 uint8_t PixFEDInterface::ReadFitelReg( Fitel * pFitel, const std::string & pRegNode )

@@ -355,11 +355,11 @@ void PixFEDFWInterface::prettyprintFIFO1( const std::vector<uint32_t>& pFifoVec,
 }
 
 
-uint32_t PixFEDFWInterface::ReadOSDWord(uint32_t pROCId, uint32_t pScopeFIFOCh)
+uint32_t PixFEDFWInterface::readOSDWord(uint32_t pROCId, uint32_t pScopeFIFOCh)
 {
     std::cout << BOLDBLUE << "OSD Readback enabled for ROC " << pROCId << RESET << std::endl;
     // first, tell the FW which ROC to consider
-    WriteReg("fifo_config.OSD_ROC_Nr", pROCId);
+    WriteReg("fe_ctrl_regs.fifo_config.OSD_ROC_Nr", pROCId);
 
     // now read back the OSD bit - note that 16 triggers are required for a full 16 bit word
 

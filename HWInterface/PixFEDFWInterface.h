@@ -138,7 +138,7 @@ public:
      * \param: ROC Number
      * \return: the joined 16bit OSD words for both TBM cores A is bits [0:15], B is bits [16:31]
      */
-    uint32_t readOSDWord( uint32_t pROCId, uint32_t pScopeFIFOCh )
+    uint32_t readOSDWord( uint32_t pROCId, uint32_t pScopeFIFOCh );
     /*!
      * \brief Start a DAQ
      */

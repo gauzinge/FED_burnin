@@ -125,8 +125,8 @@ void Amc13Interface::ConfigureTTCHistory(std::vector<std::pair<int, uint32_t>> p
 
 void Amc13Interface::DumpHistory(int pNlastEntries)
 {
-    std::vector<uint32_t> cVec = fAMC13->getTTCHistory(pNlastEntries);
     fAMC13->setTTCHistoryEna(true);
+    std::vector<uint32_t> cVec = fAMC13->getTTCHistory(pNlastEntries);
 
     //now decode the Info in here!
     std::cout << BOLDRED << "TTC History showing the last " << pNlastEntries << " items!" << RESET << std::endl;

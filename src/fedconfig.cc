@@ -44,6 +44,9 @@ int main(int argc, char* argv[] )
     cSetting = cSystemController.fSettingsMap.find("ChannelOfInterest");
     int cChannelOfInterest = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 0;
 
+    cSetting = cSystemController.fSettingsMap.find("ROCOfInterest");
+    int cROCOfInterest = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 0;
+
     // get the board info of all boards and start the acquistion
     for (auto& cFED : cSystemController.fPixFEDVector)
     {
@@ -66,7 +69,7 @@ int main(int argc, char* argv[] )
             cSystemController.fFEDInterface->readTransparentFIFO(cFED);
             cSystemController.fFEDInterface->readSpyFIFO(cFED);
             cSystemController.fFEDInterface->readFIFO1(cFED);
-            cSystemController.fFEDInterface->readOSDWord(cFED, 1, cChannelOfInterest);
+            cSystemController.fFEDInterface->readOSDWord(cFED, cROCOfInterest, cChannelOfInterest);
             // cSystemController.fFEDInterface->ReadData(cFED, 0 );
         }
     }

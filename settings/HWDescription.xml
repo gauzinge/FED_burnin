@@ -3,7 +3,7 @@
     <AMC13>
         <connection id="T1" uri="chtcp-2.0://cmsuppixch:10203?target=amc13T101:50001" address_table="file://settings/AMC13XG_T1.xml" />
         <connection id="T2" uri="chtcp-2.0://cmsuppixch:10203?target=amc13T201:50001" address_table="file://settings/AMC13XG_T2.xml" />
-        <AMCmask enable="9,5"/>
+        <AMCmask enable="9,5" />
         <!--<Register tounge="T1" name="test.test">0</Register>-->
         <!--<BGO command="15" repeat="1" prescale="0" bx="100" />-->
         <!--<Trigger local="1" mode="1" rate="100" burst="100" rules="0" />-->
@@ -36,6 +36,7 @@
     <Setting name="NTBM">2</Setting>
     <!--<Setting name="ChannelOfInterest">0</Setting>-->
     <Setting name="ChannelOfInterest">0</Setting>
+    <Setting name="ROCOfInterest">2</Setting>
     <Setting name="BlockSize">256</Setting>
     <!--if set to 0, loop will run forever-->
     <!--<Setting name="NAcq">100</Setting>-->

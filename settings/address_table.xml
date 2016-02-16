@@ -218,24 +218,24 @@
 		<node id="CH1" address="0x00000004" mode="block" size="4"/>
 		<node id="CH2" address="0x00000008" mode="block" size="4"/>
 		<node id="CH3" address="0x0000000C" mode="block" size="4"/>
-		<node id="CH4" address="0x0000000F" mode="block" size="4"/>
+		<node id="CH4" address="0x00000010" mode="block" size="4"/>
 		<node id="CH5" address="0x00000014" mode="block" size="4"/>
 		<node id="CH6" address="0x00000018" mode="block" size="4"/>
 		<node id="CH7" address="0x0000001C" mode="block" size="4"/>
-		<node id="CH8" address="0x0000001F" mode="block" size="4"/>
+		<node id="CH8" address="0x00000020" mode="block" size="4"/>
 		<node id="CH9" address="0x00000024" mode="block" size="4"/>
 		<node id="CH10" address="0x00000028" mode="block" size="4"/>
 		<node id="CH11" address="0x0000002C" mode="block" size="4"/>
 
-		<node id="CH12" address="0x0000002F" mode="block" size="4"/>
+		<node id="CH12" address="0x00000030" mode="block" size="4"/>
 		<node id="CH13" address="0x00000034" mode="block" size="4"/>
 		<node id="CH14" address="0x00000038" mode="block" size="4"/>
 		<node id="CH15" address="0x0000003C" mode="block" size="4"/>
-		<node id="CH16" address="0x0000003F" mode="block" size="4"/>
+		<node id="CH16" address="0x00000040" mode="block" size="4"/>
 		<node id="CH17" address="0x00000044" mode="block" size="4"/>
 		<node id="CH18" address="0x00000048" mode="block" size="4"/>
 		<node id="CH19" address="0x0000004C" mode="block" size="4"/>
-		<node id="CH20" address="0x0000004F" mode="block" size="4"/>
+		<node id="CH20" address="0x00000050" mode="block" size="4"/>
 		<node id="CH21" address="0x00000054" mode="block" size="4"/>
 		<node id="CH22" address="0x00000058" mode="block" size="4"/>
 		<node id="CH23" address="0x0000005C" mode="block" size="4"/>

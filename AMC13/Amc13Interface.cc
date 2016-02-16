@@ -49,8 +49,8 @@ void Amc13Interface::ConfigureAmc13()
     {
         for (auto& cBGO : fDescription->fBGOs )
         {
-            configureBGO(cIndex, uint8_t(cBGO->fCommand), uint16_t(cBGO->fBX), uint16_t(cBGO->fPrescale), cBGO->fRepeat);
-            enableBGO(cIndex);
+            this->configureBGO(cIndex, uint8_t(cBGO->fCommand), uint16_t(cBGO->fBX), uint16_t(cBGO->fPrescale), cBGO->fRepeat);
+            this->enableBGO(cIndex);
             std::cout << "Configured & enabling BGO Channel " << cIndex << " : Command: " << cBGO->fCommand << " BX: " << cBGO->fBX << " Prescale: " << cBGO->fPrescale << " Repetetive: " << cBGO->fRepeat << std::endl;
             cIndex++;
         }
@@ -60,12 +60,14 @@ void Amc13Interface::ConfigureAmc13()
     if (fDescription->fTrigger != nullptr)
     {
         fAMC13->configureLocalL1A(fDescription->fTrigger->fLocal, fDescription->fTrigger->fMode, uint32_t(fDescription->fTrigger->fBurst), uint32_t(fDescription->fTrigger->fRate), fDescription->fTrigger->fRules );
+        //fAMC13->enableLocalL1A(true);
         std::cout << "Configuring local L1A: Mode: " << fDescription->fTrigger->fMode << " Rate: " << fDescription->fTrigger->fRate << " Burst: " << fDescription->fTrigger->fBurst << " Rules: " << fDescription->fTrigger->fRules << std::endl;
     }
     // if TTC simulator is enabled, the loopback fiber is required and no external TTC stream will be received, the Triggers are local by definition
     if (fDescription->fSimulate)
     {
         fAMC13->localTtcSignalEnable(fDescription->fSimulate);
+        //fAMC13->enableLocalL1A(true);
         std::cout << RED << "AMC13 configured to use local TTC simulator - don't forget to plug the loopback fibre!" << RESET << std::endl;
     }
 
@@ -97,12 +99,12 @@ void Amc13Interface::BurstL1A()
 
 void Amc13Interface::EnableBGO(int pChan)
 {
-    fAMC13->enableBGO( pChan );
+    this->enableBGO( pChan );
 }
 
 void Amc13Interface::DisableBGO(int pChan)
 {
-    fAMC13->disableBGO( pChan );
+    this->disableBGO( pChan );
 }
 
 void Amc13Interface::EnableTTCHistory()

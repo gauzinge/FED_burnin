@@ -30,7 +30,7 @@ int main(int argc, char* argv[] )
     cAmc13Controller.ConfigureAmc13( std::cout );
     cSystemController.ConfigureHw(std::cout );
 
-    cAmc13Controller.HaltAmc13();
-    cSystemController.HaltHw();
+//    cAmc13Controller.HaltAmc13();
+//    cSystemController.HaltHw();
     exit(0);
 }

@@ -36,6 +36,9 @@ int main(int argc, char* argv[] )
     cAmc13Controller.ConfigureAmc13( std::cout );
     cSystemController.ConfigureHw(std::cout );
 
+    //cAmc13Controller.fAmc13Interface->StartL1A();
+    //cAmc13Controller.fAmc13Interface->EnableBGO(0);
+
     auto cSetting = cSystemController.fSettingsMap.find("NAcq");
     int cNAcq = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 10;
     cSetting = cSystemController.fSettingsMap.find("BlockSize");
@@ -67,13 +70,13 @@ int main(int argc, char* argv[] )
             cSystemController.fFEDInterface->WriteBoardReg(cFED, "fe_ctrl_regs.decode_reg_reset", 1);
             mypause();
             //cSystemController.fFEDInterface->readTransparentFIFO(cFED);
-            //cSystemController.fFEDInterface->readSpyFIFO(cFED);
+            cSystemController.fFEDInterface->readSpyFIFO(cFED);
             cSystemController.fFEDInterface->readFIFO1(cFED);
             cSystemController.fFEDInterface->readOSDWord(cFED, cROCOfInterest, cChannelOfInterest);
             // cSystemController.fFEDInterface->ReadData(cFED, 0 );
         }
     }
-    cSystemController.HaltHw();
-    cAmc13Controller.HaltAmc13();
+//    cSystemController.HaltHw();
+//    cAmc13Controller.HaltAmc13();
     exit(0);
 }

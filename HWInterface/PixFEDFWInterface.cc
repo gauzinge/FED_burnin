@@ -262,8 +262,8 @@ std::vector<uint32_t> PixFEDFWInterface::readSpyFIFO()
     // cSpyA = ReadBlockRegValue( "fifo.spy_A", fBlockSize / 2 );
     // cSpyB = ReadBlockRegValue( "fifo.spy_B", fBlockSize / 2 );
 
-    cSpyA = ReadBlockRegValue( "fifo.spy_A", 1024 );
-    cSpyB = ReadBlockRegValue( "fifo.spy_B", 1024 );
+    cSpyA = ReadBlockRegValue( "fifo.spy_A", 4096 );
+    cSpyB = ReadBlockRegValue( "fifo.spy_B", 4096 );
 
     std::cout  << std::endl << BOLDBLUE << "TBM_SPY FIFO A: " << RESET << std::endl;
     prettyprintSpyFIFO(cSpyA);
@@ -359,16 +359,17 @@ uint32_t PixFEDFWInterface::readOSDWord(uint32_t pROCId, uint32_t pScopeFIFOCh)
 {
     std::cout << BOLDBLUE << "OSD Readback enabled for ROC " << pROCId << RESET << std::endl;
     // first, tell the FW which ROC to consider
-    WriteReg("fe_ctrl_regs.fifo_config.OSD_ROC_Nr", pROCId);
+    WriteReg("fe_ctrl_regs.fifo_config.OSD_ROC_Nr", (pROCId & 0x7));
 
     // now read back the OSD bit - note that 16 triggers are required for a full 16 bit word
 
     uint16_t cOSD_word_A = 0;
     uint16_t cOSD_word_B = 0;
 
+    //int cNChannel = 24;
     // use this to read the OSD word for all channels, obviously need a loop to pick the correct word for all channels then
     //std::vector<uint32_t> cReadValues = ReadBlockRegValue( "idel_individual_stat_block", cNChannel * 4 );
-    //for(uint32_t iChannel = 0; iChannel = 24; i++)
+    //for(uint32_t iChannel = 0; iChannel < cNChannel; i++)
     //{
     //  word = cReadValues.at((iChannel * 4)) + 3;
     //  std::cout << A << B << etc...

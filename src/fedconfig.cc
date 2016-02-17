@@ -37,6 +37,7 @@ int main(int argc, char* argv[] )
     cSystemController.ConfigureHw(std::cout );
 
     cAmc13Controller.fAmc13Interface->StartL1A();
+    //for (fAmc13Controller->BGO vector)
     cAmc13Controller.fAmc13Interface->EnableBGO(0);
 
     auto cSetting = cSystemController.fSettingsMap.find("NAcq");

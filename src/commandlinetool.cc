@@ -38,7 +38,7 @@ int main(int argc, char* argv[] )
     cAmc13Controller.InitializeAmc13( cHWFile, std::cout );
     cSystemController.InitializeHw(cHWFile, std::cout);
 
-    // configure the HW
+     // configure the HW
     cAmc13Controller.ConfigureAmc13( std::cout );
     cSystemController.ConfigureHw(std::cout );
     auto cSetting = cSystemController.fSettingsMap.find("NAcq");
@@ -59,8 +59,6 @@ int main(int argc, char* argv[] )
 	    printPromt();
 	    //get user input
 	    getline(std::cin,userInput);
-	    //this is for testing purposes
-	    std::cout << "You entred: " << userInput << std::endl;
 	    //sanitize input
 	    splitInput(userInput);
 	  }
@@ -355,8 +353,8 @@ void printPromt(){
   //DQM
   std::cout << "\t [trans] to dump transparent buffer data" << std::endl;
   std::cout << "\t [spy] to dump spy FIFO data" << std::endl;
-  std::cout << "\t [fifo1/one] to dump FIFO1 data" << std::endl;
-  std::cout << "\t [dumpallfifo] to dump all three FIFOs" << std::endl;
+  std::cout << "\t [one] to dump FIFO1 data" << std::endl;
+  std::cout << "\t [dump] to dump all three FIFOs" << std::endl;
 
   std::cout << "\t [q/quit] to to quit" << std::endl;
 
@@ -474,31 +472,35 @@ void configDAQ(const char* configfile){
   int cNAcq = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 10;
 }
 
-void flashFPGA(){}
+void flashFPGA(){
+  std::cout << "This function is currently not supported. \n Please check back later." << std::endl;
+}
 
-void switchFW(){}
+void switchFW(){
+  std::cout << "This function is currently not supported. \n Please check back later." << std::endl;
+}
 
 void listFW(){
   // list all saved firmware images for all FEDs
 
-  //TODO: this is a dirty bug fix and needs to be removed at some point
-  cSystemController.InitializeHw("settings/FWUpload.xml");
+  //TODO: this thing is totally broken. when a SystemController is initialised with
+  //      the FITEL receivers specified we get a segmentation fault.
+  //      As soon as this bug I can fix this function can be fixed
 
-  for (auto& cFED : cSystemController.fPixFEDVector)
-    {
-      // I print the board info until I know a better way to identify the FED
-      cSystemController.fFEDInterface->getBoardInfo(cFED);
-      std::vector<std::string> FWNames;
-      FWNames = cSystemController.fFEDInterface->getFpgaConfigList(cFED);
-      std::cout << FWNames.size() << " firmware images on SD card:" << std::endl;
-      for (auto &name : FWNames)
-	{
-	  std::cout <<"\t -" << name << std::endl;
-	}
-    }
-  //restore the original settings
-  cSystemController.InitializeHw(cHWFile);
+  std::cout << "This function is currently not supported. \n Please check back later." << std::endl;
 
+  // std::string cHWFileForFWUpload = "settings/FWUpload.xml";
+  // SystemController cFWSystemController;
+  // cFWSystemController.InitializeHw(cHWFileForFWUpload);
+  // PixFED* pBoard = cFWSystemController.fPixFEDVector.at(0);
+  // std::vector<std::string> FWNames = cFWSystemController.fFEDInterface->getFpgaConfigList(pBoard);
+
+  // std::cout << FWNames.size() << " firmware images on SD card:" << std::endl;
+  // for (auto &name : FWNames)
+  //   {
+  //     std::cout <<"\t -" << name << std::endl;
+  //   }
+  
 }
 
 void getTransparent(){
@@ -536,7 +538,7 @@ void dumpAll(){
       // read fifo 1
       cSystemController.fFEDInterface->readFIFO1(cFED);
       // read data
-      cData.add(0, cSystemController.fFEDInterface->ReadData(cFED,2));
+      //      cData.add(0, cSystemController.fFEDInterface->ReadData(cFED,2));
     }
 }
 

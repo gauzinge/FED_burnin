@@ -6,6 +6,8 @@
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <chrono>
+#include <thread>
 #include "uhal/uhal.hpp"
 #include "../Utils/Utilities.h"
 #include "../HWDescription/PixFED.h"

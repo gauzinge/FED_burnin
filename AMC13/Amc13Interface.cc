@@ -60,7 +60,7 @@ void Amc13Interface::ConfigureAmc13()
     if (fDescription->fTrigger != nullptr)
     {
         fAMC13->configureLocalL1A(fDescription->fTrigger->fLocal, fDescription->fTrigger->fMode, uint32_t(fDescription->fTrigger->fBurst), uint32_t(fDescription->fTrigger->fRate), fDescription->fTrigger->fRules );
-        //fAMC13->enableLocalL1A(true);
+
         std::cout << "Configuring local L1A: Mode: " << fDescription->fTrigger->fMode << " Rate: " << fDescription->fTrigger->fRate << " Burst: " << fDescription->fTrigger->fBurst << " Rules: " << fDescription->fTrigger->fRules << std::endl;
     }
     // if TTC simulator is enabled, the loopback fiber is required and no external TTC stream will be received, the Triggers are local by definition
@@ -232,7 +232,11 @@ void Amc13Interface::enableBGO(int pChan)
 
     snprintf( tmp, sizeof(tmp), "CONF.TTC.BGO%d.%s", pChan, "ENABLE");
     fAMC13->write( amc13::AMC13Simple::T1, tmp, 1);
+
+    // Edit by Georg Auzinger, not in official AMC13 SW package but required
+    fAMC13->write( amc13::AMC13Simple::T1, "CONF.TTC.ENABLE_BGO", 1);
 }
+
 void Amc13Interface::disableBGO(int pChan)
 {
     char tmp[32];
@@ -246,4 +250,6 @@ void Amc13Interface::disableBGO(int pChan)
 
     snprintf( tmp, sizeof(tmp), "CONF.TTC.BGO%d.%s", pChan, "ENABLE");
     fAMC13->write( amc13::AMC13Simple::T1, tmp, 0);
+    // Edit by Georg Auzinger, not in official AMC13 SW package but required
+    fAMC13->write( amc13::AMC13Simple::T1, "CONF.TTC.ENABLE_BGO", 0);
 }

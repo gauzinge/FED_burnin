@@ -5,8 +5,8 @@
         <connection id="T2" uri="chtcp-2.0://cmsuppixch:10203?target=amc13T201:50001" address_table="file://settings/AMC13XG_T2.xml" />
         <AMCmask enable="9,5" />
         <!--<Register tounge="T1" name="test.test">0</Register>-->
-        <!--<BGO command="15" repeat="1" prescale="0" bx="100" />
-        <Trigger local="1" mode="1" rate="100" burst="100" rules="0" /-->
+        <BGO command="0x2c" repeat="1" prescale="0" bx="381" />
+        <Trigger local="1" mode="0" rate="1" burst="1" rules="0" />
         <TTCSimulator>0</TTCSimulator>
     </AMC13>
     <PixFED Id="0" boardType="CTA">

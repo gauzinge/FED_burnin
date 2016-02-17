@@ -88,7 +88,7 @@ void Amc13Controller::parseAmc13xml(const std::string& pFilename, std::ostream& 
         {
             std::string regname = std::string(Amc13RegNode.attribute( "name" ).value());
 
-            os << BOLDCYAN << "|" << "----" << Amc13RegNode.name() << "  " << Amc13RegNode.attribute( "tounge" ).name() << " : " << Amc13RegNode.attribute( "tounge" ).value() << " - name: " << regname << " " << BOLDRED << atoi(Amc13RegNode.first_child().value()) << RESET << std:: endl;
+            os << BOLDCYAN << "|" << "----" << Amc13RegNode.name() << "  " << Amc13RegNode.attribute( "tounge" ).name() << " : " << Amc13RegNode.attribute( "tounge" ).value() << " - name: " << regname << " " << BOLDRED << convertAnyInt(Amc13RegNode.first_child().value()) << RESET << std:: endl;
             if ( std::string(Amc13RegNode.attribute("tounge").value()) == "T1" )
                 fAmc13->setReg(1 ,  regname, convertAnyInt( Amc13RegNode.first_child().value() ) );
             else if ( std::string(Amc13RegNode.attribute("tounge").value()) == "T2" )
@@ -149,7 +149,7 @@ BGO* Amc13Controller::parseBGO(pugi::xml_node pNode,  std::ostream & os)
     BGO* cBGO = nullptr;
     if ( std::string(pNode.name()) == "BGO")
     {
-        cBGO = new BGO( atoi(pNode.attribute( "command" ).value()), bool(pNode.attribute( "repeat" ).value()), atoi(pNode.attribute( "prescale" ).value() ), atoi(pNode.attribute( "bx" ).value()) );
+        cBGO = new BGO( convertAnyInt(pNode.attribute( "command" ).value()), bool(pNode.attribute( "repeat" ).value()), convertAnyInt(pNode.attribute( "prescale" ).value() ), convertAnyInt(pNode.attribute( "bx" ).value()) );
         os <<  BOLDCYAN << "|" << "----" << "BGO : command " << cBGO->fCommand << " repeat " << cBGO->fRepeat << " Prescale " << cBGO->fPrescale << " start BX " << cBGO->fBX << RESET << std::endl;
     }
     return cBGO;
@@ -160,7 +160,7 @@ Trigger* Amc13Controller::parseTrigger( pugi::xml_node pNode, std::ostream & os 
     Trigger* cTrg = nullptr;
     if ( std::string(pNode.name()) == "Trigger" )
     {
-        cTrg = new Trigger(bool(pNode.attribute("local").value()), atoi(pNode.attribute( "mode" ).value()), atoi( pNode.attribute( "rate" ).value()), atoi( pNode.attribute( "burst" ).value()), atoi( pNode.attribute( "rules" ).value() ) );
+        cTrg = new Trigger(bool(pNode.attribute("local").value()), convertAnyInt(pNode.attribute( "mode" ).value()), convertAnyInt( pNode.attribute( "rate" ).value()), convertAnyInt( pNode.attribute( "burst" ).value()), convertAnyInt( pNode.attribute( "rules" ).value() ) );
         os <<  BOLDGREEN << "|" << "----" << "Trigger Config : Local " << cTrg->fLocal  << " Mode " << cTrg->fMode << " Rate " << cTrg->fRate << " Burst " << cTrg->fBurst << " Rules " << cTrg->fRules << RESET << std::endl;
 
     }

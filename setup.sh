@@ -34,4 +34,5 @@ export BOOST_INCLUDE=/opt/cactus/include
 export BASE_DIR=$(pwd)
 
 export PATH=$BASE_DIR/bin:$PATH
-export LD_LIBRARY_PATH=$CACTUSLIB:$QTROOTSYSDIR/lib:$QTDIR/lib:$BASE_DIR/lib:${LD_LIBRARY_PATH}
+export LD_LIBRARY_PATH=$CACTUSLIB:$BASE_DIR/lib:${LD_LIBRARY_PATH}
+export PATH=/usr/bin:/usr/local/bin:~/bin:${CACTUSBIN}:${AMC13BIN}:$PATH

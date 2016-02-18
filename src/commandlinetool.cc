@@ -29,7 +29,7 @@ int main(int argc, char* argv[] )
     uhal::setLogLevelTo(uhal::Debug());
     */
     // instantiate System Controller
-    cSystemController;
+    //    cSystemController;
 
     // initialize map of settings so I can know the proper number of acquisitions and TBMs
     cSystemController.InitializeSettings(cHWFile, std::cout);
@@ -43,6 +43,19 @@ int main(int argc, char* argv[] )
     cSystemController.ConfigureHw(std::cout );
     auto cSetting = cSystemController.fSettingsMap.find("NAcq");
     cNAcq = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 10;
+
+    //settings are as generic as possible and should be configured later
+    cSetting = cSystemController.fSettingsMap.find("ChannelOfInterest");
+    cChannelOfInterest = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 0;
+    
+    cSetting = cSystemController.fSettingsMap.find("ROCOfInterest");
+    cROCOfInterest = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 0;
+    
+
+    // we start without sending triggers, it's the job of the operator to enable them
+    cAmc13Controller.fAmc13Interface->EnableBGO(0);
+    cAmc13Controller.fAmc13Interface->StopL1A();
+
 
     //clear userinput
     userInput = "";
@@ -78,6 +91,93 @@ int main(int argc, char* argv[] )
 	    splitUserInput.erase(splitUserInput.begin());
 	    std::cout << "DAQinfo()" <<  std::endl;
 	    DAQinfo();
+	  }
+	else if(splitUserInput[0] == "channel" || splitUserInput[0] == "ch")
+	  {
+	    std::string::size_type sz;
+	    int channel;
+	    if(splitUserInput.size() > 1 && !(checkInput(splitUserInput[1])))
+	      {
+		try
+		  {
+		    channel = stoi(splitUserInput[1], &sz);
+		  }
+		catch(std::invalid_argument&)
+		  {
+		    std::cout << "There must have been an error in the command string. Try again!" << std::endl;
+		    splitUserInput.clear();
+		    continue;
+		  }
+		
+		if(splitUserInput[1].substr(sz) == "\0")
+		  {
+		    cChannelOfInterest = channel;
+		    splitUserInput.erase(splitUserInput.begin(), splitUserInput.begin()+2);
+		  }
+		else
+		  {
+		    std::cout << "There must have been an error in the command string. Try again!" << std::endl;
+		    splitUserInput.clear();
+		    continue;
+		  }
+	      }
+	    else
+	      {
+		splitUserInput.erase(splitUserInput.begin());
+	      }
+	   
+	  }
+	else if(splitUserInput[0] == "roc")
+	  {
+	    std::string::size_type sz;
+	    int roc;
+	    if(splitUserInput.size() > 1 && !(checkInput(splitUserInput[1])))
+	      {
+		try
+		  {
+		    roc = stoi(splitUserInput[1], &sz);
+		  }
+		catch(std::invalid_argument&)
+		  {
+		    std::cout << "There must have been an error in the command string. Try again!" << std::endl;
+		    splitUserInput.clear();
+		    continue;
+		  }
+		
+		if(splitUserInput[1].substr(sz) == "\0")
+		  {
+		    cROCOfInterest = roc;
+		    splitUserInput.erase(splitUserInput.begin(), splitUserInput.begin()+2);
+		  }
+		else
+		  {
+		    std::cout << "There must have been an error in the command string. Try again!" << std::endl;
+		    splitUserInput.clear();
+		    continue;
+		  }
+	      }
+	    else
+	      {
+		splitUserInput.erase(splitUserInput.begin());
+	      }
+	  }
+	else if(splitUserInput[0] == "L1start")
+	  {
+	    splitUserInput.erase(splitUserInput.begin());
+	    std::cout << "L1start()" <<  std::endl;
+	    L1start();
+	  }
+	else if(splitUserInput[0] == "L1stop")
+	  {
+	    splitUserInput.erase(splitUserInput.begin());
+	    std::cout << "L1stop()" <<  std::endl;
+	    L1stop();
+	  }
+	else if(splitUserInput[0] == "L1burst")
+	  {
+	    splitUserInput.erase(splitUserInput.begin());
+	    std::cout << "L1burst()" <<  std::endl;
+	    L1burst();
 	  }
 	else if(splitUserInput[0] == "s" || splitUserInput[0] == "start")
 	  {
@@ -140,7 +240,10 @@ int main(int argc, char* argv[] )
 		    continue;
 		  }
 	      }
-	    splitUserInput.erase(splitUserInput.begin());
+	    else
+	      {
+		splitUserInput.erase(splitUserInput.begin());
+	      }
 	    std::cout << "loopDAQ() || cNAcq =" << cNAcq <<  std::endl;
 	    loopDAQ(cNAcq);
 	  }
@@ -300,8 +403,18 @@ void defineValidInput(){
   // Find good phases for readout
   validInput.push_back("findphase");
   validInput.push_back("phase");
-
- 
+  // set channel of interest
+  validInput.push_back("channel");
+  validInput.push_back("ch");
+  // set ROC of interest
+  validInput.push_back("roc");
+  // start L1A triggers
+  validInput.push_back("L1start");
+  // stop L1A triggers
+  validInput.push_back("L1stop");
+  // burst L1A triggers
+  validInput.push_back("L1burst");
+  
 }
 
 void splitInput(std::string userInput){
@@ -312,7 +425,7 @@ void splitInput(std::string userInput){
     {
       std::string uI;
       getline(iss,uI,' ');
-      //      std::cout << uI << std::endl;
+      //std::cout << uI << std::endl;
       splitUserInput.push_back(uI);
     }
 }
@@ -333,8 +446,23 @@ bool checkInput(std::string userInput){
 
 void printPromt(){
 
+  std::cout << "Current settings: " << std::endl;
+  std::cout << "Channel of Interest: " << cChannelOfInterest << std::endl;
+  std::cout << "ROC of Interest: " << cROCOfInterest << std::endl;
+
+  std::cout << "*****************************************************" << std::endl;
+
   std::cout << "Please choose an operation:" << std::endl;
   std::cout << "\t [i/info] for board info" << std::endl;
+  //general settings
+  std::cout << "General readout settings:" << std::endl;
+  std::cout << "\t [channel/ch xx] to define the channel of interest" << std::endl; 
+  std::cout << "\t [roc xx] to define the roc of interest" << std::endl; 
+  //trigger control
+  std::cout << "AMC13 trigger control:" << std::endl;
+  std::cout << "\t [L1start] to start L1A triggers " << std::endl;
+  std::cout << "\t [L1stop] to stop L1A triggers " << std::endl;
+  std::cout << "\t [L1burst] to send a L1A trigger burst " << std::endl;
   //DAQ control
   std::cout << "DAQ control:" << std::endl;
   std::cout << "\t [s/start] to start DAQ on all FEDs" << std::endl;
@@ -373,6 +501,32 @@ void DAQinfo(){
     {
       cSystemController.fFEDInterface->getBoardInfo(cFED);
     }
+}
+
+void L1start(){
+  // start the L1A triggers
+  cAmc13Controller.fAmc13Interface->StartL1A();
+}
+
+void L1stop(){
+  // stop the L1A triggers
+  cAmc13Controller.fAmc13Interface->StopL1A();
+
+}
+
+void L1burst(){
+  // send a burst of L1A triggers
+  cAmc13Controller.fAmc13Interface->BurstL1A();
+
+}
+
+void L1burst(int triggers){
+
+  for(int i = 0; i < triggers; ++i)
+    {
+      L1burst();
+    }
+
 }
 
 void startDAQ(){

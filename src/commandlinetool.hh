@@ -17,6 +17,10 @@
 #include "../Utils/Data.h"
 
 //my variables
+
+int cChannelOfInterest;
+int cROCOfInterest;
+
 const char* cHWFile;
 SystemController cSystemController;
 Amc13Controller cAmc13Controller;
@@ -43,6 +47,10 @@ void printPromt();
 
 bool fileexists(std::string filename);
 
+void L1start();
+void L1stop();
+void L1burst();
+void L1burst(int triggers);
 
 void DAQinfo();
 void startDAQ();

@@ -13,10 +13,16 @@ IncludePaths            = $(IncludeDirs:%=-I%)
 %.o: %.cc %.h
 	$(CXX) -std=c++11 $(DevFlags) $(CCFlags) $(UserCCFlags) $(CCDefines) $(IncludePaths) -c -o $@ $<
 
+.PHONY: print clean
 
-all: $(Objs)
+all:print $(Objs)
 	$(CC) -shared -o libPh1_Description.so $(Objs)
 	mv libPh1_Description.so ../lib
+
+print:
+	@echo '****************************************'
+	@echo 'Building HWDescription'
+	@echo '****************************************'
 
 clean:
 	rm -f *.o

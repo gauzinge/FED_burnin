@@ -12,9 +12,16 @@ IncludePaths            = $(IncludeDirs:%=-I%)
 %.o: %.cc %.h 
 	$(CXX) -std=c++11  $(DevFlags) $(CCFlags) $(UserCCFlags) $(CCDefines) $(IncludePaths) -c -o $@ $<
 
-all: $(Objs) 
+.PHONY: clean print 
+
+all:print $(Objs) 
 	$(CC) -std=c++11 -shared -o libPh1_Utils.so $(Objs) -pthread
 	mv libPh1_Utils.so ../lib
+
+print:
+	@echo '****************************************'
+	@echo 'Building Utils'
+	@echo '****************************************'
 
 clean:
 	rm -f *.o

@@ -1,23 +1,23 @@
-Objs            = Amc13Description.o Amc13Interface.o Amc13Controller.o
+Objs            = TkFECController.o 
 CC              = gcc
 CXX             = g++
 CCFlags         = -g -O1 -w -Wall -pedantic -fPIC -Wcpp
 #DevFlags                   = -D__CBCDAQ_DEV__
 
-#AMC13DIR=/opt/cactus/include/amc13
+#FEC_SW_DIR=/opt/cactus/include/amc13
 
-IncludeDirs     =  /opt/cactus/include ../ ../lib
+IncludeDirs     =  /opt/cactus/include ../ 
 IncludePaths            = $(IncludeDirs:%=-I%)
 
 LibraryDirs = /opt/cactus/lib ../ ../lib
 LibraryPaths = $(LibraryDirs:%=-L%)
 
-ExternalObjects = $(LibraryPaths) -lcactus_amc13_amc13 
+ExternalObjects = $(LibraryPaths) 
 
-ifneq ("$(wildcard $(AMC13DIR))","")
-	AMC13INSTALLED = 'Building AMC13 related Objects'
+ifneq ("$(wildcard $(FEC_SW_DIR))","")
+	FECSWINSTALLED = 'Building TkFEC related Objects'
 else
-	AMC13INSTALLED = 'This feature can only be built if the AMC13 libraries are installed with cactus!' 
+	FECSWINSTALLED = 'This feature can only be built if the uTCA compliant FED SW libraries are installed! ' 
 endif
 
 .PHONY: clean print
@@ -26,12 +26,12 @@ endif
 	$(CXX) -std=c++0x  $(DevFlags) $(CCFlags) $(UserCCFlags) $(CCDefines) $(IncludePaths) $(ExternalObjects) -c -o $@ $<
 
 all:print $(Objs) 
-	$(CC) -std=c++0x -shared -o libPh1_Amc13.so $(Objs)
-	mv libPh1_Amc13.so ../lib
+	$(CC) -std=c++0x -shared -o libPh1_TkFEC.so $(Objs)
+	mv libPh1_TkFEC.so ../lib
 
 print:
 	@echo '****************************************'
-	@echo $(AMC13INSTALLED)
+	@echo $(FECSWINSTALLED)
 	@echo '****************************************'
 
 clean:

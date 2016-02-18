@@ -14,8 +14,27 @@
         <!--<Register tounge="T1" name="test.test">0</Register>-->
 	<TTCSimulator>0</TTCSimulator>
     </AMC13>
+    <TkFEC>
+        <connection id="ctatkfec" uri="chtcp-2.0://cmsuppixch:10203?target=ctatkfec:50001" address_table="file://settings/tkFEC_address_table.xml" />
+		<CCU address="0x3f" ring="0">
+			<i2c channel="0x11" address="0x30" value="0x63"/>
+			<i2c channel="0x11" address="0x31" value="0x63"/>
+			<i2c channel="0x11" address="0x32" value="0x43"/>
+			<i2c channel="0x11" address="0x33" value="0x6b"/>
+			<i2c channel="0x11" address="0x34" value="0x6b"/>
+			<i2c channel="0x11" address="0x35" value="0xf0"/>
+			<i2c channel="0x11" address="0x10" value="0x30"/>
+			<i2c channel="0x11" address="0x11" value="0x30"/>
+			<i2c channel="0x11" address="0x12" value="0x30"/>
+			<i2c channel="0x11" address="0x13" value="0x22"/>
+			<i2c channel="0x11" address="0x14" value="0x22"/>
+			<i2c channel="0x11" address="0x15" value="0x22"/>
+			<i2c channel="0x11" address="0x16" value="0x22"/>
+			<i2c channel="0x11" address="0x18" value="0x22"/>
+		</CCU>
+    </TkFEC>
     <PixFED Id="0" boardType="CTA">
-        <connection id="board0" uri="chtcp-2.0://cmsuppixch:10203?target=devfed:50001" address_table="file://settings/address_table.xml" />
+        <connection id="devfed" uri="chtcp-2.0://cmsuppixch:10203?target=devfed:50001" address_table="file://settings/FED_address_table.xml" />
         <!-- Trigger -->
         <!--Used to set the CLK input to the TTC clock from the BP - 3 is XTAL, 0 is BP-->
         <Register name="ctrl.ttc_xpoint_A_out3">0</Register>

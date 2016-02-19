@@ -12,6 +12,7 @@ TkFECController::~TkFECController()
 
 void TkFECController::InitializeTkFEC(const std::string& pFilename, std::ostream& os )
 {
+std::cout << pFilename << std::endl;
     if ( pFilename.find(".xml") != std::string::npos )
         parseTkFECxml( pFilename, os );
     else std::cerr << "Could not parse settings file " << pFilename << " - it is not .xml!" << std::endl;
@@ -93,7 +94,7 @@ CCU* TkFECController::parseCCU(pugi::xml_node pNode, std::ostream& os)
         std::string ring    = pNode.attribute( "ring" ).value();
         cCCU = new CCU(convertAnyInt(address.c_str()), convertAnyInt(ring.c_str()));
 
-        os << BOLDCYAN << "|   |" << "----" << "CCU : address " << address << " ring " << ring << RESET << std::endl;
+        os << BOLDCYAN << "|" << "----" << "CCU : address " << address << " ring " << ring << RESET << std::endl;
     }
     else
         std::cout << "Error, no CCU node found!" << std::endl;
@@ -111,7 +112,7 @@ i2c* TkFECController::parseI2C(pugi::xml_node pNode, std::ostream& os)
 
         ci2c = new i2c(convertAnyInt(channel.c_str()), convertAnyInt(address.c_str()), convertAnyInt(value.c_str()));
 
-        os << BOLDCYAN << "|   |" << "----" << "I2C : channel " << channel << " address " << address << " value " << value << RESET << std::endl;
+        os << BOLDCYAN << "|    |" << "----" << "I2C : channel " << channel << " address " << address << " value " << value << RESET << std::endl;
     }
     else
         std::cout << "Error, no I2C node found!" << std::endl;

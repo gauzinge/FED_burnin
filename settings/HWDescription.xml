@@ -17,20 +17,20 @@
     <TkFEC>
         <connection id="ctatkfec" uri="chtcp-2.0://cmsuppixch:10203?target=ctatkfec:50001" address_table="file://settings/tkFEC_address_table.xml" />
 		<CCU address="0x3f" ring="0">
-			<i2c channel="0x11" address="0x30" value="0x63"/>
-			<i2c channel="0x11" address="0x31" value="0x63"/>
-			<i2c channel="0x11" address="0x32" value="0x43"/>
-			<i2c channel="0x11" address="0x33" value="0x6b"/>
-			<i2c channel="0x11" address="0x34" value="0x6b"/>
-			<i2c channel="0x11" address="0x35" value="0xf0"/>
-			<i2c channel="0x11" address="0x10" value="0x30"/>
-			<i2c channel="0x11" address="0x11" value="0x30"/>
-			<i2c channel="0x11" address="0x12" value="0x30"/>
-			<i2c channel="0x11" address="0x13" value="0x22"/>
-			<i2c channel="0x11" address="0x14" value="0x22"/>
-			<i2c channel="0x11" address="0x15" value="0x22"/>
-			<i2c channel="0x11" address="0x16" value="0x22"/>
-			<i2c channel="0x11" address="0x18" value="0x22"/>
+			<i2c channel="0x11" address="0x30" value="0x63" description=""/>
+			<i2c channel="0x11" address="0x31" value="0x63" description=""/>
+			<i2c channel="0x11" address="0x32" value="0x43" description=""/>
+			<i2c channel="0x11" address="0x33" value="0x6b" description=""/>
+			<i2c channel="0x11" address="0x34" value="0x6b" description=""/>
+			<i2c channel="0x11" address="0x35" value="0xf0" description=""/>
+			<i2c channel="0x11" address="0x10" value="0x30" description=""/>
+			<i2c channel="0x11" address="0x11" value="0x30" description=""/>
+			<i2c channel="0x11" address="0x12" value="0x30" description=""/>
+			<i2c channel="0x11" address="0x13" value="0x22" description=""/>
+			<i2c channel="0x11" address="0x14" value="0x22" description=""/>
+			<i2c channel="0x11" address="0x15" value="0x22" description=""/>
+			<i2c channel="0x11" address="0x16" value="0x22" description=""/>
+			<i2c channel="0x11" address="0x18" value="0x22" description=""/>
 		</CCU>
     </TkFEC>
     <PixFED Id="0" boardType="CTA">

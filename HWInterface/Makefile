@@ -20,7 +20,7 @@ all:print $(Objs)
 
 print:
 	@echo '****************************************'
-	@echo 'Building HWDescription'
+	@echo 'Building HWInterface'
 	@echo '****************************************'
 
 clean:

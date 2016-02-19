@@ -24,7 +24,7 @@ else
 endif
 
 ifneq ("$(wildcard $(FEC_SW_DIR))","")
-	ExternalObjects += -lPh1_tkFEC
+	ExternalObjects += -lPh1_TkFEC
 	FECSWINSTALLED = yes
 	binaries += tkfecconfig 
 else

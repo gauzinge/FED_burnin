@@ -8,7 +8,7 @@
 #include "../Utils/argvparser.h"
 #include "../Utils/ConsoleColor.h"
 //#include "../System/TkFECController.h"
-#include "../TkFED/TkFECController.h"
+#include "../TkFEC/TkFECController.h"
 
 
 
@@ -35,7 +35,7 @@ int main( int argc, char* argv[] )
     cmd.defineOption( "interactive", "Run FEC SW Wrapper in Interactive mode." );
     cmd.defineOptionAlternative( "interactive", "i" );
 
-    cmd.defineOption( "file", "HWDescription file" );
+    cmd.defineOption( "file", "HWDescription file", ArgvParser::OptionRequiresValue /*| ArgvParser::OptionRequired*/ );
     cmd.defineOptionAlternative( "file", "f" );
 
     int result = cmd.parse( argc, argv );
@@ -46,6 +46,6 @@ int main( int argc, char* argv[] )
         exit( 1 );
     }
     std::string cHWFile = ( cmd.foundOption( "file" ) ) ? cmd.optionValue( "file" ) : "settings/HwDescription.xml";
-    cTkFECController.InitializeHw( cHWFile );
+    cTkFECController.InitializeTkFEC( cHWFile );
 
 }

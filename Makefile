@@ -16,7 +16,7 @@ else
 	FECSWINSTALLED = no
 endif
 
-SUBDIRS += Utils HWDescription HWInterface System src
+SUBDIRS += tools Utils HWDescription HWInterface System src
 
 .PHONY: print subdirs $(SUBDIRS) clean
 

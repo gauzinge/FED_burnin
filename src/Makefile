@@ -5,27 +5,36 @@ CCFlagsRoot   = `root-config --cflags --evelibs --glibs`
 Amc13Flag     = -D__AMC13__
 DevFlags      =
 
-AMC13DIR=/opt/cactus/include/amc13
+#AMC13DIR=/opt/cactus/include/amc13
 IncludeDirs   =  /opt/cactus/include ../
 IncludePaths  = $(IncludeDirs:%=-I%)
 
 LibraryDirs   = /opt/cactus/lib ../lib
 LibraryPaths  = $(LibraryDirs:%=-L%)
 
+ExternalObjects= $(LibraryPaths) -lpthread  -lcactus_extern_pugixml -lcactus_uhal_log -lcactus_uhal_grammars -lcactus_uhal_uhal -lboost_system -lPh1_Interface -lPh1_Description -lPh1_System -lPh1_Utils
+binaries       = print run fpgaconfig fedconfig
+
 ifneq ("$(wildcard $(AMC13DIR))","")
-	ExternalObjects= $(LibraryPaths) -lpthread  -lcactus_extern_pugixml -lcactus_uhal_log -lcactus_uhal_grammars -lcactus_uhal_uhal -lboost_system -lcactus_amc13_amc13 -lPh1_Interface -lPh1_Description -lPh1_System -lPh1_Utils -lPh1_Amc13
+	ExternalObjects += -lcactus_amc13_amc13 -lPh1_Amc13
 	AMC13INSTALLED = yes
-	binaries       = print run fpgaconfig amc13test fedconfig
+	binaries += amc13config 
 else
-	ExternalObjects= $(LibraryPaths) -lpthread  -lcactus_extern_pugixml -lcactus_uhal_log -lcactus_uhal_grammars -lcactus_uhal_uhal -lboost_system -lPh1_Interface -lPh1_Description -lPh1_System -lPh1_Utils
 	AMC13INSTALLED = no
-	binaries       = print run fpgaconfig fedconfig
 endif
 
-.PHONY: clean $(binaries) 
+ifneq ("$(wildcard $(FEC_SW_DIR))","")
+	ExternalObjects += -lPh1_tkFEC
+	FECSWINSTALLED = yes
+	binaries += tkfecconfig 
+else
+	FECSWINSTALLED = no
+endif
+
+.PHONY: print clean $(binaries) 
 	#run fpgaconfig amc13test
 
-binaries=print run fpgaconfig amc13test fedconfig
+#binaries=print run fpgaconfig amc13test fedconfig
 
 
 all: $(binaries)
@@ -34,6 +43,9 @@ all: $(binaries)
 print:
 	@echo '*****************************'
 	@echo 'Amc13 SW installed:' $(AMC13INSTALLED)
+	@echo '*****************************'
+	@echo '*****************************'
+	@echo 'FEC SW installed:' $(FECSWINSTALLED)
 	@echo '*****************************'
 
 run: acquisition.cc
@@ -44,11 +56,15 @@ fpgaconfig: fpgaconfig.cc
 	$(CXX) -std=c++11 $(CCFlags) -o $@ $< $(IncludePaths) $(ExternalObjects)
 	cp $@ ../bin
 
-amc13test: amc13test.cc
+amc13config: amc13test.cc
 	$(CXX) -std=c++11 $(CCFlags) -o $@ $< $(IncludePaths) $(ExternalObjects)
 	cp $@ ../bin
 
 fedconfig: fedconfig.cc
+	$(CXX) -std=c++11 $(CCFlags) -o $@ $< $(IncludePaths) $(ExternalObjects)
+	cp $@ ../bin
+
+tkfecconfig: tkfectest.cc
 	$(CXX) -std=c++11 $(CCFlags) -o $@ $< $(IncludePaths) $(ExternalObjects)
 	cp $@ ../bin
 

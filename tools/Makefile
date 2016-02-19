@@ -1,5 +1,5 @@
 CC=		g++
-FLAGS=		 -g -Wall -I./include -fPIC
+FLAGS=		 -g -Wall -I./include -fPIC -Wno-write-strings
 #FLAGS=		 -g -Wall -DDEBUG -I./include 
 LDLAGS= -m32 
 SOFLAGS= -shared

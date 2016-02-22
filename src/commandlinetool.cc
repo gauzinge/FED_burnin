@@ -463,6 +463,7 @@ void printPromt(){
   std::cout << "\t [L1start] to start L1A triggers " << std::endl;
   std::cout << "\t [L1stop] to stop L1A triggers " << std::endl;
   std::cout << "\t [L1burst] to send a L1A trigger burst " << std::endl;
+  std::cout << "\t \t [L1burst XXX] to send xxx consecutive L1A trigger burst " << std::endl;
   //DAQ control
   std::cout << "DAQ control:" << std::endl;
   std::cout << "\t [s/start] to start DAQ on all FEDs" << std::endl;

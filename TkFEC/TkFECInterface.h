@@ -64,7 +64,7 @@ string writeI2C(unsigned int fecAddress, unsigned int ringAddress, unsigned int 
 string readI2C(unsigned int fecAddress, unsigned int ringAddress, unsigned int ccuAddress, unsigned int channelAddress, unsigned int deviceAddress);
 
 
-int RunInteracitve(string deviceType, int port, unsigned int fecAddress, unsigned int ringAddress, unsigned int channelAddress, unsigned int ccuAddress, unsigned int piaChannelAddress);
+int RunInteracitve(char* deviceType, int port, unsigned int fecAddress, unsigned int ringAddress, unsigned int channelAddress, unsigned int ccuAddress, unsigned int piaChannelAddress);
     
 
 

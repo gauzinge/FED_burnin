@@ -1,72 +1,18 @@
-/*
-This file is part of Fec Software project.
+#include "TkFECInterface.h"
 
-Fec Software is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-Fec Software is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Fec Software; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-Copyright 2002 - 2003, Frederic DROUHIN - Universite de Haute-Alsace, Mulhouse-France
-*/
-//#include <iostream>
-//#include <sstream>
-//#include <fstream>
-
-//using std::cout;
-//using std::endl;
-
-//#include <stdio.h>    // fopen snprintf
-//#include <stdlib.h>
-//#include <string.h>   // strcmp
-//#include <unistd.h>
-//#include <sys/types.h>
-//#include <sys/socket.h>
-//#include <netinet/in.h>
-//#include <vector>
-//#include <string>
-//#include <time.h>
-
-
-
-//#include "ServerAccess.h"
-//#include "SimpleCommand.h"
-//#include "MultiplexingServer.h"
-//#include "VMELock.h"
-
-////port address
-//const int portaddress = 2002;
-
-//using namespace std;
-
-//// address table
-////map< string, int > fecAddressMap;               // key = sector
-//map< string, unsigned int > fecAddressMap;       // key = sector
-//map< string, unsigned int > ringAddressMap;
-//map< string, unsigned int > ccuAddressMap;
-//map< string, unsigned int > channelAddressMap;  // key = group
-
-TkFECInterface::TkFECInterface*()
+TkFECInterface::TkFECInterface()
 {
     floop = 1;
     ftms  = 0 ;  // wait tms microseconds
     fmodeType = PHILIPS ;
 
-    int port = 2002; 
     int argc = 4;
     char* argv[4];
     argv[0] = "dummy";
     argv[1] = "-utca";
     argv[2] = "-port";
-    argv[3] = char*(port);
+// need to convert port to char
+    argv[3] = "2002";
 
     //VMELock lock(1);
     //lock.acquire();
@@ -115,27 +61,29 @@ TkFECInterface::TkFECInterface*()
     ffecAccess->seti2cChannelSpeed (i2cSpeed) ;
 }
 
-string TkFECInterface::writeI2C(unsigned int fecAddress, unsigned int ringAddress, unsigned int ccuAddress, unsigned int channelAddress, unsigned int deviceAddress, unsigned int deviceValue)
+std::string TkFECInterface::writeI2C(unsigned int fecAddress, unsigned int ringAddress, unsigned int ccuAddress, unsigned int channelAddress, unsigned int deviceAddress, unsigned int deviceValue)
 {
     string result = setI2CDevice ( ffecAccess, fecAddress, ringAddress, ccuAddress, channelAddress, deviceAddress, fmodeType, floop, ftms, deviceValue ) ;
     return result;
 }
 
-string TkFECInterface::readI2C(unsigned int fecAddress, unsigned int ringAddress, unsigned int ccuAddress, unsigned int channelAddress, unsigned int deviceAddress)
+std::string TkFECInterface::readI2C(unsigned int fecAddress, unsigned int ringAddress, unsigned int ccuAddress, unsigned int channelAddress, unsigned int deviceAddress)
 {
    return getI2CDevice ( ffecAccess, fecAddress, ringAddress, ccuAddress, channelAddress, deviceAddress, fmodeType, floop, ftms) ;
 }
 
-int TkFECInterface::RunInteracitve(std::string deviceType, int port, unsigned int fecAddress, unsigned int ringAddress, unsigned int channelAddress, unsigned int ccuAddress, unsigned int piaChannelAddress)
+int TkFECInterface::RunInteracitve(char* deviceType, int port, unsigned int fecAddress, unsigned int ringAddress, unsigned int channelAddress, unsigned int ccuAddress, unsigned int piaChannelAddress)
 //int main(int argc, char *argv[])
 {
     // need to create a char* argv[]
     int argc = 4;
     char* argv[4];
     argv[0] = "dummy";
-    argv[1] = "-" + deviceType.c_str();
+    argv[1] = '-'+deviceType;
     argv[2] = "-port";
-    argv[3] = char*(port);
+    char buf[5];
+    std::sprintf(buf, "%d", port);
+    argv[3] = buf;
 
     VMELock lock(1);
     lock.acquire();

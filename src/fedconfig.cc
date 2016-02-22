@@ -38,7 +38,7 @@ int main(int argc, char* argv[] )
 
     cAmc13Controller.fAmc13Interface->StartL1A();
     //for (fAmc13Controller->BGO vector)
-    cAmc13Controller.fAmc13Interface->EnableBGO(0);
+    //cAmc13Controller.fAmc13Interface->EnableBGO(0);
 
     auto cSetting = cSystemController.fSettingsMap.find("NAcq");
     int cNAcq = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 10;
@@ -77,6 +77,9 @@ int main(int argc, char* argv[] )
             // cSystemController.fFEDInterface->ReadData(cFED, 0 );
         }
     }
+
+    cAmc13Controller.fAmc13Interface->StopL1A();
+
 //    cSystemController.HaltHw();
 //    cAmc13Controller.HaltAmc13();
     exit(0);

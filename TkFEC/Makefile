@@ -1,4 +1,4 @@
-Objs            = TkFECController.o 
+Objs            = TkFECInterface.o TkFECController.o 
 CC              = gcc
 CXX             = g++
 CCFlags         = -g -O1 -w -Wall -pedantic -fPIC -Wcpp

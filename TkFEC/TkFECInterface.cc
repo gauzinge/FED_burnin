@@ -17,42 +17,114 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 Copyright 2002 - 2003, Frederic DROUHIN - Universite de Haute-Alsace, Mulhouse-France
 */
-#include <iostream>
-#include <sstream>
-#include <fstream>
+//#include <iostream>
+//#include <sstream>
+//#include <fstream>
 
-using std::cout;
-using std::endl;
+//using std::cout;
+//using std::endl;
 
-#include <stdio.h>    // fopen snprintf
-#include <stdlib.h>
-#include <string.h>   // strcmp
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <vector>
-#include <string>
-#include <time.h>
+//#include <stdio.h>    // fopen snprintf
+//#include <stdlib.h>
+//#include <string.h>   // strcmp
+//#include <unistd.h>
+//#include <sys/types.h>
+//#include <sys/socket.h>
+//#include <netinet/in.h>
+//#include <vector>
+//#include <string>
+//#include <time.h>
 
 
 
-#include "ServerAccess.h"
-#include "SimpleCommand.h"
-#include "MultiplexingServer.h"
-#include "VMELock.h"
+//#include "ServerAccess.h"
+//#include "SimpleCommand.h"
+//#include "MultiplexingServer.h"
+//#include "VMELock.h"
 
-//port address
-const int portaddress = 2002;
+////port address
+//const int portaddress = 2002;
 
-using namespace std;
+//using namespace std;
 
-// address table
-//map< string, int > fecAddressMap;               // key = sector
-map< string, unsigned int > fecAddressMap;       // key = sector
-map< string, unsigned int > ringAddressMap;
-map< string, unsigned int > ccuAddressMap;
-map< string, unsigned int > channelAddressMap;  // key = group
+//// address table
+////map< string, int > fecAddressMap;               // key = sector
+//map< string, unsigned int > fecAddressMap;       // key = sector
+//map< string, unsigned int > ringAddressMap;
+//map< string, unsigned int > ccuAddressMap;
+//map< string, unsigned int > channelAddressMap;  // key = group
+
+TkFECInterface::TkFECInterface*()
+{
+    floop = 1;
+    ftms  = 0 ;  // wait tms microseconds
+    fmodeType = PHILIPS ;
+
+    int port = 2002; 
+    int argc = 4;
+    char* argv[4];
+    argv[0] = "dummy";
+    argv[1] = "-utca";
+    argv[2] = "-port";
+    argv[3] = char*(port);
+
+    //VMELock lock(1);
+    //lock.acquire();
+    //Download all
+    ffecAccess  = NULL ;
+
+    unsigned int i2cSpeed = 100 ;
+    bool fack             = true  ;
+
+    // Create the FEC Access
+    int cnt;
+
+    // FEC Address and Ring Address
+    //unsigned int fecAddress = 0x9 ;
+    //unsigned int ringAddress = 0x8 ;
+    ////unsigned int ringAddress = 0x7 ;
+    //unsigned int channelAddress = 0x11 ;
+    ////unsigned int ccuAddress = 0x7c;
+    //unsigned int ccuAddress = 0x3f;
+    //unsigned int piaChannelAddress = 0x30 ;
+    //long loop = 1 ;
+    string sector = "-6P";
+    string group = "-6PL12";
+    //readAddressMaps("./data/fec_ring_ccu_channel_group.txt");
+
+    // Check: pci or vme mode
+        //cout << "utca mode " << endl;
+        //fecAddress = 0 ;
+        //ringAddress = 0x0 ;
+    //create fec access
+    try
+    {
+        ffecAccess = createFecAccess ( argc, argv, &cnt, 9 ) ;  // fecslot // JMTBAD should this 20 be 9? diff when porting from slc4 box
+    }
+    catch (FecExceptionHandler e)
+    {
+
+        cout << "------------ Exception ----------" << std::endl ;
+        cout << e.what()  << std::endl ;
+        cout << "---------------------------------" << std::endl ;
+        exit (EXIT_FAILURE) ;
+    }
+    cout << "FecAccess created " << endl;
+
+    ffecAccess->setForceAcknowledge (fack) ;
+    ffecAccess->seti2cChannelSpeed (i2cSpeed) ;
+}
+
+string TkFECInterface::writeI2C(unsigned int fecAddress, unsigned int ringAddress, unsigned int ccuAddress, unsigned int channelAddress, unsigned int deviceAddress, unsigned int deviceValue)
+{
+    string result = setI2CDevice ( ffecAccess, fecAddress, ringAddress, ccuAddress, channelAddress, deviceAddress, fmodeType, floop, ftms, deviceValue ) ;
+    return result;
+}
+
+string TkFECInterface::readI2C(unsigned int fecAddress, unsigned int ringAddress, unsigned int ccuAddress, unsigned int channelAddress, unsigned int deviceAddress)
+{
+   return getI2CDevice ( ffecAccess, fecAddress, ringAddress, ccuAddress, channelAddress, deviceAddress, fmodeType, floop, ftms) ;
+}
 
 int TkFECInterface::RunInteracitve(std::string deviceType, int port, unsigned int fecAddress, unsigned int ringAddress, unsigned int channelAddress, unsigned int ccuAddress, unsigned int piaChannelAddress)
 //int main(int argc, char *argv[])
@@ -60,7 +132,7 @@ int TkFECInterface::RunInteracitve(std::string deviceType, int port, unsigned in
     // need to create a char* argv[]
     int argc = 4;
     char* argv[4];
-    argv[0] = "";
+    argv[0] = "dummy";
     argv[1] = "-" + deviceType.c_str();
     argv[2] = "-port";
     argv[3] = char*(port);
@@ -322,7 +394,7 @@ int TkFECInterface::RunInteracitve(std::string deviceType, int port, unsigned in
 
 
 /* helper function that chops a string into a vector of strings */
-void tokenize(const string& str,
+void TkFECInterface::tokenize(const string& str,
               vector<string>& tokens,
               const string& symbols)
 {
@@ -365,7 +437,7 @@ void tokenize(const string& str,
     }
 }
 
-string printAddressMap()
+string TkFECInterface::printAddressMap()
 {
     string line;
     map<string, unsigned int>::const_iterator itr;
@@ -383,7 +455,7 @@ string printAddressMap()
 
 
 
-void readAddressMaps(const string filename)
+void TkFECInterface::readAddressMaps(const string filename)
 {
     string line;
     ifstream myfile (filename.c_str());
@@ -423,7 +495,7 @@ void readAddressMaps(const string filename)
 
 /* this function handles client requests passed on to it as a string and
    returns a response string that is going to be sent back to the client */
-string handle(vector<string> tokens, string sector, string group, FecAccess *fecAccess, unsigned int fecAddress, unsigned int ringAddress, unsigned int ccuAddress, unsigned int channelAddress, unsigned int piaChannelAddress, long loop )
+string TkFECInterface::handle(vector<string> tokens, string sector, string group, FecAccess *fecAccess, unsigned int fecAddress, unsigned int ringAddress, unsigned int ccuAddress, unsigned int channelAddress, unsigned int piaChannelAddress, long loop )
 {
     ////////////////////////////////////
     //Default settings

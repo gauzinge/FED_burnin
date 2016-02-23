@@ -1,6 +1,6 @@
 #AMC13DIR=/opt/cactus/include/amc13
 
-SUBDIRS= 
+SUBDIRS += tools Utils HWDescription HWInterface 
 
 ifneq ("$(wildcard $(AMC13DIR))","")
 	SUBDIRS += AMC13
@@ -16,7 +16,7 @@ else
 	FECSWINSTALLED = no
 endif
 
-SUBDIRS += tools Utils HWDescription HWInterface System src
+SUBDIRS += System src
 
 .PHONY: print subdirs $(SUBDIRS) clean
 
@@ -44,5 +44,6 @@ clean:
 	(cd TkFEC; make clean)
 	(cd HWDescription; make clean)
 	(cd src; make clean)
+	(cd tools; make clean)
 	(rm -f lib/* bin/*)
 

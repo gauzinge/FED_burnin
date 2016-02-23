@@ -18,7 +18,7 @@ ifneq ("$(wildcard $(FEC_SW_DIR))","")
 				   $(FEC_SW_DIR)/FecPciDeviceDriver/include \
 				   ${XDAQ_ROOT}/include\
 				   ${XDAQ_ROOT}/include/hal\
-				   ../tools/include
+				   ../tools
 	CCFLAGS += $(CRAZYFLAGS)
 	LibraryDirs += $(XDAQ_ROOT)/lib \
 				   $(FEC_SW_DIR)/lib

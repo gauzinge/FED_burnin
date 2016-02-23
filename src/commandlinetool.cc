@@ -321,6 +321,13 @@ int main(int argc, char* argv[] )
 	    std::cout << "getFIFO1()" <<  std::endl;	    
 	    getFIFO1();
 	  }
+	else if(splitUserInput[0] == "OSD")
+	  {
+	    // OSD read back
+	    splitUserInput.erase(splitUserInput.begin());
+	    std::cout << "getOSD" <<  std::endl;	    
+	    getOSD();
+	  }
 	else if(splitUserInput[0] == "dumpallfifo" || splitUserInput[0] == "dump")
 	  {
 	    // dump all FIFOs and transparent buffer
@@ -389,6 +396,8 @@ void defineValidInput(){
   // read FIFO1
   validInput.push_back("fifo1");
   validInput.push_back("one");
+  // OSD read back
+  validInput.push_back("OSD");
   // dump all FIFOs
   validInput.push_back("dumpallfifo");
   validInput.push_back("dump");
@@ -413,8 +422,7 @@ void defineValidInput(){
   // stop L1A triggers
   validInput.push_back("L1stop");
   // burst L1A triggers
-  validInput.push_back("L1burst");
-  
+  validInput.push_back("L1burst");  
 }
 
 void splitInput(std::string userInput){
@@ -458,6 +466,10 @@ void printPromt(){
   std::cout << "General readout settings:" << std::endl;
   std::cout << "\t [channel/ch xx] to define the channel of interest" << std::endl; 
   std::cout << "\t [roc xx] to define the roc of interest" << std::endl; 
+  //connection tests
+  std::cout << "Connection Tests: " << std::endl;
+  std::cout << "\t [light] to check light on fibr" << std::endl;
+  std::cout << "\t [phase] to find correct phase settings" << std::endl;
   //trigger control
   std::cout << "AMC13 trigger control:" << std::endl;
   std::cout << "\t [L1start] to start L1A triggers " << std::endl;
@@ -483,6 +495,7 @@ void printPromt(){
   std::cout << "\t [trans] to dump transparent buffer data" << std::endl;
   std::cout << "\t [spy] to dump spy FIFO data" << std::endl;
   std::cout << "\t [one] to dump FIFO1 data" << std::endl;
+  std::cout << "\t [OSD] to read back ODS data" << std::endl;
   std::cout << "\t [dump] to dump all three FIFOs" << std::endl;
 
   std::cout << "\t [q/quit] to to quit" << std::endl;
@@ -512,13 +525,11 @@ void L1start(){
 void L1stop(){
   // stop the L1A triggers
   cAmc13Controller.fAmc13Interface->StopL1A();
-
 }
 
 void L1burst(){
   // send a burst of L1A triggers
   cAmc13Controller.fAmc13Interface->BurstL1A();
-
 }
 
 void L1burst(int triggers){
@@ -527,7 +538,6 @@ void L1burst(int triggers){
     {
       L1burst();
     }
-
 }
 
 void startDAQ(){
@@ -682,6 +692,22 @@ void getFIFO1(){
     }
 }
 
+void getOSD(){
+  for (auto& cFED : cSystemController.fPixFEDVector)
+    {
+      // read fifo 1
+      cSystemController.fFEDInterface->readOSDWord(cFED, cROCOfInterest, cChannelOfInterest);
+    }
+}
+
+void getOSD(int RoI, int CoI){
+  for (auto& cFED : cSystemController.fPixFEDVector)
+    {
+      // read fifo 1
+      cSystemController.fFEDInterface->readOSDWord(cFED, RoI, CoI);
+    }
+}
+
 void dumpAll(){
   Data cData;
   for (auto& cFED : cSystemController.fPixFEDVector)
@@ -703,6 +729,7 @@ void findLight(){
       for (auto& cFitel : cFED->fFitelVector)
 	{
 	  cSystemController.fFEDInterface->ReadLightOnFibre(cFitel);
+	  cSystemController.fFEDInterface->ReadADC(cFitel, cChannelOfInterest, true);
         }
     }
 }
@@ -714,7 +741,7 @@ void findPhases(){
       //TODO: make the channel of interest (here 11) a variable that can be changed
 
       cSystemController.fFEDInterface->getBoardInfo(cFED);
-      cSystemController.fFEDInterface->findPhases(cFED, 0xb);
+      cSystemController.fFEDInterface->findPhases(cFED, cChannelOfInterest);
     }
   
 }

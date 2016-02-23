@@ -68,6 +68,8 @@ void listFW();
 void getTransparent();
 void getSpy();
 void getFIFO1();
+void getOSD();
+void getOSD(int RoI, int CoI);
 void dumpAll();
 
 void findLight();

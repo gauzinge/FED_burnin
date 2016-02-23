@@ -2742,18 +2742,18 @@ void readFecRegisterSR0 (FecAccess *fecAccess,
       keyType indexFEC = *p ;
       std::cout << "####################################################" << std::endl ;
       std::cout << "FEC " << std::dec << (int)getFecKey(indexFEC) << " Ring " << (int)getRingKey(indexFEC) << std::endl ;
-      if (fecAccess->getFecBusType() == FECVME) {
-	FecVmeRingDevice *fecVmeRing = (FecVmeRingDevice *)fecAccess->getFecRingDevice (indexFEC) ;
-	try {
-	  std::cout << "FEC hardware ID = " << fecVmeRing->getFecHardwareId() << std::endl ;
-	  std::cout << "VME Firmware version = " << fecVmeRing->getVmeVersion() << std::endl ;
-	}
-	catch (FecExceptionHandler e) {
-	  std::cerr << "Unable to read the firmware version from the VME FEC" << std::endl ;
-	  std::cerr << e.what() << std::endl ;
-	}
-      }
-      std::cout << "FEC firmware version = " << std::hex << fecAccess->getFecFirmwareVersion(indexFEC) << std::endl ;
+      //if (fecAccess->getFecBusType() == FECVME) {
+//	FecVmeRingDevice *fecVmeRing = (FecVmeRingDevice *)fecAccess->getFecRingDevice (indexFEC) ;
+//	try {
+//	  std::cout << "FEC hardware ID = " << fecVmeRing->getFecHardwareId() << std::endl ;
+//	  std::cout << "VME Firmware version = " << fecVmeRing->getVmeVersion() << std::endl ;
+//	}
+//	catch (FecExceptionHandler e) {
+//	  std::cerr << "Unable to read the firmware version from the VME FEC" << std::endl ;
+//	  std::cerr << e.what() << std::endl ;
+//	}
+ //     }
+  //    std::cout << "FEC firmware version = " << std::hex << fecAccess->getFecFirmwareVersion(indexFEC) << std::endl ;
 
       for (long loopI = 0 ; (loopI < loop) || (loop < 0) ; loopI ++) {
 	

@@ -25,11 +25,10 @@ endif
 .PHONY: clean $(binaries) 
 	#run fpgaconfig amc13test
 
-binaries=print run fpgaconfig amc13test fedconfig
+binaries=print run fpgaconfig amc13test fedconfig clt
 
 
 all: $(binaries)
-
 
 print:
 	@echo '*****************************'
@@ -40,7 +39,7 @@ run: acquisition.cc
 	$(CXX) -std=c++11 $(CCFlags) -o $@ $< $(IncludePaths) $(ExternalObjects)
 	cp $@ ../bin
 
-fpgaconfig: fpgaconfig.cc
+clt: commandlinetool.cc commandlinetool.hh
 	$(CXX) -std=c++11 $(CCFlags) -o $@ $< $(IncludePaths) $(ExternalObjects)
 	cp $@ ../bin
 
@@ -49,6 +48,10 @@ amc13test: amc13test.cc
 	cp $@ ../bin
 
 fedconfig: fedconfig.cc
+	$(CXX) -std=c++11 $(CCFlags) -o $@ $< $(IncludePaths) $(ExternalObjects)
+	cp $@ ../bin
+
+fpgaconfig: fpgaconfig.cc
 	$(CXX) -std=c++11 $(CCFlags) -o $@ $< $(IncludePaths) $(ExternalObjects)
 	cp $@ ../bin
 

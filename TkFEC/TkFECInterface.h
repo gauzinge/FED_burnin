@@ -43,7 +43,7 @@ using std::endl;
 #include "VMELock.h"
 
 //port address
-const int portaddress = 2002;
+//const int portaddress = 2002;
 
 using namespace std;
 

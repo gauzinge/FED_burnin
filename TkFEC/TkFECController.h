@@ -8,6 +8,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+//#include "TkFECInterface.h"
 
 class TkFECController
 {
@@ -20,6 +21,7 @@ public:
     void InitializeTkFEC(const std::string& pFilename, std::ostream& os = std::cout);
     // no need to configure the TkFEC, only need to configure the ring!
     void ConfigureRing();
+    void RunInteracitve();
 
     //Interface to contain the wrapper to the FEC software (to be seen if used)
     //TkFECInterface* fTkFECInterface;

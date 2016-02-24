@@ -10,9 +10,20 @@ TkFECController::~TkFECController()
     fCCUVector.clear();
 }
 
+void TkFECController::ConfigureRing()
+{
+    // loop the CCU nodes and then the i2c nodes and call write I2C method
+
+}
+
+void TkFECController::RunInteracitve()
+{
+
+}
+
 void TkFECController::InitializeTkFEC(const std::string& pFilename, std::ostream& os )
 {
-std::cout << pFilename << std::endl;
+    std::cout << pFilename << std::endl;
     if ( pFilename.find(".xml") != std::string::npos )
         parseTkFECxml( pFilename, os );
     else std::cerr << "Could not parse settings file " << pFilename << " - it is not .xml!" << std::endl;
@@ -47,8 +58,6 @@ void TkFECController::parseTkFECxml(const std::string& pFilename, std::ostream& 
     for ( pugi::xml_node cTkFECNode = doc.child( "HwDescription" ).child( "TkFEC" ); cTkFECNode; cTkFECNode = cTkFECNode.next_sibling("TkFEC") )
     {
         os << BOLDCYAN << cTkFECNode.name() << RESET << std::endl;        // now create a new AMC13 Description Object
-        //if ( fAmc13 != nullptr ) delete fAmc13;
-        //fAmc13 = new Amc13Description();
 
         std::string cId;
         std::string cUri;
@@ -61,7 +70,6 @@ void TkFECController::parseTkFECxml(const std::string& pFilename, std::ostream& 
         cAddress = cTkFECConnection.attribute("address_table").value();
 
         std::cout << BOLDBLUE <<  "|" << "----" << "Board Id: " << BOLDYELLOW << cTkFECConnection.attribute("id").value() << BOLDBLUE << " URI: " << BOLDYELLOW << cTkFECConnection.attribute("uri").value() << BOLDBLUE << " Address Table: " << BOLDYELLOW << cTkFECConnection.attribute("address_table").value() << RESET << std::endl;
-
 
         // here loop over the CCU nodes
         for ( pugi::xml_node cCCUNode = cTkFECNode.child( "CCU" ); cCCUNode; cCCUNode = cCCUNode.next_sibling("CCU") )
@@ -80,6 +88,7 @@ void TkFECController::parseTkFECxml(const std::string& pFilename, std::ostream& 
         }
 
         // here create the tkFEC interface, whatever it might be
+        //fTkFECInterface = new TkFECInterface(cId, cUri, cAddress);
     }
 
 }

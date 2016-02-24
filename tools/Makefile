@@ -12,7 +12,7 @@ OBJECTS=Getline.o MultiplexingServer.o SimpleCommand.o SimpleConnection.o VMELoc
 
 .PHONY: print clean
 
-all: print $(OBJECTS) lib
+all: print lib 
 
 print:
 	@echo '*****************************'
@@ -22,7 +22,7 @@ print:
 lib:	$(OBJECTS)
 	$(CC) -shared -o libSockets.so $(LDFLAGS) $(OBJECTS)
 	rm -f $(PIXELLIB)/libSockets.so
-	cp libSockets.so  $(PIXELLIB)/libSockets.so
+	mv libSockets.so  ../lib/libSockets.so
 
 #%.o: %.cc %.h 
 #	$(CXX) -std=c++11  $(DevFlags) $(CCFlags) $(UserCCFlags) $(CCDefines) $(IncludePaths) -c -o $@ $<

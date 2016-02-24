@@ -7,10 +7,10 @@
         <!--This is used to send a calibration Trigger via the AMC13s internal BGO mechanism, 0x2c is the command configured as BGO15 
              on the TTCci - repeat is obvious, prescale is in orbits, the bx is selected such that it occurs 98 BX before the local
 	     L1A which is periodic at BX500 every orbit-->
-        <BGO command="0x2c" repeat="1" prescale="0" bx="381"/>
+        <!--<BGO command="0x2c" repeat="1" prescale="0" bx="381"/>-->
         <!-- Local enables Local L1A, mode 0 means a trigger every orbit at BX500, rate is 1 for every orbit and burst is 1 
              for 1 trigger when sending burst (equivalent to single trigger -->
-        <Trigger local="1" mode="0" rate="1" burst="1" rules="0"/>
+        <!--<Trigger local="1" mode="0" rate="1" burst="1" rules="0"/>-->
         <!--<Register tounge="T1" name="test.test">0</Register>-->
 	<TTCSimulator>0</TTCSimulator>
     </AMC13>
@@ -30,17 +30,17 @@
         <Register name="pixfed_ctrl_regs.TBM_MASK_3">0xFFFFFFFF</Register>
         <!-- FITELS -->
         <Fitel_Files path="./settings/" />
-        <!--<Fitel FMC="0" Id="0" file="FMC0_Fitel0.txt" />-->
-        <!--<Fitel FMC="0" Id="1" file="FMC0_Fitel1.txt" />-->
-        <Fitel FMC="1" Id="0" file="FMC1_Fitel0.txt" />
-        <Fitel FMC="1" Id="1" file="FMC1_Fitel1.txt" />
+        <Fitel FMC="0" Id="0" file="FMC0_Fitel0.txt" />
+        <Fitel FMC="0" Id="1" file="FMC0_Fitel1.txt" />
+        <!--Fitel FMC="1" Id="0" file="FMC1_Fitel0.txt" /-->
+        <!--Fitel FMC="1" Id="1" file="FMC1_Fitel1.txt" /-->
     </PixFED>
 </HwDescription>
 <Settings>
     <!--Setting name="NTBM">2</Setting-->
     <!--<Setting name="ChannelOfInterest">0</Setting>-->
     <!-- 0 indexed -->
-    <Setting name="ChannelOfInterest">4</Setting>
+    <Setting name="ChannelOfInterest">8</Setting>
     <!-- 0 indexed -->
     <Setting name="ROCOfInterest">1</Setting>
     <Setting name="BlockSize">512</Setting>

@@ -19,7 +19,9 @@
 //my variables
 
 int cChannelOfInterest;
+void changeChannelOfInterest(int CoI);
 int cROCOfInterest;
+void changeROCOfInterest(int RoI);
 
 const char* cHWFile;
 SystemController cSystemController;

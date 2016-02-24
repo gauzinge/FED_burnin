@@ -112,6 +112,7 @@ int main(int argc, char* argv[] )
 		if(splitUserInput[1].substr(sz) == "\0")
 		  {
 		    cChannelOfInterest = channel;
+		    changeChannelOfInterest(cChannelOfInterest);
 		    splitUserInput.erase(splitUserInput.begin(), splitUserInput.begin()+2);
 		  }
 		else
@@ -147,6 +148,7 @@ int main(int argc, char* argv[] )
 		if(splitUserInput[1].substr(sz) == "\0")
 		  {
 		    cROCOfInterest = roc;
+		    changeROCOfInterest(cROCOfInterest);
 		    splitUserInput.erase(splitUserInput.begin(), splitUserInput.begin()+2);
 		  }
 		else
@@ -468,7 +470,7 @@ void printPromt(){
   std::cout << "\t [roc xx] to define the roc of interest" << std::endl; 
   //connection tests
   std::cout << "Connection Tests: " << std::endl;
-  std::cout << "\t [light] to check light on fibr" << std::endl;
+  std::cout << "\t [light] to check light on fibre" << std::endl;
   std::cout << "\t [phase] to find correct phase settings" << std::endl;
   //trigger control
   std::cout << "AMC13 trigger control:" << std::endl;
@@ -700,14 +702,6 @@ void getOSD(){
     }
 }
 
-void getOSD(int RoI, int CoI){
-  for (auto& cFED : cSystemController.fPixFEDVector)
-    {
-      // read fifo 1
-      cSystemController.fFEDInterface->readOSDWord(cFED, RoI, CoI);
-    }
-}
-
 void dumpAll(){
   Data cData;
   for (auto& cFED : cSystemController.fPixFEDVector)
@@ -726,9 +720,10 @@ void dumpAll(){
 void findLight(){
     for (auto& cFED : cSystemController.fPixFEDVector)
     {
+      std::cout <<"FED loop" << std::endl;
       for (auto& cFitel : cFED->fFitelVector)
 	{
-	  cSystemController.fFEDInterface->ReadLightOnFibre(cFitel);
+	  std::cout <<"Fitel loop" << std::endl;
 	  cSystemController.fFEDInterface->ReadADC(cFitel, cChannelOfInterest, true);
         }
     }
@@ -738,12 +733,25 @@ void findPhases(){
 
   for (auto& cFED : cSystemController.fPixFEDVector)
     {
-      //TODO: make the channel of interest (here 11) a variable that can be changed
-
       cSystemController.fFEDInterface->getBoardInfo(cFED);
       cSystemController.fFEDInterface->findPhases(cFED, cChannelOfInterest);
     }
-  
+}
+
+void changeChannelOfInterest(int CoI){
+
+  for (auto& cFED : cSystemController.fPixFEDVector)
+    {
+      cSystemController.fFEDInterface->WriteBoardReg(cFED, "fe_ctrl_regs.fifo_config.channel_of_interest", CoI);
+    }
+}
+
+void changeROCOfInterest(int RoI){
+
+ for (auto& cFED : cSystemController.fPixFEDVector)
+    {
+      cSystemController.fFEDInterface->WriteBoardReg(cFED, "fe_ctrl_regs.fifo_config.OSD_ROC_Nr", RoI );
+    }
 }
 
 

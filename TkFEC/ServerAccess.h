@@ -132,7 +132,7 @@ bool getErrorCounterFlag ( ) ;
 /** For output
  */
 void setStdchan ( FILE *chan ) ;
-FILE *getStdchan ( ) ; 
+FILE *getStdchan ( ) ;
 
 /** For different FEC bus
 */
@@ -140,190 +140,192 @@ void setFecType ( enumFecBusType fecBusType ) ;
 
 /** Create the FEC Access class depending on the version of the FecSoftware and the FEC type
  */
-FecAccess *createFecAccess ( int argc, char **argv, int *cnt , int fecslot= 0xFFFFFFFF);
+FecAccess *createFecAccess ( int argc, char **argv, int *cnt , int fecslot = 0xFFFFFFFF);
+
+FecAccess *createUtcaFecAccess ( const std::string& pHardwareId, const std::string& pUri, const std::string& pAddressTable );
 
 
 /** \brief read PLL
  */
 std::string readPll ( FecAccess *fec,
-		      tscType8 fecAddress, 
-		      tscType8 ringAddress,
-		      tscType8 ccuAddress, 
-		      tscType8 channelAddress,
-		      tscType8 deviceAddress,
-		      long loop, unsigned long tms ) ;
+                      tscType8 fecAddress,
+                      tscType8 ringAddress,
+                      tscType8 ccuAddress,
+                      tscType8 channelAddress,
+                      tscType8 deviceAddress,
+                      long loop, unsigned long tms ) ;
 
 /** \brief reset PLL
  */
 std::string resetPll ( FecAccess *fecAccess,
-		       tscType8 fecAddress, 
-		       tscType8 ringAddress,
-		       tscType8 ccuAddress, 
-		       tscType8 channelAddress,
-		       tscType8 deviceAddress,
-		       long loop, unsigned long tms ) ;
+                       tscType8 fecAddress,
+                       tscType8 ringAddress,
+                       tscType8 ccuAddress,
+                       tscType8 channelAddress,
+                       tscType8 deviceAddress,
+                       long loop, unsigned long tms ) ;
 
 /** \brief set PLL
  */
 std::string setPll_ClockPhase ( FecAccess *fec,
-				tscType8 fecAddress, 
-				tscType8 ringAddress,
-				tscType8 ccuAddress, 
-				tscType8 channelAddress,
-				tscType8 deviceAddress,
-				long loop, unsigned long tms,
-				unsigned int value ) ;
+                                tscType8 fecAddress,
+                                tscType8 ringAddress,
+                                tscType8 ccuAddress,
+                                tscType8 channelAddress,
+                                tscType8 deviceAddress,
+                                long loop, unsigned long tms,
+                                unsigned int value ) ;
 
 /** \brief set PLL
  */
 std::string setPll_TriggerDelay ( FecAccess *fec,
-				  tscType8 fecAddress, 
-				  tscType8 ringAddress,
-				  tscType8 ccuAddress, 
-				  tscType8 channelAddress,
-				  tscType8 deviceAddress,
-				  long loop, unsigned long tms,
-				  unsigned int value ) ;
+                                  tscType8 fecAddress,
+                                  tscType8 ringAddress,
+                                  tscType8 ccuAddress,
+                                  tscType8 channelAddress,
+                                  tscType8 deviceAddress,
+                                  long loop, unsigned long tms,
+                                  unsigned int value ) ;
 
 /** \brief read DELAY25
  */
 std::string readDelay25 ( FecAccess *fec,
-			  tscType8 fecAddress, 
-			  tscType8 ringAddress,
-			  tscType8 ccuAddress, 
-			  tscType8 channelAddress,
-			  tscType8 deviceAddress,
-			  long loop, unsigned long tms ) ;
+                          tscType8 fecAddress,
+                          tscType8 ringAddress,
+                          tscType8 ccuAddress,
+                          tscType8 channelAddress,
+                          tscType8 deviceAddress,
+                          long loop, unsigned long tms ) ;
 
 /** \brief set delay0 of a DELAY25
  */
 std::string setDelay25_Delay0 ( FecAccess *fec,
-				tscType8 fecAddress, 
-				tscType8 ringAddress,
-				tscType8 ccuAddress, 
-				tscType8 channelAddress,
-				tscType8 deviceAddress,
-				long loop, unsigned long tms,
-				unsigned int value ) ;
+                                tscType8 fecAddress,
+                                tscType8 ringAddress,
+                                tscType8 ccuAddress,
+                                tscType8 channelAddress,
+                                tscType8 deviceAddress,
+                                long loop, unsigned long tms,
+                                unsigned int value ) ;
 
 /** \brief set delay1 of a DELAY25
  */
 std::string setDelay25_Delay1 ( FecAccess *fec,
-				tscType8 fecAddress, 
-				tscType8 ringAddress,
-				tscType8 ccuAddress, 
-				tscType8 channelAddress,
-				tscType8 deviceAddress,
-				long loop, unsigned long tms,
-				unsigned int value ) ;
+                                tscType8 fecAddress,
+                                tscType8 ringAddress,
+                                tscType8 ccuAddress,
+                                tscType8 channelAddress,
+                                tscType8 deviceAddress,
+                                long loop, unsigned long tms,
+                                unsigned int value ) ;
 
 /** \brief set delay2 of a DELAY25
  */
 std::string setDelay25_Delay2 ( FecAccess *fec,
-				tscType8 fecAddress, 
-				tscType8 ringAddress,
-				tscType8 ccuAddress, 
-				tscType8 channelAddress,
-				tscType8 deviceAddress,
-				long loop, unsigned long tms,
-				unsigned int value ) ;
+                                tscType8 fecAddress,
+                                tscType8 ringAddress,
+                                tscType8 ccuAddress,
+                                tscType8 channelAddress,
+                                tscType8 deviceAddress,
+                                long loop, unsigned long tms,
+                                unsigned int value ) ;
 
 /** \brief set delay3 of a DELAY25
  */
 std::string setDelay25_Delay3 ( FecAccess *fec,
-				tscType8 fecAddress, 
-				tscType8 ringAddress,
-				tscType8 ccuAddress, 
-				tscType8 channelAddress,
-				tscType8 deviceAddress,
-				long loop, unsigned long tms,
-				unsigned int value ) ;
+                                tscType8 fecAddress,
+                                tscType8 ringAddress,
+                                tscType8 ccuAddress,
+                                tscType8 channelAddress,
+                                tscType8 deviceAddress,
+                                long loop, unsigned long tms,
+                                unsigned int value ) ;
 
 /** \brief set delay4 of a DELAY25
  */
 std::string setDelay25_Delay4 ( FecAccess *fec,
-				tscType8 fecAddress, 
-				tscType8 ringAddress,
-				tscType8 ccuAddress, 
-				tscType8 channelAddress,
-				tscType8 deviceAddress,
-				long loop, unsigned long tms,
-				unsigned int value ) ;
+                                tscType8 fecAddress,
+                                tscType8 ringAddress,
+                                tscType8 ccuAddress,
+                                tscType8 channelAddress,
+                                tscType8 deviceAddress,
+                                long loop, unsigned long tms,
+                                unsigned int value ) ;
 
-/** \brief resynch dll 
+/** \brief resynch dll
  */
 std::string ResynchDLL ( FecAccess *fecAccess,
-			 tscType8 fecAddress, 
-			 tscType8 ringAddress,
-			 tscType8 ccuAddress, 
-			 tscType8 channelAddress,
-			 tscType8 deviceAddress,
-			 long loop, unsigned long tms ) ;
- 
+                         tscType8 fecAddress,
+                         tscType8 ringAddress,
+                         tscType8 ccuAddress,
+                         tscType8 channelAddress,
+                         tscType8 deviceAddress,
+                         long loop, unsigned long tms ) ;
+
 
 /** \brief Basic test for accessing a LaserDriver
  */
 std::string readLaserdriver ( FecAccess *fec,
-			      tscType8 fecAddress, 
-			      tscType8 ringAddress,
-			      tscType8 ccuAddress, 
-			      tscType8 channelAddress,
-			      tscType8 deviceAddress,
-			      long loop, unsigned long tms) ;
+                              tscType8 fecAddress,
+                              tscType8 ringAddress,
+                              tscType8 ccuAddress,
+                              tscType8 channelAddress,
+                              tscType8 deviceAddress,
+                              long loop, unsigned long tms) ;
 
 /** \brief Basic test for accessing a LaserDriver
  */
 std::string setLaserdriver ( FecAccess *fecAccess,
-			     tscType8 fecAddress, 
-			     tscType8 ringAddress,
-			     tscType8 ccuAddress, 
-			     tscType8 channelAddress,
-			     tscType8 deviceAddress,
-			     long loop, unsigned long tms,
-			     bool setgain0,
-			     unsigned int valuegain0,
-			     bool setgain1,
-			     unsigned int valuegain1,
-			     bool setgain2,
-			     unsigned int valuegain2,
-			     bool setbias0,
-			     unsigned int valuebias0,
-			     bool setbias1,
-			     unsigned int valuebias1,
-			     bool setbias2,
-			     unsigned int valuebias2);
-		
+                             tscType8 fecAddress,
+                             tscType8 ringAddress,
+                             tscType8 ccuAddress,
+                             tscType8 channelAddress,
+                             tscType8 deviceAddress,
+                             long loop, unsigned long tms,
+                             bool setgain0,
+                             unsigned int valuegain0,
+                             bool setgain1,
+                             unsigned int valuegain1,
+                             bool setgain2,
+                             unsigned int valuegain2,
+                             bool setbias0,
+                             unsigned int valuebias0,
+                             bool setbias1,
+                             unsigned int valuebias1,
+                             bool setbias2,
+                             unsigned int valuebias2);
+
 /** \brief Basic test for accessing a DOH
  */
 std::string readDoh ( FecAccess *fecAccess,
-		      tscType8 fecAddress, 
-		      tscType8 ringAddress,
-		      tscType8 ccuAddress, 
-		      tscType8 channelAddress,
-		      tscType8 deviceAddress,
-		      long loop, unsigned long tms) ;
+                      tscType8 fecAddress,
+                      tscType8 ringAddress,
+                      tscType8 ccuAddress,
+                      tscType8 channelAddress,
+                      tscType8 deviceAddress,
+                      long loop, unsigned long tms) ;
 
 /** \brief Basic test for accessing a DOH
  */
 std::string setDoh  ( FecAccess *fecAccess,
-		      tscType8 fecAddress, 
-		      tscType8 ringAddress,
-		      tscType8 ccuAddress, 
-		      tscType8 channelAddress,
-		      tscType8 deviceAddress,
-		      long loop, unsigned long tms,
-		      bool setgain0,
-		      unsigned int valuegain0,
-		      bool setgain1,
-		      unsigned int valuegain1,
-		      bool setgain2,
-		      unsigned int valuegain2,
-		      bool setbias0,
-		      unsigned int valuebias0,
-		      bool setbias1,
-		      unsigned int valuebias1,
-		      bool setbias2,
-		      unsigned int valuebias2);
+                      tscType8 fecAddress,
+                      tscType8 ringAddress,
+                      tscType8 ccuAddress,
+                      tscType8 channelAddress,
+                      tscType8 deviceAddress,
+                      long loop, unsigned long tms,
+                      bool setgain0,
+                      unsigned int valuegain0,
+                      bool setgain1,
+                      unsigned int valuegain1,
+                      bool setgain2,
+                      unsigned int valuegain2,
+                      bool setbias0,
+                      unsigned int valuebias0,
+                      bool setbias1,
+                      unsigned int valuebias1,
+                      bool setbias2,
+                      unsigned int valuebias2);
 
 
 /** \brief display all the counters
@@ -336,10 +338,10 @@ void displayStatus ( FecExceptionHandler *e, unsigned int count, FecAccess *fecA
 
 /** \brief Reset all PLX/FEC
  */
-std::string resetPlxFec ( FecAccess *fecAccess, 
-			  tscType8 fecAddress,
-			  tscType8 ringAddress,
-			  long loop, unsigned long tms ) ;
+std::string resetPlxFec ( FecAccess *fecAccess,
+                          tscType8 fecAddress,
+                          tscType8 ringAddress,
+                          long loop, unsigned long tms ) ;
 
 /** \brief Crate reset for VME FEC
  */
@@ -347,36 +349,36 @@ std::string crateReset ( FecAccess *fecAccess, bool testCrateReset, long loop, u
 
 /** \brief test of DC-DC converters
  */
-std::string DCDCenableTest ( FecAccess *fecAccess, 
-			     tscType8 fecAddress,
-			     tscType8 ringAddress, 
-			     tscType8 ccuAddress,
-			     unsigned int dcdcAddress,
-			     bool noBroadcast );
+std::string DCDCenableTest ( FecAccess *fecAccess,
+                             tscType8 fecAddress,
+                             tscType8 ringAddress,
+                             tscType8 ccuAddress,
+                             unsigned int dcdcAddress,
+                             bool noBroadcast );
 
 /** \brief scan for ccu
  */
-std::string testScanCCU ( FecAccess *fecAccess, 
-			  tscType8 fecAddress,
-			  tscType8 ringAddress,
-			  bool noBroadcast );
+std::string testScanCCU ( FecAccess *fecAccess,
+                          tscType8 fecAddress,
+                          tscType8 ringAddress,
+                          bool noBroadcast );
 
 /** \brief scan for ccu
  */
 std::string newtestScanCCU ( FecAccess *fecAccess,
-			     bool noBroadcast );
+                             bool noBroadcast );
 
 /** \brief scan for the devices
  */
 std::string testScanRingEDevice ( FecAccess *fecAccess,
 
-				  tscType8 fecAddress, tscType8 ringAddress );
+                                  tscType8 fecAddress, tscType8 ringAddress );
 /** \brief scan for the devices
  */
-std::string testScanPixelDevice ( FecAccess *fecAccess, 
-				  tscType8 fecAddress,
-				  tscType8 ringAddress,
-				  long loop, unsigned long tms); 
+std::string testScanPixelDevice ( FecAccess *fecAccess,
+                                  tscType8 fecAddress,
+                                  tscType8 ringAddress,
+                                  long loop, unsigned long tms);
 
 
 void allCCUsPiaReset ( FecAccess *fecAccess, tscType8 fecAddress, tscType8 ringAddress );
@@ -384,56 +386,56 @@ void allCCUsPiaReset ( FecAccess *fecAccess, tscType8 fecAddress, tscType8 ringA
 /** \brief status
  */
 std::string testStatus ( FecAccess *fecAccess,
-			 bool noBroadcast );
+                         bool noBroadcast );
 
 /** \brief map (fec)
  */
 std::string testMap ( FecAccess *fecAccess,
-		      bool noBroadcast );
+                      bool noBroadcast );
 
 /** \brief map (fec and ccu)
  */
 std::string testMapCCU ( FecAccess *fecAccess,
-		    bool noBroadcast );
+                         bool noBroadcast );
 
 /** \brief redundancy
  */
-std::string testRedundancyRing ( FecAccess *fecAccess, 
-				 tscType8 fecAddress,
-				 tscType8 ringAddress,
-				 uint ccuAddresses[][3], 
-				 uint numberOfCCU );
-     
+std::string testRedundancyRing ( FecAccess *fecAccess,
+                                 tscType8 fecAddress,
+                                 tscType8 ringAddress,
+                                 uint ccuAddresses[][3],
+                                 uint numberOfCCU );
+
 /** \brief Access by write/read a register on i2c channel
  */
 std::string setI2CDevice (FecAccess *fecAccess,
-			  tscType8 fecAddress,
-			  tscType8 ringAddress,
-			  tscType8 ccuAddress,
-			  tscType8 channelAddress,
-			  tscType8 deviceAddress,
-			  enumDeviceType modeType,
-			  long loop, unsigned long tms,
-			  unsigned int value ) ;
+                          tscType8 fecAddress,
+                          tscType8 ringAddress,
+                          tscType8 ccuAddress,
+                          tscType8 channelAddress,
+                          tscType8 deviceAddress,
+                          enumDeviceType modeType,
+                          long loop, unsigned long tms,
+                          unsigned int value ) ;
 
 
 
 std::string getI2CDevice (FecAccess *fecAccess,
-		     tscType8 fecAddress,
-		     tscType8 ringAddress,
-		     tscType8 ccuAddress,
-		     tscType8 channelAddress,
-		     tscType8 deviceAddress,
-		     enumDeviceType modeType,
-		     long loop, unsigned long tms) ;
+                          tscType8 fecAddress,
+                          tscType8 ringAddress,
+                          tscType8 ccuAddress,
+                          tscType8 channelAddress,
+                          tscType8 deviceAddress,
+                          enumDeviceType modeType,
+                          long loop, unsigned long tms) ;
 
 
 
 /** \brief Default test, just read the FEC CR0
  */
-void readFecRegisterSR0 (FecAccess *fecAccess, 
-			 tscType8 fecAddress, 
-			 tscType8 ringAddress,
+void readFecRegisterSR0 (FecAccess *fecAccess,
+                         tscType8 fecAddress,
+                         tscType8 ringAddress,
                          long loop, unsigned long tms ) ;
 
 
@@ -500,28 +502,28 @@ std::string displayCCUCRE ( tscType32 CRE ) ;
 /** \brief pia reset
  */
 std::string testPIAResetfunctions (FecAccess *fecAccess,
-				   tscType8 fecAddress,
-				   tscType8 ringAddress,
-				   tscType8 ccuAddress,
-				   tscType8 channelAddress,
-				   tscType16 value,
-				   unsigned long delayActiveReset,
-				   unsigned long intervalDelayReset,
-				   long loop, unsigned long tms );
+                                   tscType8 fecAddress,
+                                   tscType8 ringAddress,
+                                   tscType8 ccuAddress,
+                                   tscType8 channelAddress,
+                                   tscType16 value,
+                                   unsigned long delayActiveReset,
+                                   unsigned long intervalDelayReset,
+                                   long loop, unsigned long tms );
 
 /* \brief autoredundancy
  */
 std::vector<std::string> autoRedundancyRing ( FecAccess *fecAccess,
-					      tscType8 fecAddress,
-					      tscType8 ringAddress,
-					      long loop, unsigned long tms ) ;
+        tscType8 fecAddress,
+        tscType8 ringAddress,
+        long loop, unsigned long tms ) ;
 
 /** Clear the error in the FECs and in the different CCUs
  */
 void clearFecCcuErrorRegisters ( FecAccess *fecAccess,
-				 tscType8 fecAddress,
-				 tscType8 ringAddress,
-				 std::list<keyType> ccuAddresses ) ;
+                                 tscType8 fecAddress,
+                                 tscType8 ringAddress,
+                                 std::list<keyType> ccuAddresses ) ;
 
 /** This method try to recover the ring until the status register 0 is ok
  */
@@ -533,27 +535,26 @@ void displayFecStatus ( FecAccess *fecAccess,
                         keyType index ) ;
 
 std::string PIOrw (FecAccess *fecAccess,
-		     tscType8 fecAddress,
-		     tscType8 ringAddress,
-		     tscType8 ccuAddress,
-		    tscType8 channelAddress=0x30, 
-		    int value=0xFF);
+                   tscType8 fecAddress,
+                   tscType8 ringAddress,
+                   tscType8 ccuAddress,
+                   tscType8 channelAddress = 0x30,
+                   int value = 0xFF);
 
 std::string CtrlRegE (FecAccess *fecAccess,
-		     tscType8 fecAddress,
-		     tscType8 ringAddress,
-		     tscType8 ccuAddress,
-		    tscType8 channelAddress=0x30, 
-		    int value=0xFF);
+                      tscType8 fecAddress,
+                      tscType8 ringAddress,
+                      tscType8 ccuAddress,
+                      tscType8 channelAddress = 0x30,
+                      int value = 0xFF);
 
 std::string pixDCDCCommand(FecAccess* fecAccess,
-			   tscType8 fecAddress,
-			   tscType8 ringAddress,
-			   tscType8 ccuAddressEnable,
-			   tscType8 ccuAddressPgood,
-			   tscType8 piaChannelAddress,
-			   bool turnOn,
-			   unsigned int portNumber);
+                           tscType8 fecAddress,
+                           tscType8 ringAddress,
+                           tscType8 ccuAddressEnable,
+                           tscType8 ccuAddressPgood,
+                           tscType8 piaChannelAddress,
+                           bool turnOn,
+                           unsigned int portNumber);
 
 #endif
-

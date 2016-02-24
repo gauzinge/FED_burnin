@@ -1,18 +1,11 @@
 #include "TkFECInterface.h"
 
-TkFECInterface::TkFECInterface()
+TkFECInterface::TkFECInterface(const std::string& pHardwareId, const std::string& pUri, const std::string& pAddressTable)
 {
+    std::string pDummyfilename = "../HWInterface/dummy.xml";
     floop = 1;
     ftms  = 0 ;  // wait tms microseconds
     fmodeType = PHILIPS ;
-
-    int argc = 4;
-    char* argv[4];
-    argv[0] = "dummy";
-    argv[1] = "-utca";
-    argv[2] = "-port";
-// need to convert port to char
-    argv[3] = "2002";
 
     //VMELock lock(1);
     //lock.acquire();
@@ -39,13 +32,14 @@ TkFECInterface::TkFECInterface()
     //readAddressMaps("./data/fec_ring_ccu_channel_group.txt");
 
     // Check: pci or vme mode
-        //cout << "utca mode " << endl;
-        //fecAddress = 0 ;
-        //ringAddress = 0x0 ;
+    //cout << "utca mode " << endl;
+    //fecAddress = 0 ;
+    //ringAddress = 0x0 ;
     //create fec access
     try
     {
-        ffecAccess = createFecAccess ( argc, argv, &cnt, 9 ) ;  // fecslot // JMTBAD should this 20 be 9? diff when porting from slc4 box
+        //ffecAccess = createFecAccess ( argc, argv, &cnt, 9 ) ;  // fecslot // JMTBAD should this 20 be 9? diff when porting from slc4 box
+        ffecAccess = createUtcaFecAccess ( pHardwareId, pUri, pAddressTable) ;  // fecslot // JMTBAD should this 20 be 9? diff when porting from slc4 box
     }
     catch (FecExceptionHandler e)
     {
@@ -69,97 +63,97 @@ std::string TkFECInterface::writeI2C(unsigned int fecAddress, unsigned int ringA
 
 std::string TkFECInterface::readI2C(unsigned int fecAddress, unsigned int ringAddress, unsigned int ccuAddress, unsigned int channelAddress, unsigned int deviceAddress)
 {
-   return getI2CDevice ( ffecAccess, fecAddress, ringAddress, ccuAddress, channelAddress, deviceAddress, fmodeType, floop, ftms) ;
+    return getI2CDevice ( ffecAccess, fecAddress, ringAddress, ccuAddress, channelAddress, deviceAddress, fmodeType, floop, ftms) ;
 }
 
 int TkFECInterface::RunInteracitve(char* deviceType, int port, unsigned int fecAddress, unsigned int ringAddress, unsigned int channelAddress, unsigned int ccuAddress, unsigned int piaChannelAddress)
 //int main(int argc, char *argv[])
 {
     // need to create a char* argv[]
-    int argc = 4;
-    char* argv[4];
-    argv[0] = "dummy";
-    argv[1] = '-'+deviceType;
-    argv[2] = "-port";
-    char buf[5];
-    std::sprintf(buf, "%d", port);
-    argv[3] = buf;
+    //int argc = 4;
+    //char* argv[4];
+    //argv[0] = "dummy";
+    //argv[1] = '-' + deviceType;
+    //argv[2] = "-port";
+    //char buf[5];
+    //std::sprintf(buf, "%d", port);
+    //argv[3] = buf;
 
     VMELock lock(1);
     lock.acquire();
 
-    //Download all
-    FecAccess *fecAccess  = NULL ;
+    ////Download all
+    //FecAccess *fecAccess  = NULL ;
 
 
     unsigned int i2cSpeed = 100 ;
     bool fack             = true  ;
 
-    // Create the FEC Access
+    //// Create the FEC Access
     int cnt;
 
-    // FEC Address and Ring Address
-    //unsigned int fecAddress = 0x9 ;
-    //unsigned int ringAddress = 0x8 ;
-    ////unsigned int ringAddress = 0x7 ;
-    //unsigned int channelAddress = 0x11 ;
-    ////unsigned int ccuAddress = 0x7c;
-    //unsigned int ccuAddress = 0x3f;
-    //unsigned int piaChannelAddress = 0x30 ;
+    //// FEC Address and Ring Address
+    ////unsigned int fecAddress = 0x9 ;
+    ////unsigned int ringAddress = 0x8 ;
+    //////unsigned int ringAddress = 0x7 ;
+    ////unsigned int channelAddress = 0x11 ;
+    //////unsigned int ccuAddress = 0x7c;
+    ////unsigned int ccuAddress = 0x3f;
+    ////unsigned int piaChannelAddress = 0x30 ;
     long loop = 1 ;
     string sector = "-6P";
     string group = "-6PL12";
 
-    //readAddressMaps("./data/fec_ring_ccu_channel_group.txt");
+    ////readAddressMaps("./data/fec_ring_ccu_channel_group.txt");
 
-    // Check: pci or vme mode
-    if (strcasecmp (deviceType, "-pci") == 0)  // If pci
-    {
-        cout << "pci mode " << endl;
-        fecAddress = 0 ;
-        ringAddress = 0 ;
-    }
-    else if (strcasecmp (deviceType, "-vmecaenusb") == 0)  // If pci
-    {
-        cout << "vmecaenusb mode " << endl;
-        fecAddress = 5 ;
-        ringAddress = 0x7 ;
-    }
-    else if (strcasecmp (deviceType, "-vmecaenpci") == 0)  // If pci
-    {
-        cout << "vmecaenpci mode " << endl;
-        fecAddress = 9 ;
-        ringAddress = 0x8 ;
-    }
-    else if (strcasecmp (deviceType, "-utca") == 0)  // If utca
-    {
-        cout << "utca mode " << endl;
-        fecAddress = 0 ;
-        ringAddress = 0x0 ;
-    }
-    else
-    {
-        cout << "Please select PCI [-pci] or VME [-vmecaenusb]/[-vmecaenpci] or uTCA [-utca] mode " << endl;
-        return 0;
-    }
+    //// Check: pci or vme mode
+    //if (strcasecmp (deviceType, "-pci") == 0)  // If pci
+    //{
+    //cout << "pci mode " << endl;
+    //fecAddress = 0 ;
+    //ringAddress = 0 ;
+    //}
+    //else if (strcasecmp (deviceType, "-vmecaenusb") == 0)  // If pci
+    //{
+    //cout << "vmecaenusb mode " << endl;
+    //fecAddress = 5 ;
+    //ringAddress = 0x7 ;
+    //}
+    //else if (strcasecmp (deviceType, "-vmecaenpci") == 0)  // If pci
+    //{
+    //cout << "vmecaenpci mode " << endl;
+    //fecAddress = 9 ;
+    //ringAddress = 0x8 ;
+    //}
+    //else if (strcasecmp (deviceType, "-utca") == 0)  // If utca
+    //{
+    //cout << "utca mode " << endl;
+    //fecAddress = 0 ;
+    //ringAddress = 0x0 ;
+    //}
+    //else
+    //{
+    //cout << "Please select PCI [-pci] or VME [-vmecaenusb]/[-vmecaenpci] or uTCA [-utca] mode " << endl;
+    //return 0;
+    //}
 
-    //create fec access
-    try
-    {
-        fecAccess = createFecAccess ( argc, argv, &cnt, 9 ) ;  // fecslot // JMTBAD should this 20 be 9? diff when porting from slc4 box
-    }
-    catch (FecExceptionHandler e)
-    {
+    ////create fec access
+    //try
+    //{
+    //fecAccess = createFecAccess ( argc, argv, &cnt, 9 ) ;  // fecslot // JMTBAD should this 20 be 9? diff when porting from slc4 box
+    //}
+    //catch (FecExceptionHandler e)
+    //{
 
-        cout << "------------ Exception ----------" << std::endl ;
-        cout << e.what()  << std::endl ;
-        cout << "---------------------------------" << std::endl ;
-        exit (EXIT_FAILURE) ;
-    }
-    cout << "FecAccess created " << endl;
+    //cout << "------------ Exception ----------" << std::endl ;
+    //cout << e.what()  << std::endl ;
+    //cout << "---------------------------------" << std::endl ;
+    //exit (EXIT_FAILURE) ;
+    //}
+    //cout << "FecAccess created " << endl;
 
-    fecAccess->setForceAcknowledge (fack) ;
-    fecAccess->seti2cChannelSpeed (i2cSpeed) ;
+    ffecAccess->setForceAcknowledge (fack) ;
+    ffecAccess->seti2cChannelSpeed (i2cSpeed) ;
     printf("\n\n\nJMT JMT JMT NO RESET\n\n\n");
     //resetPlxFec ( fecAccess, fecAddress, ringAddress, loop, 0 );
     //testScanCCU ( fecAccess, fecAddress, ringAddress, false );
@@ -169,15 +163,15 @@ int TkFECInterface::RunInteracitve(char* deviceType, int port, unsigned int fecA
     lock.release();
 
     MultiplexingServer serv;
-    if (argc == 4)
-    {
-        if ((strcasecmp (argv[2], "-port") == 0))
-        {
-            int port = atoi(argv[3]);
-            cout << "port = " << port << endl;
-            serv.open(port);
-        }
-    }
+    //if (argc == 4)
+    //{
+    //if ((strcasecmp (argv[2], "-port") == 0))
+    //{
+    //int port = atoi(argv[3]);
+    cout << "port = " << port << endl;
+    serv.open(port);
+    //}
+    //}
 
     while ( serv.eventloop() )
     {
@@ -312,18 +306,18 @@ int TkFECInterface::RunInteracitve(char* deviceType, int port, unsigned int fecA
         else
         {
             lock.acquire();
-            response = handle(tokens, sector, group, fecAccess, fecAddress, ringAddress, ccuAddress, channelAddress, piaChannelAddress, loop);
+            response = handle(tokens, sector, group, ffecAccess, fecAddress, ringAddress, ccuAddress, channelAddress, piaChannelAddress, loop);
             cout << response << endl;
             lock.release();
         }
     }
 
     lock.acquire();
-    if (fecAccess != NULL)
+    if (ffecAccess != NULL)
     {
         try
         {
-            delete fecAccess ;
+            delete ffecAccess ;
         }
         catch (FecExceptionHandler e)
         {
@@ -343,8 +337,8 @@ int TkFECInterface::RunInteracitve(char* deviceType, int port, unsigned int fecA
 
 /* helper function that chops a string into a vector of strings */
 void TkFECInterface::tokenize(const string& str,
-              vector<string>& tokens,
-              const string& symbols)
+                              vector<string>& tokens,
+                              const string& symbols)
 {
     const string whitespace = " \n";
     const string doublequotes = "\"";

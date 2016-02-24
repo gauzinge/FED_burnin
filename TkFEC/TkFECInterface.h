@@ -54,30 +54,31 @@ map< string, unsigned int > ringAddressMap;
 map< string, unsigned int > ccuAddressMap;
 map< string, unsigned int > channelAddressMap;  // key = group
 
-class TkFECInterface {
-    public:
-TkFECInterface();
-~TkFECInterface();
+class TkFECInterface
+{
+public:
+    TkFECInterface(const std::string& pHardwareId, const std::string& pUri, const std::string& pAddressTable);
+    ~TkFECInterface();
 
-string writeI2C(unsigned int fecAddress, unsigned int ringAddress, unsigned int ccuAddress, unsigned int channelAddress, unsigned int deviceAddress, unsigned int deviceValue);
+    string writeI2C(unsigned int fecAddress, unsigned int ringAddress, unsigned int ccuAddress, unsigned int channelAddress, unsigned int deviceAddress, unsigned int deviceValue);
 
-string readI2C(unsigned int fecAddress, unsigned int ringAddress, unsigned int ccuAddress, unsigned int channelAddress, unsigned int deviceAddress);
-
-
-int RunInteracitve(char* deviceType, int port, unsigned int fecAddress, unsigned int ringAddress, unsigned int channelAddress, unsigned int ccuAddress, unsigned int piaChannelAddress);
-    
+    string readI2C(unsigned int fecAddress, unsigned int ringAddress, unsigned int ccuAddress, unsigned int channelAddress, unsigned int deviceAddress);
 
 
-    private:
-FecAccess* ffecAccess;
-long floop;
-enumDeviceType fmodeType = PHILIPS ;
-unsigned long ftms; 
+    int RunInteracitve(char* deviceType, int port, unsigned int fecAddress, unsigned int ringAddress, unsigned int channelAddress, unsigned int ccuAddress, unsigned int piaChannelAddress);
 
-    private:
-void readAddressMaps(const string filename);
-string printAddressMap();
-void tokenize(const string& str, vector<string>& tokens, const string& symbols);
 
-string handle(vector<string> tokens, string sector, string group, FecAccess *fecAccess, unsigned int fecAddress, unsigned int ringAddress, unsigned int ccuAddress, unsigned int channelAddress, unsigned int piaChannelAddress, long loop );
+
+private:
+    FecAccess* ffecAccess;
+    long floop;
+    enumDeviceType fmodeType = PHILIPS ;
+    unsigned long ftms;
+
+private:
+    void readAddressMaps(const string filename);
+    string printAddressMap();
+    void tokenize(const string& str, vector<string>& tokens, const string& symbols);
+
+    string handle(vector<string> tokens, string sector, string group, FecAccess *fecAccess, unsigned int fecAddress, unsigned int ringAddress, unsigned int ccuAddress, unsigned int channelAddress, unsigned int piaChannelAddress, long loop );
 };

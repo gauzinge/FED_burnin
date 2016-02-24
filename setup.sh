@@ -1,8 +1,17 @@
 #!/bin/bash
-echo 'creating lib!'
-mkdir lib
-echo 'creating bin!'
-mkdir bin
+if [ ! -d "lib" ]
+then
+    echo 'creating lib!'
+    mkdir lib
+fi
+
+if [ ! -d "bin" ]
+then
+    echo 'creating bin!'
+    mkdir bin
+fi
+
+
 #CACTUS
 export CACTUSBIN=/opt/cactus/bin
 export CACTUSLIB=/opt/cactus/lib
@@ -18,8 +27,6 @@ export BOOST_INCLUDE=/opt/cactus/include
 #export QMAKESPEC=
 #export QTROOTSYSDIR=/usr/local/qtRoot/root
 
-#ROOT
-#source /usr/local/bin/thisroot.sh
 
 #FED Burnin
 export BASE_DIR=$(pwd)
@@ -27,3 +34,4 @@ export BASE_DIR=$(pwd)
 export PATH=$BASE_DIR/bin:$PATH
 export LD_LIBRARY_PATH=$CACTUSLIB:$BASE_DIR/lib:${LD_LIBRARY_PATH}
 export PATH=/usr/local/bin:/usr/bin:~/bin:${CACTUSBIN}:${AMC13BIN}:$PATH
+

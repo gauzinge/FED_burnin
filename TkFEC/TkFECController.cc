@@ -13,12 +13,25 @@ TkFECController::~TkFECController()
 void TkFECController::ConfigureRing()
 {
     // loop the CCU nodes and then the i2c nodes and call write I2C method
+    for (auto& cCCU : fCCUVector)
+    {
+        unsigned int cFecAddress = 0;
+        unsigned int cRingAddress = cCCU->fRingId;
+        unsigned int cCCUAddress  = cCCU->fAddress;
+        for (auto& ci2c : cCCU->fChannelVector)
+        {
+            unsigned int cChannel = ci2c->fChannel;
+            unsigned int cDeviceAddress = ci2c->fAddress;
+            unsigned int cDeviceValue = ci2c->fValue;
 
+            fTkFECInterface->writeI2C(cFecAddress, cRingAddress, cCCUAddress, cChannel, cDeviceAddress, cDeviceValue);
+        }
+    }
 }
 
 void TkFECController::RunInteracitve()
 {
-
+    fTkFECInterface->RunInteracitve(0, 0, 0, 0, 0);
 }
 
 void TkFECController::InitializeTkFEC(const std::string& pFilename, std::ostream& os )

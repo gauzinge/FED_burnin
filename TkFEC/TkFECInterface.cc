@@ -66,7 +66,7 @@ std::string TkFECInterface::readI2C(unsigned int fecAddress, unsigned int ringAd
     return getI2CDevice ( ffecAccess, fecAddress, ringAddress, ccuAddress, channelAddress, deviceAddress, fmodeType, floop, ftms) ;
 }
 
-int TkFECInterface::RunInteracitve(char* deviceType, int port, unsigned int fecAddress, unsigned int ringAddress, unsigned int channelAddress, unsigned int ccuAddress, unsigned int piaChannelAddress)
+int TkFECInterface::RunInteracitve(unsigned int fecAddress, unsigned int ringAddress, unsigned int channelAddress, unsigned int ccuAddress, unsigned int piaChannelAddress)
 //int main(int argc, char *argv[])
 {
     // need to create a char* argv[]
@@ -168,6 +168,7 @@ int TkFECInterface::RunInteracitve(char* deviceType, int port, unsigned int fecA
     //if ((strcasecmp (argv[2], "-port") == 0))
     //{
     //int port = atoi(argv[3]);
+    int port = 2002;
     cout << "port = " << port << endl;
     serv.open(port);
     //}

@@ -3,7 +3,7 @@
     <AMC13>
         <connection id="T1" uri="chtcp-2.0://cmsuppixch:10203?target=amc13T101:50001" address_table="file://settings/AMC13XG_T1.xml" />
         <connection id="T2" uri="chtcp-2.0://cmsuppixch:10203?target=amc13T201:50001" address_table="file://settings/AMC13XG_T2.xml" />
-        <AMCmask enable="9,5" />
+        <AMCmask enable="9,5,10" />
         <!--This is used to send a calibration Trigger via the AMC13s internal BGO mechanism, 0x2c is the command configured as BGO15 
              on the TTCci - repeat is obvious, prescale is in orbits, the bx is selected such that it occurs 98 BX before the local
 	     L1A which is periodic at BX500 every orbit-->
@@ -15,7 +15,7 @@
 	<TTCSimulator>0</TTCSimulator>
     </AMC13>
     <PixFED Id="0" boardType="CTA">
-        <connection id="board0" uri="chtcp-2.0://cmsuppixch:10203?target=devfed:50001" address_table="file://settings/address_table.xml" />
+        <connection id="board0" uri="chtcp-2.0://cmsuppixch:10203?target=pilotfed:50001" address_table="file://settings/address_table.xml" />
         <!-- Trigger -->
         <!--Used to set the CLK input to the TTC clock from the BP - 3 is XTAL, 0 is BP-->
         <Register name="ctrl.ttc_xpoint_A_out3">0</Register>
@@ -30,17 +30,17 @@
         <Register name="pixfed_ctrl_regs.TBM_MASK_3">0xFFFFFFFF</Register>
         <!-- FITELS -->
         <Fitel_Files path="./settings/" />
-        <!--<Fitel FMC="0" Id="0" file="FMC0_Fitel0.txt" />-->
-        <!--<Fitel FMC="0" Id="1" file="FMC0_Fitel1.txt" />-->
-        <Fitel FMC="1" Id="0" file="FMC1_Fitel0.txt" />
-        <Fitel FMC="1" Id="1" file="FMC1_Fitel1.txt" />
+        <Fitel FMC="0" Id="0" file="FMC0_Fitel0.txt" />
+        <Fitel FMC="0" Id="1" file="FMC0_Fitel1.txt" />
+        <!--<Fitel FMC="1" Id="0" file="FMC1_Fitel0.txt" />-->
+        <!--<Fitel FMC="1" Id="1" file="FMC1_Fitel1.txt" />-->
     </PixFED>
 </HwDescription>
 <Settings>
     <!--Setting name="NTBM">2</Setting-->
     <!--<Setting name="ChannelOfInterest">0</Setting>-->
     <!-- 0 indexed -->
-    <Setting name="ChannelOfInterest">4</Setting>
+    <Setting name="ChannelOfInterest">7</Setting>
     <!-- 0 indexed -->
     <Setting name="ROCOfInterest">1</Setting>
     <Setting name="BlockSize">512</Setting>

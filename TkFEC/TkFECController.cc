@@ -88,7 +88,7 @@ void TkFECController::parseTkFECxml(const std::string& pFilename, std::ostream& 
         }
 
         // here create the tkFEC interface, whatever it might be
-        //fTkFECInterface = new TkFECInterface(cId, cUri, cAddress);
+        fTkFECInterface = new TkFECInterface(cId, cUri, cAddress);
     }
 
 }

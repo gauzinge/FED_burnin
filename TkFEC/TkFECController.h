@@ -8,7 +8,7 @@
 #include <iostream>
 #include <map>
 #include <string>
-//#include "TkFECInterface.h"
+#include "TkFECInterface.h"
 
 class TkFECController
 {
@@ -24,7 +24,7 @@ public:
     void RunInteracitve();
 
     //Interface to contain the wrapper to the FEC software (to be seen if used)
-    //TkFECInterface* fTkFECInterface;
+    TkFECInterface* fTkFECInterface;
     // vector of CCUs to contain the i2c values
     std::vector<CCU*> fCCUVector;
 

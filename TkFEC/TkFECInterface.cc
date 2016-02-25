@@ -247,62 +247,62 @@ int TkFECInterface::RunInteracitve(char* deviceType, int port, unsigned int fecA
             else
                 cout << "wrong number of parameters! loop needs 1 parameter" << endl;
         }
-        else if (tokens[0] == "group")
-        {
-            if (tokens.size() > 1)
-            {
+        //else if (tokens[0] == "group")
+        //{
+        //if (tokens.size() > 1)
+        //{
 
-                string l_group = tokens[1];
-                string l_sector = l_group.substr(0, 3);
-                if ((fecAddressMap[l_sector] == 0) || (channelAddressMap[l_group] == 0))
-                {
-                    cout << "invalid group description" << endl;
-                }
-                else
-                {
-                    group = l_group;
-                    sector = l_sector;
-                    fecAddress = fecAddressMap[sector]  ;
-                    ringAddress = ringAddressMap[sector] ;
-                    ccuAddress = ccuAddressMap[sector];
-                    channelAddress = channelAddressMap[group] ;
-                    cout << "Group set to " << group << endl << "\t but caution: PIA address unchanged." << endl;
-                }
-            }
-            else
-            {
-                cout << "wrong number of parameters! group needs 1 parameter" << endl;
-            }
-        }
+        //string l_group = tokens[1];
+        //string l_sector = l_group.substr(0, 3);
+        //if ((fecAddressMap[l_sector] == 0) || (channelAddressMap[l_group] == 0))
+        //{
+        //cout << "invalid group description" << endl;
+        //}
+        //else
+        //{
+        //group = l_group;
+        //sector = l_sector;
+        //fecAddress = fecAddressMap[sector]  ;
+        //ringAddress = ringAddressMap[sector] ;
+        //ccuAddress = ccuAddressMap[sector];
+        //channelAddress = channelAddressMap[group] ;
+        //cout << "Group set to " << group << endl << "\t but caution: PIA address unchanged." << endl;
+        //}
+        //}
+        //else
+        //{
+        //cout << "wrong number of parameters! group needs 1 parameter" << endl;
+        //}
+        //}
 
-        else if (tokens[0] == "sector")
-        {
-            if (tokens.size() > 1)
-            {
-                string l_sector = tokens[1];
-                if (fecAddressMap[l_sector] == 0)
-                {
-                    cout << "invalid sector description" << endl;
-                }
-                else
-                {
-                    sector = l_sector;
-                    cout << "Sector set to " << sector << endl;
-                    fecAddress = fecAddressMap[sector]  ;
-                    ringAddress = ringAddressMap[sector] ;
-                    ccuAddress = ccuAddressMap[sector];
-                    channelAddress = channelAddressMap[group] ;
-                }
-            }
-            else
-            {
-                cout << "wrong number of parameters! sector needs 1 parameter" << endl;
-            }
+        //else if (tokens[0] == "sector")
+        //{
+        //if (tokens.size() > 1)
+        //{
+        //string l_sector = tokens[1];
+        //if (fecAddressMap[l_sector] == 0)
+        //{
+        //cout << "invalid sector description" << endl;
+        //}
+        //else
+        //{
+        //sector = l_sector;
+        //cout << "Sector set to " << sector << endl;
+        //fecAddress = fecAddressMap[sector]  ;
+        //ringAddress = ringAddressMap[sector] ;
+        //ccuAddress = ccuAddressMap[sector];
+        //channelAddress = channelAddressMap[group] ;
+        //}
+        //}
+        //else
+        //{
+        //cout << "wrong number of parameters! sector needs 1 parameter" << endl;
+        //}
 
 
 
-            // handle the request
-        }
+        //// handle the request
+        //}
         else
         {
             lock.acquire();
@@ -379,58 +379,58 @@ void TkFECInterface::tokenize(const string& str,
     }
 }
 
-string TkFECInterface::printAddressMap()
-{
-    string line;
-    map<string, unsigned int>::const_iterator itr;
-    std::ostringstream o;
-    for (itr = fecAddressMap.begin(); itr != fecAddressMap.end(); ++itr)
-    {
-        string sector = itr->first;
-        //   cout <<  (*itr).first << " Value: " << (*itr).second;
-        o << sector << " " << fecAddressMap[sector] << " "
-          << ringAddressMap[sector] << " " << ccuAddressMap[sector] << endl;
-        // JMTBAD PIA channel
-    }
-    return o.str();
-}
+//string TkFECInterface::printAddressMap()
+//{
+//string line;
+//map<string, unsigned int>::const_iterator itr;
+//std::ostringstream o;
+//for (itr = fecAddressMap.begin(); itr != fecAddressMap.end(); ++itr)
+//{
+//string sector = itr->first;
+////   cout <<  (*itr).first << " Value: " << (*itr).second;
+//o << sector << " " << fecAddressMap[sector] << " "
+//<< ringAddressMap[sector] << " " << ccuAddressMap[sector] << endl;
+//// JMTBAD PIA channel
+//}
+//return o.str();
+//}
 
 
 
-void TkFECInterface::readAddressMaps(const string filename)
-{
-    string line;
-    ifstream myfile (filename.c_str());
-    if (myfile.is_open())
-    {
+//void TkFECInterface::readAddressMaps(const string filename)
+//{
+//string line;
+//ifstream myfile (filename.c_str());
+//if (myfile.is_open())
+//{
 
-        while (! myfile.eof() )
-        {
-            getline (myfile, line);
-            if (line[0] == '#' || line == "") continue;
-            vector<string> column;  // must clear when declared outside of the loop
-            tokenize(line , column, "");
+//while (! myfile.eof() )
+//{
+//getline (myfile, line);
+//if (line[0] == '#' || line == "") continue;
+//vector<string> column;  // must clear when declared outside of the loop
+//tokenize(line , column, "");
 
-            if (column.size() == 5)
-            {
-                string group = column[4].c_str();
-                string sector = group.substr(0, 3);
-                fecAddressMap[sector] = atoi(column[0].c_str());
-                ringAddressMap[sector] = strtol (column[1].c_str(), NULL, 16);
-                ccuAddressMap[sector] = strtol (column[2].c_str(), NULL, 16);
-                channelAddressMap[group] = strtol (column[3].c_str(), NULL, 16);
-                // JMTBAD PIA channel
-                //cout << line << " ===>"   << group << " " << sector << " " << fecAddressMap[sector] << endl;
-            }
-        }
-    }
-    else
-    {
-        cout << "error reading address table " << filename << endl;
-        exit(1);
-    }
-    printAddressMap();
-}
+//if (column.size() == 5)
+//{
+//string group = column[4].c_str();
+//string sector = group.substr(0, 3);
+//fecAddressMap[sector] = atoi(column[0].c_str());
+//ringAddressMap[sector] = strtol (column[1].c_str(), NULL, 16);
+//ccuAddressMap[sector] = strtol (column[2].c_str(), NULL, 16);
+//channelAddressMap[group] = strtol (column[3].c_str(), NULL, 16);
+//// JMTBAD PIA channel
+////cout << line << " ===>"   << group << " " << sector << " " << fecAddressMap[sector] << endl;
+//}
+//}
+//}
+//else
+//{
+//cout << "error reading address table " << filename << endl;
+//exit(1);
+//}
+//printAddressMap();
+//}
 
 
 
@@ -775,13 +775,13 @@ string TkFECInterface::handle(vector<string> tokens, string sector, string group
     }
     //************************************PRINTADDRESSMAP
     //************************************
-    else if (tokens[0] == "printAddressMap")
-    {
+    //else if (tokens[0] == "printAddressMap")
+    //{
 
-        return printAddressMap();
+    //return printAddressMap();
 
 
-    }
+    //}
 
     //************************************DCDCENABLETES
     else if (tokens[0] == "dcdcenabletest")
@@ -1137,18 +1137,18 @@ string TkFECInterface::handle(vector<string> tokens, string sector, string group
             unsigned int l_ringAddress, l_ccuAddress;
 
             string sectorName = tokens[1];
-            try
-            {
-                l_fecAddress = fecAddressMap[sectorName];
-                l_ringAddress = ringAddressMap[sectorName];
-                l_ccuAddress = ccuAddressMap[sectorName];
-                //cout << "DEBUG i2c " <<  sectorName << " " << l_fecAddress << " " << l_ringAddress << " " << l_ccuAddress << endl;
-            }
-            catch (...)
-            {
-                cout << "sector " << sectorName << " not found in address table " << endl;
-                return "error";
-            }
+            //try
+            //{
+            //l_fecAddress = fecAddressMap[sectorName];
+            //l_ringAddress = ringAddressMap[sectorName];
+            //l_ccuAddress = ccuAddressMap[sectorName];
+            ////cout << "DEBUG i2c " <<  sectorName << " " << l_fecAddress << " " << l_ringAddress << " " << l_ccuAddress << endl;
+            //}
+            //catch (...)
+            //{
+            //cout << "sector " << sectorName << " not found in address table " << endl;
+            //return "error";
+            //}
             unsigned int AddressChannel = strtol (tokens[2].c_str(), NULL, 16);
             deviceAddress = strtol (tokens[3].c_str(), NULL, 16);
             if (tokens[4] == "read")
@@ -2136,16 +2136,16 @@ string TkFECInterface::handle(vector<string> tokens, string sector, string group
         }
         return PIOrw(fecAccess, fecAddress, ringAddress, ccuAddress, 0x30, value);
     }
-    else if ((tokens.size() == 2) && (tokens[0] == "pio") && (tokens[1] == "init") )
-    {
-        string msg = "";
-        for (map< string, unsigned int >::iterator it = ccuAddressMap.begin(); it != ccuAddressMap.end(); it++)
-        {
-            string s = it->first; // sector name
-            msg += s + ":" + PIOrw(fecAccess, fecAddressMap[s], ringAddressMap[s], ccuAddressMap[s], 0xFF);
-        }
-        return msg;
-    }
+    //else if ((tokens.size() == 2) && (tokens[0] == "pio") && (tokens[1] == "init") )
+    //{
+    //string msg = "";
+    //for (map< string, unsigned int >::iterator it = ccuAddressMap.begin(); it != ccuAddressMap.end(); it++)
+    //{
+    //string s = it->first; // sector name
+    //msg += s + ":" + PIOrw(fecAccess, fecAddressMap[s], ringAddressMap[s], ccuAddressMap[s], 0xFF);
+    //}
+    //return msg;
+    //}
     else
     {
         return string("not an option! options: \[help] lists valid options");

@@ -49,10 +49,10 @@ using namespace std;
 
 // address table
 //map< string, int > fecAddressMap;               // key = sector
-map< string, unsigned int > fecAddressMap;       // key = sector
-map< string, unsigned int > ringAddressMap;
-map< string, unsigned int > ccuAddressMap;
-map< string, unsigned int > channelAddressMap;  // key = group
+//map< string, unsigned int > fecAddressMap;       // key = sector
+//map< string, unsigned int > ringAddressMap;
+//map< string, unsigned int > ccuAddressMap;
+//map< string, unsigned int > channelAddressMap;  // key = group
 
 class TkFECInterface
 {
@@ -76,8 +76,8 @@ private:
     unsigned long ftms;
 
 private:
-    void readAddressMaps(const string filename);
-    string printAddressMap();
+    //void readAddressMaps(const string filename);
+    //string printAddressMap();
     void tokenize(const string& str, vector<string>& tokens, const string& symbols);
 
     string handle(vector<string> tokens, string sector, string group, FecAccess *fecAccess, unsigned int fecAddress, unsigned int ringAddress, unsigned int ccuAddress, unsigned int channelAddress, unsigned int piaChannelAddress, long loop );

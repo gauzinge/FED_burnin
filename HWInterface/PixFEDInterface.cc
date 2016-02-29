@@ -103,7 +103,7 @@ std::vector<uint32_t> PixFEDInterface::ReadBlockBoardReg( PixFED * pFED, const s
 //FITEL METHODS
 /////////////////////////
 
-void PixFEDInterface::ConfigureFitel( const Fitel* pFitel, bool pVerifLoop )
+void PixFEDInterface::ConfigureFitel( Fitel* pFitel, bool pVerifLoop )
 {
     setBoard( pFitel->getBeId() );
 
@@ -214,47 +214,12 @@ void PixFEDInterface::ConfigureFitel( const Fitel* pFitel, bool pVerifLoop )
             }
         }
     }
+    // this part until now wrote 0x02 to all Channels which disables them
+    // now I go over the ChannelList of the Fitel object and do a write and enable all the channels
+    toggleFitelChannels(pFitel, true);
 }
 
-void PixFEDInterface::ReadLightOnFibre( const Fitel* pFitel )
-{
-    setBoard( pFitel->getBeId() );
-
-    //std::vector<uint32_t> cVecWrite;
-    std::vector<uint32_t> cVecRead;
-
-    uint32_t cCounter = 0;
-    FitelRegMap cFitelRegMap = pFitel->getRegMap();
-    //FitelRegMap::iterator cIt = cFitelRegMap.begin();
-    for ( int cFibre = 1; cFibre < 13; cFibre++ )
-    {
-        std::string cRegname = "Ch";
-        std::stringstream ss;
-        ss << "Ch" << std::setw(2) << std::setfill('0') << cFibre << "_InterruptReg";
-        FitelRegMap::iterator cIt = cFitelRegMap.find(ss.str());
-
-        FitelRegItem cItem = cIt->second;
-        cItem.fValue = 0;
-
-        EncodeFitelReg( cItem, pFitel->getFMCId(), pFitel->getFitelId(), cVecRead );
-        cCounter++;
-    }
-
-    uint8_t cFMCId = pFitel->getFMCId();
-    uint8_t cFitelId = pFitel->getFitelId();
-
-    fFEDFW->ReadFitelBlockReg( cVecRead );
-    for (int cItem = 0; cItem < cVecRead.size(); cItem++)
-    {
-        FitelRegItem cRegItemRead;
-        DecodeFitelReg( cRegItemRead, cFMCId, cFitelId, cVecRead.at(cItem) );
-        if (cRegItemRead.fValue == 0x80)
-            std::cout << RED <<  "Detected Light on FMC: " << +cFMCId <<  " Fitel Id: " << +cFitelId  << " Fibre: " << cItem << " Value: " << +cRegItemRead.fValue <<  RESET << std::endl;
-
-    }
-}
-
-bool PixFEDInterface::WriteFitelReg(Fitel * pFitel, const std::string & pRegNode, uint8_t pValue, bool pVerifLoop)
+bool PixFEDInterface::WriteFitelReg( Fitel * pFitel, const std::string & pRegNode, uint8_t pValue, bool pVerifLoop)
 {
     FitelRegItem cRegItem = pFitel->getRegItem( pRegNode );
     std::vector<uint32_t> cVecWrite;
@@ -342,6 +307,22 @@ bool PixFEDInterface::WriteFitelReg(Fitel * pFitel, const std::string & pRegNode
     else return true;
 }
 
+void PixFEDInterface::toggleFitelChannels(Fitel* pFitel, bool pEnable)
+{
+    //enable the used fibres from the Fitel object again
+    for (auto& cChannel : pFitel->fChEnableVec)
+    {
+        //temporary fix: Fibre 1 corresponds to FITEL channel 12 an vice versa
+        char tmp[25];
+        snprintf( tmp, sizeof(tmp), "Ch%02d_ConfigReg", cChannel);
+        std::cout << tmp << std::endl;
+        // setting the value to 0x08 enables the channel, 0x02 disables it
+        // setting it to 0x0c enables the RSSI readback
+        uint8_t cValue = (pEnable) ? 0x08 : 0x02;
+        WriteFitelReg(pFitel, std::string(tmp), cValue, false);
+    }
+}
+
 std::vector<double> PixFEDInterface::ReadADC( Fitel* pFitel, uint32_t pChan, bool pPrintAll)
 {
     pChan = (pChan % 12 ) + 1;
@@ -353,13 +334,19 @@ std::vector<double> PixFEDInterface::ReadADC( Fitel* pFitel, uint32_t pChan, boo
     // write the selected Channel 0x0c to enable that specific channel
     WriteFitelReg(pFitel, "AllCh_ConfigReg", 0x02, false);
     char tmp[25];
+    //temporary fix: Fibre 1 corresponds to FITEL channel 12 an vice versa
+
     snprintf( tmp, sizeof(tmp), "Ch%02d_ConfigReg", pChan);
     WriteFitelReg(pFitel, std::string(tmp), 0x0c, false);
 
     // now read the actual ADC value
     std::vector<double> cADCValues = fFEDFW->ReadADC(pFitel->getFMCId(), pFitel->getFitelId(), pPrintAll);
 
-    WriteFitelReg(pFitel, "AllCh_ConfigReg", 0x0c, false);
+    //disable all channels again
+    WriteFitelReg(pFitel, "AllCh_ConfigReg", 0x02, false);
+
+    toggleFitelChannels(pFitel, true);
+    //WriteFitelReg(pFitel, "AllCh_ConfigReg", 0x0c, false);
     return cADCValues;
 }
 

@@ -113,15 +113,15 @@ public:
         fFEDFW->DecodeReg( pRegItem, pFMCId, pFitelId, pWord );
     }
 
-    bool WriteFitelReg(Fitel* pFitel, const std::string& pRegNode, uint8_t pValue, bool pVerifLoop = true);
+    bool WriteFitelReg( Fitel* pFitel, const std::string& pRegNode, uint8_t pValue, bool pVerifLoop = true);
 
-    uint8_t ReadFitelReg(Fitel* pFitel, const std::string& pRegNode);
+    uint8_t ReadFitelReg( Fitel* pFitel, const std::string& pRegNode);
 
-    void ConfigureFitel(const Fitel* pFitel, bool pVerifLoop = true);
-
-    void ReadLightOnFibre(const Fitel* pFitel);
+    void ConfigureFitel( Fitel* pFitel, bool pVerifLoop = true);
 
     std::vector<double> ReadADC( Fitel* pFitel, uint32_t pChan, bool pPrintAll = false );
+
+    void toggleFitelChannels(Fitel* pFitel, bool pEnable);
     /////////////////////////////////////
     // PixFED System Methods
     /////////////////////////////////////

@@ -21,6 +21,7 @@
 #include <stdint.h>
 #include <utility>
 #include <set>
+#include <vector>
 
 // Fitel2 Chip HW Description Class
 
@@ -36,6 +37,7 @@ class Fitel
 {
 
 public:
+    std::vector<int> fChEnableVec;
 
     // C'tors with object FE Description
     Fitel( uint8_t pBeId, uint8_t pFMCId, uint8_t pFitelId, const std::string& filename );

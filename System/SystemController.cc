@@ -104,6 +104,7 @@ void SystemController::parseHWxml( const std::string& pFilename, std::ostream& o
         os << BOLDCYAN << cBeBoardNode.name() << "  " << cBeBoardNode.first_attribute().name() << " :" << cBeBoardNode.attribute( "Id" ).value() << RESET << std::endl;
 
         cBeId = cBeBoardNode.attribute( "Id" ).as_int();
+        //std::cout << +cBeId << std::endl;
         PixFED* cPixFED = new PixFED( cBeId );
 
         // the connection ID is not used but built in RegManager constructor!
@@ -135,6 +136,24 @@ void SystemController::parseHWxml( const std::string& pFilename, std::ostream& o
                 cFileName = cFilePrefix + cFitelNode.attribute( "file" ).value();
             else cFileName = cFitelNode.attribute( "file" ).value();
             Fitel* cFitel = new Fitel( cBeId, cFitelNode.attribute( "FMC" ).as_int(), cFitelNode.attribute( "Id" ).as_int(), cFileName );
+
+            // parse the list of enabled channels from the config file to apply this after configuration
+            if (std::string(cFitelNode.attribute("Enable").name()) == "Enable")
+            {
+                //for ( pugi::xml_node cNode = pNode.child( "AMCmask" ); cNode; cNode = cNode.next_sibling("AMCmask") )
+                //{
+                std::string cList = std::string(cFitelNode.attribute("Enable").value());
+                std::string ctoken;
+                std::stringstream cStr(cList);
+
+                os <<  BOLDCYAN << "|    |" << "----" << "List of Enabled Channels: ";
+                while (std::getline(cStr, ctoken, ','))
+                {
+                    cFitel->fChEnableVec.push_back(convertAnyInt( ctoken.c_str() ));
+                    os << GREEN << ctoken << BOLDCYAN << ", ";
+                }
+                os << RESET << std::endl;
+            }
             cPixFED->addFitel(cFitel);
         }
         fPixFEDVector.push_back(cPixFED);

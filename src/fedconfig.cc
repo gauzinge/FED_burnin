@@ -37,8 +37,6 @@ int main(int argc, char* argv[] )
     cSystemController.ConfigureHw(std::cout );
 
     cAmc13Controller.fAmc13Interface->StartL1A();
-    //for (fAmc13Controller->BGO vector)
-    //cAmc13Controller.fAmc13Interface->EnableBGO(0);
 
     auto cSetting = cSystemController.fSettingsMap.find("NAcq");
     int cNAcq = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 10;
@@ -59,7 +57,7 @@ int main(int argc, char* argv[] )
             cSystemController.fFEDInterface->ReadLightOnFibre(cFitel);
             cSystemController.fFEDInterface->ReadADC(cFitel, cChannelOfInterest, true);
         }
-        //cSystemController.fFEDInterface->getBoardInfo(cFED);
+        cSystemController.fFEDInterface->getBoardInfo(cFED);
         cSystemController.fFEDInterface->findPhases(cFED, cChannelOfInterest);
     }
 
@@ -74,7 +72,7 @@ int main(int argc, char* argv[] )
             cSystemController.fFEDInterface->readSpyFIFO(cFED);
             cSystemController.fFEDInterface->readFIFO1(cFED);
             cSystemController.fFEDInterface->readOSDWord(cFED, cROCOfInterest, cChannelOfInterest);
-            // cSystemController.fFEDInterface->ReadData(cFED, 0 );
+            //cSystemController.fFEDInterface->ReadData(cFED, 0 );
         }
     }
 

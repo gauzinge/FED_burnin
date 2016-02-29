@@ -3,11 +3,11 @@
     <AMC13>
         <connection id="T1" uri="chtcp-2.0://cmsuppixch:10203?target=amc13T101:50001" address_table="file://settings/AMC13XG_T1.xml" />
         <connection id="T2" uri="chtcp-2.0://cmsuppixch:10203?target=amc13T201:50001" address_table="file://settings/AMC13XG_T2.xml" />
-        <AMCmask enable="4,9,5" />
+        <AMCmask enable="3,4,5,9,10" />
         <!--This is used to send a calibration Trigger via the AMC13s internal BGO mechanism, 0x2c is the command configured as BGO15 
              on the TTCci - repeat is obvious, prescale is in orbits, the bx is selected such that it occurs 98 BX before the local
 	     L1A which is periodic at BX500 every orbit-->
-        <BGO command="0x2c" repeat="1" prescale="0" bx="381"/>
+        <BGO command="0x2c" repeat="1" prescale="0" bx="380"/>
         <!-- Local enables Local L1A, mode 0 means a trigger every orbit at BX500, rate is 1 for every orbit and burst is 1 
              for 1 trigger when sending burst (equivalent to single trigger -->
         <Trigger local="1" mode="0" rate="1" burst="1" rules="0"/>
@@ -19,13 +19,13 @@
         <!-- Trigger -->
         <!--Used to set the CLK input to the TTC clock from the BP - 3 is XTAL, 0 is BP-->
         <Register name="ctrl.ttc_xpoint_A_out3">0</Register>
-        <Register name="pixfed_ctrl_regs.TRIGGER_SEL">0</Register>
+        <!--<Register name="pixfed_ctrl_regs.TRIGGER_SEL">0</Register>-->
         <!--<Register name="pixfed_ctrl_regs.INTERNAL_TRIG_EN">0</Register>-->
         <Register name="pixfed_ctrl_regs.data_type">2</Register>
         <!--<Register name="pixfed_ctrl_regs.INT_TRIGGER_FREQ_SEL">9</Register>-->
         <!--<Register name="pixfed_ctrl_regs.PACKET_NB">10</Register>-->
         <!-- TBM MASK -->
-        <Register name="pixfed_ctrl_regs.TBM_MASK_1">0xFFFFFFFC</Register>
+        <Register name="pixfed_ctrl_regs.TBM_MASK_1">0xFFFFFCFF</Register>
         <Register name="pixfed_ctrl_regs.TBM_MASK_2">0xFFFFFFFF</Register>
         <Register name="pixfed_ctrl_regs.TBM_MASK_3">0xFFFFFFFF</Register>
         <!-- FITELS -->
@@ -40,7 +40,7 @@
     <!--Setting name="NTBM">2</Setting-->
     <!--<Setting name="ChannelOfInterest">0</Setting>-->
     <!-- 0 indexed -->
-    <Setting name="ChannelOfInterest">8</Setting>
+    <Setting name="ChannelOfInterest">0</Setting>
     <!-- 0 indexed -->
     <Setting name="ROCOfInterest">1</Setting>
     <Setting name="BlockSize">512</Setting>

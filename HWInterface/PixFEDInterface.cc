@@ -307,6 +307,23 @@ bool PixFEDInterface::WriteFitelReg( Fitel * pFitel, const std::string & pRegNod
     else return true;
 }
 
+int PixFEDInterface::swap_channels(int pChan)
+{
+    if (pChan == 12) return 1;
+    else if (pChan == 11) return 2;
+    else if (pChan == 10) return 3;
+    else if (pChan == 9) return 4;
+    else if (pChan == 8) return 5;
+    else if (pChan == 7) return 6;
+    else if (pChan == 6) return 7;
+    else if (pChan == 5) return 8;
+    else if (pChan == 4) return 9;
+    else if (pChan == 3) return 10;
+    else if (pChan == 2) return 11;
+    else if (pChan == 1) return 12;
+    else return -99;
+}
+
 void PixFEDInterface::toggleFitelChannels(Fitel* pFitel, bool pEnable)
 {
     //enable the used fibres from the Fitel object again
@@ -314,7 +331,7 @@ void PixFEDInterface::toggleFitelChannels(Fitel* pFitel, bool pEnable)
     {
         //temporary fix: Fibre 1 corresponds to FITEL channel 12 an vice versa
         char tmp[25];
-        snprintf( tmp, sizeof(tmp), "Ch%02d_ConfigReg", cChannel);
+        snprintf( tmp, sizeof(tmp), "Ch%02d_ConfigReg", swap_channels( cChannel ) );
         std::cout << tmp << std::endl;
         // setting the value to 0x08 enables the channel, 0x02 disables it
         // setting it to 0x0c enables the RSSI readback
@@ -336,7 +353,7 @@ std::vector<double> PixFEDInterface::ReadADC( Fitel* pFitel, uint32_t pChan, boo
     char tmp[25];
     //temporary fix: Fibre 1 corresponds to FITEL channel 12 an vice versa
 
-    snprintf( tmp, sizeof(tmp), "Ch%02d_ConfigReg", pChan);
+    snprintf( tmp, sizeof(tmp), "Ch%02d_ConfigReg", swap_channels(pChan) );
     WriteFitelReg(pFitel, std::string(tmp), 0x0c, false);
 
     // now read the actual ADC value

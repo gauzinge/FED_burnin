@@ -30,8 +30,8 @@
         <Register name="pixfed_ctrl_regs.TBM_MASK_3">0xFFFFFFFF</Register>
         <!-- FITELS -->
         <Fitel_Files path="./settings/" />
-        <Fitel FMC="0" Id="0" file="FMCFITEL.txt" Enable="1,2" />
-        <Fitel FMC="0" Id="1" file="FMCFITEL.txt" Enable="" />
+        <Fitel FMC="0" Id="0" file="FMCFITEL.txt" Enable="" />
+        <Fitel FMC="0" Id="1" file="FMCFITEL.txt" Enable="1" />
         <!--<Fitel FMC="1" Id="0" file="FMC1_Fitel0.txt" />-->
         <!--<Fitel FMC="1" Id="1" file="FMC1_Fitel1.txt" />-->
     </PixFED>

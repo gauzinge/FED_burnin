@@ -121,7 +121,6 @@ public:
 
     std::vector<double> ReadADC( Fitel* pFitel, uint32_t pChan, bool pPrintAll = false );
 
-    void toggleFitelChannels(Fitel* pFitel, bool pEnable);
     /////////////////////////////////////
     // PixFED System Methods
     /////////////////////////////////////
@@ -251,6 +250,10 @@ public:
      * \param strId Firmware image identifier*/
     void DeleteFpgaConfig( PixFED* pFED, const std::string& strId );
 
+private:
+    void toggleFitelChannels(Fitel* pFitel, bool pEnable);
+
+    int swap_channels(int pChan);
 };
 
 #endif

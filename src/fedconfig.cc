@@ -60,21 +60,30 @@ int main(int argc, char* argv[] )
         cSystemController.fFEDInterface->findPhases(cFED, cChannelOfInterest);
     }
 
+    //std::cout << "Monitoring Phases for selected Channel of Interest for 10 seconds ... " << std::endl << std::endl;
+    //std::cout << BOLDGREEN << "FIBRE CTRL_RDY CNTVAL_Hi CNTVAL_Lo   pattern:                     S H1 L1 H0 L0   W R" << RESET << std::endl;
+    //while (true)
+    //{
+        //for (auto& cFED : cSystemController.fPixFEDVector)
+        //{
+            //cSystemController.fFEDInterface->monitorPhases(cFED, cChannelOfInterest);
+        //}
+    //}
+
     for (int i = 0; i < 11; i++)
     {
-
-        for (auto& cFED : cSystemController.fPixFEDVector)
-        {
+         for (auto& cFED : cSystemController.fPixFEDVector)
+         {
             cSystemController.fFEDInterface->WriteBoardReg(cFED, "fe_ctrl_regs.decode_reg_reset", 1);
-            mypause();
-            //cSystemController.fFEDInterface->readTransparentFIFO(cFED);
-            cSystemController.fFEDInterface->readSpyFIFO(cFED);
-            cSystemController.fFEDInterface->readFIFO1(cFED);
-            cSystemController.fFEDInterface->readOSDWord(cFED, cROCOfInterest, cChannelOfInterest);
-            //cSystemController.fFEDInterface->ReadData(cFED, 0 );
-        }
+             mypause();
+             //cSystemController.fFEDInterface->readTransparentFIFO(cFED);
+             cSystemController.fFEDInterface->readSpyFIFO(cFED);
+             cSystemController.fFEDInterface->readFIFO1(cFED);
+             cSystemController.fFEDInterface->readOSDWord(cFED, cROCOfInterest, cChannelOfInterest);
+             //cSystemController.fFEDInterface->ReadData(cFED, 0 );
+         }
     }
-
+    
     cAmc13Controller.fAmc13Interface->StopL1A();
 
 //    cSystemController.HaltHw();

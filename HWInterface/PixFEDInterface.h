@@ -153,6 +153,11 @@ public:
      */
     void findPhases( const PixFED* pFED, uint32_t pScopeFIFOCh = 0 );
     /*!
+     * \brief: find Phases for input data stream
+     * \param: pScopeFIFOCh: channel for Phase Stability monitoring
+     */
+    void monitorPhases( const PixFED* pFED, uint32_t pScopeFIFOCh = 0 );
+    /*!
      * \brief: read transparent Fifo
      * \return: vector of 32 bit words with FIFO content
      */

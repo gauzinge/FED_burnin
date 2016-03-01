@@ -349,10 +349,11 @@ std::vector<double> PixFEDInterface::ReadADC( Fitel* pFitel, uint32_t pChan, boo
     // I could do this via the files, but it is easier to just do it here
     // therefore: write AllChConfig Register 0x02 = disable channel for RSSI
     // write the selected Channel 0x0c to enable that specific channel
+    // this method is completely agnostic to the channels enabled in the xml file - it only looks at the channel of interest
     WriteFitelReg(pFitel, "AllCh_ConfigReg", 0x02, false);
     char tmp[25];
-    //temporary fix: Fibre 1 corresponds to FITEL channel 12 an vice versa
 
+    //temporary fix: Fibre 1 corresponds to FITEL channel 12 an vice versa
     snprintf( tmp, sizeof(tmp), "Ch%02d_ConfigReg", swap_channels(pChan) );
     WriteFitelReg(pFitel, std::string(tmp), 0x0c, false);
 
@@ -439,6 +440,12 @@ void PixFEDInterface::findPhases( const PixFED * pFED, uint32_t pScopeFIFOCh )
 {
     setBoard( pFED->getBeId() );
     fFEDFW->findPhases(pScopeFIFOCh);
+}
+
+void PixFEDInterface::monitorPhases(const PixFED* pFED, uint32_t pScopeFIFOCh)
+{
+    setBoard( pFED->getBeId() );
+    fFEDFW->monitorPhases(pScopeFIFOCh);
 }
 
 

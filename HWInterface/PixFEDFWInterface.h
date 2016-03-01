@@ -122,6 +122,10 @@ public:
      */
     void findPhases(uint32_t pScopeFIFOCh = 0);
     /*!
+     * \brief: find correct phases for incoming data stream
+     */
+    void monitorPhases(uint32_t pScopeFIFOCh = 0);
+    /*!
      * \brief: read the bistream FIFO of the PixFED
      */
     std::vector<uint32_t> readTransparentFIFO();

@@ -194,22 +194,24 @@ void PixFEDFWInterface::findPhases(uint32_t pScopeFIFOCh)
 
     //std::this_thread::sleep_for( cWait );
 
-    //std::cout << "Monitoring Phases for selected Channel of Interest for 10 seconds ... " << std::endl << std::endl;
-    //std::cout << BOLDGREEN << "FIBRE CTRL_RDY CNTVAL_Hi CNTVAL_Lo   pattern:                     S H1 L1 H0 L0   W R" << RESET << std::endl;
-    //for (uint32_t cCounter = 0; cCounter < 10; cCounter++)
-    //{
-    //std::string cRegname = "idel_individual_stat.CH" + std::to_string(pScopeFIFOCh);
-    //std::vector<uint32_t> cReadValues = ReadBlockRegValue( cRegname, 4 );
-    //prettyprintPhase(cReadValues, 0);
-    //std::this_thread::sleep_for( cWait );
-
-    //}
     cVecReg.push_back( { "pixfed_ctrl_regs.PC_CONFIG_OK", 0} );
     WriteStackReg(cVecReg);
     cVecReg.clear();
     cVecReg.push_back( { "pixfed_ctrl_regs.PC_CONFIG_OK", 1} );
     WriteStackReg(cVecReg);
     cVecReg.clear();
+}
+
+void PixFEDFWInterface::monitorPhases(uint32_t pScopeFIFOCh)
+{
+    //std::cout << "Monitoring Phases for selected Channel of Interest for 10 seconds ... " << std::endl << std::endl;
+    //std::cout << BOLDGREEN << "FIBRE CTRL_RDY CNTVAL_Hi CNTVAL_Lo   pattern:                     S H1 L1 H0 L0   W R" << RESET << std::endl;
+    std::chrono::milliseconds cWait( 3000 );
+
+    std::string cRegname = "idel_individual_stat.CH" + std::to_string(pScopeFIFOCh);
+    std::vector<uint32_t> cReadValues = ReadBlockRegValue( cRegname, 4 );
+    prettyprintPhase(cReadValues, 0);
+    std::this_thread::sleep_for( cWait );
 }
 
 void PixFEDFWInterface::prettyprintPhase(const std::vector<uint32_t>& pData, int pChannel)

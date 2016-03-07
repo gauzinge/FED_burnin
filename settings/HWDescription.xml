@@ -21,17 +21,17 @@
         <Register name="ctrl.ttc_xpoint_A_out3">0</Register>
         <!--<Register name="pixfed_ctrl_regs.TRIGGER_SEL">0</Register>-->
         <!--<Register name="pixfed_ctrl_regs.INTERNAL_TRIG_EN">0</Register>-->
-        <Register name="pixfed_ctrl_regs.data_type">2</Register>
+        <Register name="pixfed_ctrl_regs.data_type">0</Register>
         <!--<Register name="pixfed_ctrl_regs.INT_TRIGGER_FREQ_SEL">9</Register>-->
         <!--<Register name="pixfed_ctrl_regs.PACKET_NB">10</Register>-->
         <!-- TBM MASK -->
-        <Register name="pixfed_ctrl_regs.TBM_MASK_1">0xFFFFFCFF</Register>
+        <Register name="pixfed_ctrl_regs.TBM_MASK_1">0xFFFCFFFF</Register>
         <Register name="pixfed_ctrl_regs.TBM_MASK_2">0xFFFFFFFF</Register>
         <Register name="pixfed_ctrl_regs.TBM_MASK_3">0xFFFFFFFF</Register>
         <!-- FITELS -->
         <Fitel_Files path="./settings/" />
         <Fitel FMC="0" Id="0" file="FMCFITEL.txt" Enable="" />
-        <Fitel FMC="0" Id="1" file="FMCFITEL.txt" Enable="1" />
+        <Fitel FMC="0" Id="1" file="FMCFITEL.txt" Enable="9" />
         <!--<Fitel FMC="1" Id="0" file="FMC1_Fitel0.txt" />-->
         <!--<Fitel FMC="1" Id="1" file="FMC1_Fitel1.txt" />-->
     </PixFED>
@@ -40,10 +40,10 @@
     <!--Setting name="NTBM">2</Setting-->
     <!--<Setting name="ChannelOfInterest">0</Setting>-->
     <!-- 0 indexed -->
-    <Setting name="ChannelOfInterest">0</Setting>
+    <Setting name="ChannelOfInterest">8</Setting>
     <!-- 0 indexed -->
     <Setting name="ROCOfInterest">1</Setting>
     <Setting name="BlockSize">512</Setting>
     <!--if set to 0, loop will run forever-->
-    <!--<Setting name="NAcq">100</Setting>-->
+    <Setting name="NAcq">0</Setting>
 </Settings>

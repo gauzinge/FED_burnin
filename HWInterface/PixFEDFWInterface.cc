@@ -543,8 +543,10 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData( PixFED* pPixFED, uint32_t pBl
     while ( ReadReg( fStrFull ) == 1 )
         std::this_thread::sleep_for( cWait );
     WriteReg( fStrReadout, 0 );
-
-    prettyprintTBMFIFO(cData);
+//For Satoshi
+for(auto& cWord : cData)
+std::cout << std::hex << std::setw(8) << cWord << std::endl;
+//    prettyprintTBMFIFO(cData);
     fNthAcq++;
     return cData;
 }

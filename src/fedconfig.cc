@@ -70,18 +70,41 @@ int main(int argc, char* argv[] )
         //}
     //}
 
-    for (int i = 0; i < 11; i++)
+    //for (int i = 0; i < 11; i++)
+    //{
+    //     for (auto& cFED : cSystemController.fPixFEDVector)
+    //     {
+    //        cSystemController.fFEDInterface->WriteBoardReg(cFED, "fe_ctrl_regs.decode_reg_reset", 1);
+    //         mypause();
+    //         //cSystemController.fFEDInterface->readTransparentFIFO(cFED);
+    //         cSystemController.fFEDInterface->readSpyFIFO(cFED);
+    //         cSystemController.fFEDInterface->readFIFO1(cFED);
+    //         cSystemController.fFEDInterface->readOSDWord(cFED, cROCOfInterest, cChannelOfInterest);
+    //         //cSystemController.fFEDInterface->ReadData(cFED, 0 );
+    //     }
+    // }
+
+    // loop over the number of acquisitions
+    uint32_t iAcq = 0;
+    bool running = true;
+    while ( running )
     {
-         for (auto& cFED : cSystemController.fPixFEDVector)
-         {
-            cSystemController.fFEDInterface->WriteBoardReg(cFED, "fe_ctrl_regs.decode_reg_reset", 1);
-             mypause();
-             //cSystemController.fFEDInterface->readTransparentFIFO(cFED);
-             cSystemController.fFEDInterface->readSpyFIFO(cFED);
-             cSystemController.fFEDInterface->readFIFO1(cFED);
-             cSystemController.fFEDInterface->readOSDWord(cFED, cROCOfInterest, cChannelOfInterest);
-             //cSystemController.fFEDInterface->ReadData(cFED, 0 );
-         }
+        //std::cout << std::endl << BOLDRED << "Acquisition: " << iAcq << RESET << "\r";
+        for (auto& cFED : cSystemController.fPixFEDVector)
+        {
+            //std::cout << BOLDGREEN << "Data for FED " << +cFED->getBeId() << RESET << std::endl;
+            cSystemController.fFEDInterface->ReadData(cFED,0);
+        }
+        iAcq++;
+        if (iAcq < cNAcq && cNAcq > 0 )running = true;
+        else if (cNAcq == 0 ) running = true;
+        else running = false;
+
+
+        if (iAcq % 100 == 0)
+        {
+		std::cout << "NAcquisition: " << iAcq << std::endl;
+        }
     }
     
     cAmc13Controller.fAmc13Interface->StopL1A();

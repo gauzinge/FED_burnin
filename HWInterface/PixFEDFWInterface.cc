@@ -522,6 +522,7 @@ void PixFEDFWInterface::Resume()
 
 std::vector<uint32_t> PixFEDFWInterface::ReadData ( PixFED* pPixFED, uint32_t pBlockSize )
 {
+    uint32_t cAcq_mode = ReadReg ("pixfed_ctrl_regs.acq_ctrl.acq_mode");
     uint32_t cBlockSize = 0;
 
     if (pBlockSize == 0) cBlockSize = fBlockSize;
@@ -563,23 +564,41 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData ( PixFED* pPixFED, uint32_t pB
 
     WriteReg ( fStrReadout, 0 );
 
-    prettyprintTBMFIFO (cData);
+    if (cAcq_mode == 1) prettyprintTBMFIFO (cData);
+    else
+    {
+        //first, pack the 32 bit words into 64 bit words
+        std::vector<uint64_t> cSlinkData;
+
+        for (uint32_t cIndex = 0; cIndex < ceil (cData.size() / 2.); cIndex++ )
+            cSlinkData.push_back (pData.at (2 * cIndex) << 32) | pData.at (2 * cIndex + 1) );
+
+            prettyprintSlink (cSlinkData);
+        }
+
     fNthAcq++;
     return cData;
 }
 
-std::vector<uint32_t> PixFEDFWInterface::ReadNEvents ( PixFED* pPixFED, uint32_t pBlockSize = 0 )
+std::vector<uint32_t> PixFEDFWInterface::ReadNEvents ( PixFED* pPixFED, uint32_t pNEvents )
 {
-    uint32_t cBlockSize = 0;
+    //first, set up calibration mode
+    std::vector< std::pair<std::string, uint32_t> > cVecReg;
+    cVecReg.push_back ({"pixfed_ctrl_regs.acq_ctrl.calib_mode", 1});
+    cVecReg.push_back ({"pixfed_ctrl_regs.acq_ctrl.calib_mode_NEvents", pNEvents - 1});
+    WriteStackReg ( cVecReg );
+    cVecReg.clear();
 
-    if (pBlockSize == 0) cBlockSize = fBlockSize;
-    else cBlockSize = pBlockSize;
+    // first set DDR bank to 0
+    SelectDaqDDR ( 0 );
+    //uint32_t cBlockSize = 0;
+
+    //if (pBlockSize == 0) cBlockSize = fBlockSize;
+    //else cBlockSize = pBlockSize;
 
     std::chrono::milliseconds cWait ( 10 );
     // the fNthAcq variable is automatically used to determine which DDR FIFO to read - so it has to be incremented in this method!
 
-    // first find which DDR bank to read
-    SelectDaqDDR ( fNthAcq );
     //std::cout << "Querying " << fStrDDR << " for FULL condition!" << std::endl;
 
     uhal::ValWord<uint32_t> cVal;
@@ -593,6 +612,15 @@ std::vector<uint32_t> PixFEDFWInterface::ReadNEvents ( PixFED* pPixFED, uint32_t
     while ( cVal == 0 );
 
     //std::cout << fStrDDR << " full: " << ReadReg( fStrFull ) << std::endl;
+
+    //now figure out how many 32 bit words to read
+    uint32_t cNWords32 = ReadReg ("pixfed_stat_regs.cnt_word32from_start");
+    std::cout << "Reading " << cNWords32 << " 32 bit words from DDR " << 0 << std::endl;
+    uint32_t cAcq_mode = ReadReg ("pixfed_ctrl_regs.acq_ctrl.acq_mode");
+    //in normal TBM Fifo mode read 2* the number of words read from the FW (+1 fake trigger)
+    //in FEROL IPBUS mode read the number of 32 bit words + 2*2*pNEvents (1 factor 2 is for 64 bit words)
+uint32_t cBlockSize = (cAcq_mode == 1) 2 * cNWords32 :
+                          cNWords32 + (2 * 2 * pNEvents);
 
     // DDR control: 0 = ipbus, 1 = user
     WriteReg ( fStrDDRControl, 0 );
@@ -611,7 +639,18 @@ std::vector<uint32_t> PixFEDFWInterface::ReadNEvents ( PixFED* pPixFED, uint32_t
 
     WriteReg ( fStrReadout, 0 );
 
-    prettyprintTBMFIFO (cData);
+    if (cAcq_mode == 1) prettyprintTBMFIFO (cData);
+    else
+    {
+        //first, pack the 32 bit words into 64 bit words
+        std::vector<uint64_t> cSlinkData;
+
+        for (uint32_t cIndex = 0; cIndex < ceil (cData.size() / 2.); cIndex++ )
+            cSlinkData.push_back (pData.at (2 * cIndex) << 32) | pData.at (2 * cIndex + 1) );
+
+            prettyprintSlink (cSlinkData);
+        }
+
     fNthAcq++;
     return cData;
 }
@@ -657,6 +696,29 @@ void PixFEDFWInterface::prettyprintTBMFIFO (const std::vector<uint32_t>& pData )
 
         cIndex++;
     }
+}
+
+void PixFEDFWInterface::prettyprintSlink (const std::vector<uint64_t>& pData )
+{
+    for (auto& cWord : pData)
+    {
+        //now run Jordans decoder. First, check the header
+        if ( (cWord >> 60) == 0x5 )
+        {
+            //Header
+
+        }
+        else if( (cWord >> 60) == 0xa )
+        {
+            //Trailer
+            
+            // here decode the header word
+        }
+        else
+        {
+             //Payload
+        }
+    } 
 }
 
 uint32_t PixFEDFWInterface::computeBlockSize ( bool pFakeData )

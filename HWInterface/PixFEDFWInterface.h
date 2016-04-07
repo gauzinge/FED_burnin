@@ -172,7 +172,7 @@ public:
      * \param pPixFED
      * \return vector<uint32_t> cData
      */
-    std::vector<uint32_t> ReadNEvents( PixFED* pPixFED, uint32_t pBlockSize = 0 );
+    std::vector<uint32_t> ReadNEvents( PixFED* pPixFED, uint32_t pNEvents = 1 );
 
     // EVENT HANDLING
     //const Event* GetNextEvent( const PixFED* pPixFED ) const;
@@ -239,6 +239,7 @@ private:
     void prettyprintSpyFIFO(const std::vector<uint32_t>& pVec);
     void prettyprintFIFO1( const std::vector<uint32_t>& pFifoVec, const std::vector<uint32_t>& pMarkerVec, std::ostream& os = std::cout);
     void prettyprintTBMFIFO(const std::vector<uint32_t>& pData);
+    void prettyprintSlink(const std::vector<uint32_t>& pData);
     void prettyprintPhase( const std::vector<uint32_t>& pData, int pChannel );
 
     // FPGA CONFIG METHODS

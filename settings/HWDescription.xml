@@ -22,19 +22,19 @@
         <!--0: real data, 1: constants after TBM fifo, 2: pattern before TBM fifo-->
         <Register name="pixfed_ctrl_regs.data_type">2</Register>
         <!--1: TBM fifo, 2: Slink FIFO, 3: FEROL-->
-        <Register name="acq_ctrl.acq_mode">1</Register>
+        <Register name="pixfed_ctrl_regs.acq_ctrl.acq_mode">1</Register>
 
         <!--SLINK-->
-        <Register name="slink_ctrl.privateEvtNb">0x00</Register>
-        <Register name="slink_ctrl.slinkFormatH_source_id">0xbcd</Register>
-        <Register name="slink_ctrl.slinkFormatH_FOV">0xe</Register>
-        <Register name="slink_ctrl.slinkFormatH_Evt_ty">0xa</Register>
-        <Register name="slink_ctrl.slinkFormatH_Evt_stat">0x00</Register>
+        <Register name="pixfed_ctrl_regs.slink_ctrl.privateEvtNb">0x00</Register>
+        <Register name="spixfed_ctrl_regs.link_ctrl.slinkFormatH_source_id">0xbcd</Register>
+        <Register name="spixfed_ctrl_regs.link_ctrl.slinkFormatH_FOV">0xe</Register>
+        <Register name="spixfed_ctrl_regs.link_ctrl.slinkFormatH_Evt_ty">0xa</Register>
+        <Register name="spixfed_ctrl_regs.link_ctrl.slinkFormatH_Evt_stat">0x00</Register>
 
         <!-- TBM MASK -->
         <Register name="pixfed_ctrl_regs.TBM_MASK_1">0xFFFFFCFF</Register>
         <Register name="pixfed_ctrl_regs.TBM_MASK_2">0xFFFFFFFF</Register>
-        <Register name="tbm_trailer_status_mask">0x00</Register>
+        <Register name="tpixfed_ctrl_regs.bm_trailer_status_mask">0x00</Register>
         <!--<Register name="pixfed_ctrl_regs.PACKET_NB">10</Register>-->
 
         <!-- FITELS -->

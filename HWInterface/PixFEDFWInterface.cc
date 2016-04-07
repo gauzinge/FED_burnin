@@ -565,17 +565,7 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData ( PixFED* pPixFED, uint32_t pB
     WriteReg ( fStrReadout, 0 );
 
     if (cAcq_mode == 1) prettyprintTBMFIFO (cData);
-    else
-    {
-        //first, pack the 32 bit words into 64 bit words
-        std::vector<uint64_t> cSlinkData;
-
-        for (uint32_t cIndex = 0; cIndex < ceil (cData.size() / 2.); cIndex++ )
-            cSlinkData.push_back (pData.at (2 * cIndex) << 32) | pData.at (2 * cIndex + 1) );
-
-            prettyprintSlink (cSlinkData);
-        }
-
+    else prettyprintSlink (expandto64(cData));
     fNthAcq++;
     return cData;
 }
@@ -640,16 +630,7 @@ uint32_t cBlockSize = (cAcq_mode == 1) 2 * cNWords32 :
     WriteReg ( fStrReadout, 0 );
 
     if (cAcq_mode == 1) prettyprintTBMFIFO (cData);
-    else
-    {
-        //first, pack the 32 bit words into 64 bit words
-        std::vector<uint64_t> cSlinkData;
-
-        for (uint32_t cIndex = 0; cIndex < ceil (cData.size() / 2.); cIndex++ )
-            cSlinkData.push_back (pData.at (2 * cIndex) << 32) | pData.at (2 * cIndex + 1) );
-
-            prettyprintSlink (cSlinkData);
-        }
+    else prettyprintSlink (expandto64(cData));
 
     fNthAcq++;
     return cData;

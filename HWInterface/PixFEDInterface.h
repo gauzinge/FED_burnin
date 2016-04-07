@@ -204,11 +204,17 @@ public:
     /*!
      * \brief Read data from DAQ
      * \param pFED
-     * \param pNthAcq : actual number of acquisitions
      * \param pBreakTrigger : if true, enable the break trigger
-     * \return cNPackets: the number of packets read
+     * \return cData: the data in 32 bit words
      */
     std::vector<uint32_t> ReadData( PixFED* pFED, uint32_t pBlockSize = 0 );
+    /*!
+     * \brief Read N Events 
+     * \param pFED
+     * \param pNEvents: number of Events to read
+     * \return cData: the data in 32 bit words
+     */
+    std::vector<uint32_t> ReadNEvents( PixFED* pFED, uint32_t pNEvents = 1 );
     /*!
      * \brief Get next event from data buffer
      * \param pFED

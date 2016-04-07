@@ -56,6 +56,12 @@ double MyErf( double* x, double* par );
  */
 uint32_t convertAnyInt( const char* pRegValue );
 /*!
+ * \brief converts any vector of 32 bit words to vector of 64 bit words
+ * \param pVector: vector of 32 bit words
+ * \return vector of 64 bit words
+ */
+std::vector<uint64> expandto64(const std::vector<uint32_t>& pVector)
+/*!
  * \brief: verify if image is part of list
  * \param strImage: Image Name
  * \param lstName: List of Images

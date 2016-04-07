@@ -81,6 +81,16 @@ uint32_t convertAnyInt( const char* pRegValue )
 
 }
 
+std::vector<uint64> expandto64(const std::vector<uint32_t>& pVector)
+{
+//first, pack the 32 bit words into 64 bit words
+        std::vector<uint64_t> cSlinkData;
+
+        for (uint32_t cIndex = 0; cIndex < ceil (cData.size() / 2.); cIndex++ )
+            cSlinkData.push_back (pData.at (2 * cIndex) << 32) | pData.at (2 * cIndex + 1) );
+        return cSlinkData;
+}
+
 void verifyImageName( const std::string& strImage, const std::vector<std::string>& lstNames)
 {
     if (lstNames.empty())

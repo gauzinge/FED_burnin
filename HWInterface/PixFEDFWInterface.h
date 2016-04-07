@@ -163,11 +163,16 @@ public:
     /*!
      * \brief Read data from DAQ
      * \param pPixFED
-     * \param pNthAcq : actual number of acquisitions
      * \param pBreakTrigger : if true, enable the break trigger
-     * \return cNPackets: the number of packets read
+     * \return vector<uint32_t> cData
      */
     std::vector<uint32_t> ReadData( PixFED* pPixFED, uint32_t pBlockSize = 0 );
+    /*!
+     * \brief Read data from Slink FIFO
+     * \param pPixFED
+     * \return vector<uint32_t> cData
+     */
+    std::vector<uint32_t> ReadNEvents( PixFED* pPixFED, uint32_t pBlockSize = 0 );
 
     // EVENT HANDLING
     //const Event* GetNextEvent( const PixFED* pPixFED ) const;

@@ -687,17 +687,24 @@ void PixFEDFWInterface::prettyprintSlink (const std::vector<uint64_t>& pData )
         if ( (cWord >> 60) == 0x5 )
         {
             //Header
+            std::cout << BOLDGREEN << "Evt. ty " << ((cWord >> 56) & 0xF )<< " L1A Id " << ((cWord >> 32) & 0xFFFFFF) << " BX Id " << ((cWord >> 20) & 0xFFF ) << " Source Id " << ((cWord >> 8) & 0xFFF) << " FOV " << ((cWord >> 4) & 0xF) << RESET << std::endl;
 
         }
         else if( (cWord >> 60) == 0xa )
         {
             //Trailer
+            std::cout << BOLDRED << "Evt. Length " << ((cWord >> 32) & 0xFFFFFF )<< " CRC " << ((cWord >> 16) & 0xFFFF) << RESET << std::endl;
             
-            // here decode the header word
         }
         else
         {
-             //Payload
+           //Payload
+           //2 32 bit data words in each 64 bit word containing a hit each 
+            uint32_t cWord1 = (cWord >> 32) & 0xFFFFFFFF;
+            uint32_t cWord2 = cWord & 0xFFFFFFFF;
+            
+            std::cout << "Channel " << ((cWord1 >> 26) & 0x3F) << " ROC " <<  ((cWord1 >> 21) & 0x1F) << " DC " << ((cWord1 >> 16) & 0x1F) << " Pxl " << ((cWord1 >> 8) & 0xFF) << " PH " << (cWord1 & 0xFF) << std::endl; 
+            std::cout << "Channel " << ((cWord2 >> 26) & 0x3F) << " ROC " <<  ((cWord2 >> 21) & 0x1F) << " DC " << ((cWord2 >> 16) & 0x1F) << " Pxl " << ((cWord2 >> 8) & 0xFF) << " PH " << (cWord2 & 0xFF) << std::endl; 
         }
     } 
 }

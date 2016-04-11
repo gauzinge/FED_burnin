@@ -5,6 +5,7 @@
 #include "../HWDescription/PixFED.h"
 #include "../HWInterface/PixFEDInterface.h"
 #include "../System/SystemController.h"
+#include "../AMC13/Amc13Controller.h"
 #include "../Utils/Data.h"
 
 int main(int argc, char* argv[] )
@@ -72,7 +73,7 @@ while(true)
 //             cSystemController.fFEDInterface->readSpyFIFO(cFED);
 //            cSystemController.fFEDInterface->readFIFO1(cFED);
 //             cSystemController.fFEDInterface->readOSDWord(cFED, cROCOfInterest, cChannelOfInterest);
-             cSystemController.fFEDInterface->ReadData(cFED, 0 );
+//            cSystemController.fFEDInterface->ReadData(cFED, 0 );
 //             cSystemController.fFEDInterface->ReadNEvents(cFED, cNEventsCommMode );
          }
  }   

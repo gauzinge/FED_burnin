@@ -60,7 +60,7 @@ uint32_t convertAnyInt( const char* pRegValue );
  * \param pVector: vector of 32 bit words
  * \return vector of 64 bit words
  */
-std::vector<uint64> expandto64(const std::vector<uint32_t>& pVector)
+std::vector<uint64_t> expandto64(const std::vector<uint32_t>& pVector);
 /*!
  * \brief: verify if image is part of list
  * \param strImage: Image Name

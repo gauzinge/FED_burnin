@@ -609,7 +609,7 @@ std::vector<uint32_t> PixFEDFWInterface::ReadNEvents ( PixFED* pPixFED, uint32_t
     uint32_t cAcq_mode = ReadReg ("pixfed_ctrl_regs.acq_ctrl.acq_mode");
     //in normal TBM Fifo mode read 2* the number of words read from the FW (+1 fake trigger)
     //in FEROL IPBUS mode read the number of 32 bit words + 2*2*pNEvents (1 factor 2 is for 64 bit words)
-uint32_t cBlockSize = (cAcq_mode == 1) 2 * cNWords32 :
+uint32_t cBlockSize = (cAcq_mode == 1) ?  2 * cNWords32 :
                           cNWords32 + (2 * 2 * pNEvents);
 
     // DDR control: 0 = ipbus, 1 = user

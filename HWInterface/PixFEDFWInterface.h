@@ -240,7 +240,7 @@ private:
     void prettyprintSpyFIFO(const std::vector<uint32_t>& pVec);
     void prettyprintFIFO1( const std::vector<uint32_t>& pFifoVec, const std::vector<uint32_t>& pMarkerVec, std::ostream& os = std::cout);
     void prettyprintTBMFIFO(const std::vector<uint32_t>& pData);
-    void prettyprintSlink(const std::vector<uint32_t>& pData);
+    void prettyprintSlink(const std::vector<uint64_t>& pData);
     void prettyprintPhase( const std::vector<uint32_t>& pData, int pChannel );
 
     // FPGA CONFIG METHODS

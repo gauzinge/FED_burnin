@@ -701,12 +701,12 @@ void PixFEDFWInterface::prettyprintSlink (const std::vector<uint64_t>& pData )
             std::cout << BOLDRED << "Evt. Length " << ((cWord >> 32) & 0xFFFFFF )<< " CRC " << ((cWord >> 16) & 0xFFFF) << RESET << std::endl;
             
         }
-        else if (cWord != 0xFFFFFFFFFFFFFFFF)
+        else //if (cWord != 0xFFFFFFFFFFFFFFFF)
         {
            //Payload
            //2 32 bit data words in each 64 bit word containing a hit each 
-            uint32_t cWord2 = (cWord >> 32) & 0xFFFFFFFF;
             uint32_t cWord1 = cWord & 0xFFFFFFFF;
+            uint32_t cWord2 = (cWord >> 32) & 0xFFFFFFFF;
             
             std::cout << "Channel " << ((cWord1 >> 26) & 0x3F) << " ROC " <<  ((cWord1 >> 21) & 0x1F) << " DC " << ((cWord1 >> 16) & 0x1F) << " Pxl " << ((cWord1 >> 8) & 0xFF) << " PH " << (cWord1 & 0xFF) << std::endl; 
             std::cout << "Channel " << ((cWord2 >> 26) & 0x3F) << " ROC " <<  ((cWord2 >> 21) & 0x1F) << " DC " << ((cWord2 >> 16) & 0x1F) << " Pxl " << ((cWord2 >> 8) & 0xFF) << " PH " << (cWord2 & 0xFF) << std::endl; 

@@ -232,7 +232,7 @@
             <node id="slinkFormatH_Evt_ty" mask="0x0f000000" />
             <node id="slinkFormatH_Evt_stat" mask="0xf0000000" />
         </node>
-        <node id="tbm_trailer_status_mask" address="0x4001009" mask="0x000000ff" permission="rw" />
+        <node id="tbm_trailer_status_mask" address="0x40010009" mask="0x000000ff" permission="rw" />
     </node>
     <!-- MISC -->
     <node id="fitel_config_fifo_tx" address="0x40100000" mode="non-incremental" size="512" permission="rw" />

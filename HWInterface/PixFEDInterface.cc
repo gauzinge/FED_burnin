@@ -337,6 +337,8 @@ void PixFEDInterface::toggleFitelChannels(Fitel* pFitel, bool pEnable)
         // setting it to 0x0c enables the RSSI readback
         uint8_t cValue = (pEnable) ? 0x08 : 0x02;
         WriteFitelReg(pFitel, std::string(tmp), cValue, false);
+//GEORG TESTING
+std::cout << cChannel << " " <<  tmp << " " << +cValue << std::endl;
     }
 }
 

@@ -3,7 +3,7 @@
     <AMC13>
         <connection id="T1" uri="chtcp-2.0://cmsuppixch:10203?target=amc13T101:50001" address_table="file://settings/AMC13XG_T1.xml" />
         <connection id="T2" uri="chtcp-2.0://cmsuppixch:10203?target=amc13T201:50001" address_table="file://settings/AMC13XG_T2.xml" />
-        <AMCmask enable="3,4,5,9,10" />
+        <AMCmask enable="3,4,5,7,8,9,10" />
         <!--This is used to send a calibration Trigger via the AMC13s internal BGO mechanism, 0x2c is the command configured as BGO15 
              on the TTCci - repeat is obvious, prescale is in orbits, the bx is selected such that it occurs 98 BX before the local
              L1A which is periodic at BX500 every orbit-->
@@ -20,29 +20,29 @@
         <!--Used to set the CLK input to the TTC clock from the BP - 3 is XTAL, 0 is BP-->
         <Register name="ctrl.ttc_xpoint_A_out3">0</Register>
         <!--0: real data, 1: constants after TBM fifo, 2: pattern before TBM fifo-->
-        <Register name="pixfed_ctrl_regs.data_type">2</Register>
+        <Register name="pixfed_ctrl_regs.data_type">0</Register>
         <!--1: TBM fifo, 2: Slink FIFO, 3: FEROL-->
-        <Register name="pixfed_ctrl_regs.acq_ctrl.acq_mode">1</Register>
+        <Register name="pixfed_ctrl_regs.acq_ctrl.acq_mode">2</Register>
 
         <!--SLINK-->
         <Register name="pixfed_ctrl_regs.slink_ctrl.privateEvtNb">0x00</Register>
-        <Register name="spixfed_ctrl_regs.link_ctrl.slinkFormatH_source_id">0xbcd</Register>
-        <Register name="spixfed_ctrl_regs.link_ctrl.slinkFormatH_FOV">0xe</Register>
-        <Register name="spixfed_ctrl_regs.link_ctrl.slinkFormatH_Evt_ty">0xa</Register>
-        <Register name="spixfed_ctrl_regs.link_ctrl.slinkFormatH_Evt_stat">0x00</Register>
+        <Register name="pixfed_ctrl_regs.slink_ctrl.slinkFormatH_source_id">0xbcd</Register>
+        <Register name="pixfed_ctrl_regs.slink_ctrl.slinkFormatH_FOV">0xe</Register>
+        <Register name="pixfed_ctrl_regs.slink_ctrl.slinkFormatH_Evt_ty">0xa</Register>
+        <Register name="pixfed_ctrl_regs.slink_ctrl.slinkFormatH_Evt_stat">0xf</Register>
 
         <!-- TBM MASK -->
-        <Register name="pixfed_ctrl_regs.TBM_MASK_1">0xFFFFFCFF</Register>
+        <Register name="pixfed_ctrl_regs.TBM_MASK_1">0xFFFFFF3F</Register>
         <Register name="pixfed_ctrl_regs.TBM_MASK_2">0xFFFFFFFF</Register>
-        <Register name="tpixfed_ctrl_regs.bm_trailer_status_mask">0x00</Register>
+        <Register name="pixfed_ctrl_regs.tbm_trailer_status_mask">0x00</Register>
         <!--<Register name="pixfed_ctrl_regs.PACKET_NB">10</Register>-->
 
         <!-- FITELS -->
         <Fitel_Files path="./settings/" />
-        <Fitel FMC="0" Id="0" file="FMCFITEL.txt" Enable="" />
-        <Fitel FMC="0" Id="1" file="FMCFITEL.txt" Enable="1" />
-        <!--<Fitel FMC="1" Id="0" file="FMC1_Fitel0.txt" />-->
-        <!--<Fitel FMC="1" Id="1" file="FMC1_Fitel1.txt" />-->
+        <!--<Fitel FMC="0" Id="0" file="FMCFITEL.txt" Enable="" />-->
+        <!--<Fitel FMC="0" Id="1" file="FMCFITEL.txt" Enable="1" />-->
+        <Fitel FMC="1" Id="0" file="FMCFITEL.txt" Enable=""/>
+        <Fitel FMC="1" Id="1" file="FMCFITEL.txt" Enable="9"/>
     </PixFED>
 </HwDescription>
 
@@ -50,10 +50,11 @@
     <!--Setting name="NTBM">2</Setting-->
     <!--<Setting name="ChannelOfInterest">0</Setting>-->
     <!-- 0 indexed -->
-    <Setting name="ChannelOfInterest">0</Setting>
+    <Setting name="ChannelOfInterest">3</Setting>
     <!-- 0 indexed -->
     <Setting name="ROCOfInterest">1</Setting>
     <Setting name="BlockSize">512</Setting>
+    <Setting name="NEventsCommissioningMode">4</Setting>
     <!--if set to 0, loop will run forever-->
     <!--<Setting name="NAcq">100</Setting>-->
 </Settings>

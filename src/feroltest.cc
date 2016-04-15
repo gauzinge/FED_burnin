@@ -63,8 +63,11 @@ int main(int argc, char* argv[] )
         //}
     //}
 
-while(true)
-{
+    uint32_t iAcq = 0;
+    bool running = true;
+    while ( running )
+    {
+//std::cout << cNAcq << " ##########################" << std::endl;
          for (auto& cFED : cSystemController.fPixFEDVector)
          {
             //cSystemController.fFEDInterface->WriteBoardReg(cFED, "fe_ctrl_regs.decode_reg_reset", 1);
@@ -73,9 +76,13 @@ while(true)
 //             cSystemController.fFEDInterface->readSpyFIFO(cFED);
 //            cSystemController.fFEDInterface->readFIFO1(cFED);
 //             cSystemController.fFEDInterface->readOSDWord(cFED, cROCOfInterest, cChannelOfInterest);
-//            cSystemController.fFEDInterface->ReadData(cFED, 0 );
+            cSystemController.fFEDInterface->ReadData(cFED, 0 );
 //             cSystemController.fFEDInterface->ReadNEvents(cFED, cNEventsCommMode );
          }
+        iAcq++;
+        if (iAcq < cNAcq && cNAcq > 0 )running = true;
+        else if (cNAcq == 0 ) running = true;
+        else running = false;
  }   
     cAmc13Controller.fAmc13Interface->StopL1A();
 

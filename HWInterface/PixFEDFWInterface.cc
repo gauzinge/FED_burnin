@@ -411,7 +411,6 @@ bool PixFEDFWInterface::ConfigureBoard ( const PixFED* pPixFED, bool pFakeData )
     cVecReg.push_back ( {"pixfed_ctrl_regs.PC_CONFIG_OK", 0} );
     //cVecReg.push_back( {"pixfed_ctrl_regs.INT_TRIGGER_EN", 0} );
     cVecReg.push_back ( {"pixfed_ctrl_regs.rx_index_sel_en", 0} );
-
     cVecReg.push_back ( {"pixfed_ctrl_regs.DDR0_end_readout", 0} );
     cVecReg.push_back ( {"pixfed_ctrl_regs.DDR1_end_readout", 0} );
 
@@ -437,12 +436,14 @@ bool PixFEDFWInterface::ConfigureBoard ( const PixFED* pPixFED, bool pFakeData )
     cVecReg.clear();
 
     cVecReg.push_back ({"pixfed_ctrl_regs.fitel_i2c_cmd_reset", 0});
+    cVecReg.push_back ({"pixfed_ctrl_regs.acq_ctrl.calib_mode", 0});
     cVecReg.push_back ({"pixfed_ctrl_regs.fitel_config_req", 0});
     cVecReg.push_back ( {"pixfed_ctrl_regs.PC_CONFIG_OK", 1} );
     WriteStackReg ( cVecReg );
 
     cVecReg.clear();
 
+    fAcq_mode = ReadReg ("pixfed_ctrl_regs.acq_ctrl.acq_mode");
 
     std::this_thread::sleep_for ( cPause );
 
@@ -522,7 +523,6 @@ void PixFEDFWInterface::Resume()
 
 std::vector<uint32_t> PixFEDFWInterface::ReadData ( PixFED* pPixFED, uint32_t pBlockSize )
 {
-    uint32_t cAcq_mode = ReadReg ("pixfed_ctrl_regs.acq_ctrl.acq_mode");
     uint32_t cBlockSize = 0;
 
     if (pBlockSize == 0) cBlockSize = fBlockSize;
@@ -548,13 +548,13 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData ( PixFED* pPixFED, uint32_t pB
     //std::cout << fStrDDR << " full: " << ReadReg( fStrFull ) << std::endl;
 
     // DDR control: 0 = ipbus, 1 = user
-    WriteReg ( fStrDDRControl, 0 );
-    std::this_thread::sleep_for ( cWait );
+    //WriteReg ( fStrDDRControl, 0 );
+    //std::this_thread::sleep_for ( cWait );
     //std::cout << "Starting block read of " << fStrDDR << std::endl;
 
     std::vector<uint32_t> cData = ReadBlockRegValue ( fStrDDR, cBlockSize );
-    WriteReg ( fStrDDRControl , 1 );
-    std::this_thread::sleep_for ( cWait );
+    //WriteReg ( fStrDDRControl , 1 );
+    //std::this_thread::sleep_for ( cWait );
     WriteReg ( fStrReadout, 1 );
     std::this_thread::sleep_for ( cWait );
 
@@ -564,7 +564,7 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData ( PixFED* pPixFED, uint32_t pB
 
     WriteReg ( fStrReadout, 0 );
 
-    if (cAcq_mode == 1) prettyprintTBMFIFO (cData);
+    if (fAcq_mode == 1) prettyprintTBMFIFO (cData);
     else prettyprintSlink (expandto64(cData));
     fNthAcq++;
     return cData;
@@ -610,20 +610,19 @@ std::vector<uint32_t> PixFEDFWInterface::ReadNEvents ( PixFED* pPixFED, uint32_t
     //now figure out how many 32 bit words to read
     uint32_t cNWords32 = ReadReg ("pixfed_stat_regs.cnt_word32from_start");
     std::cout << "Reading " << cNWords32 << " 32 bit words from DDR " << 0 << std::endl;
-    uint32_t cAcq_mode = ReadReg ("pixfed_ctrl_regs.acq_ctrl.acq_mode");
     //in normal TBM Fifo mode read 2* the number of words read from the FW (+1 fake trigger)
     //in FEROL IPBUS mode read the number of 32 bit words + 2*2*pNEvents (1 factor 2 is for 64 bit words)
-uint32_t cBlockSize = (cAcq_mode == 1) ?  2 * cNWords32 + 1 :
+uint32_t cBlockSize = (fAcq_mode == 1) ?  2 * cNWords32 + 1 :
                           cNWords32 + (2 * 2 * pNEvents) + 1;
-std::cout << "This translates into " << cBlockSize << " words in the current mode: " << cAcq_mode << std::endl;
+std::cout << "This translates into " << cBlockSize << " words in the current mode: " << fAcq_mode << std::endl;
 
     // DDR control: 0 = ipbus, 1 = user
-    WriteReg ( fStrDDRControl, 0 );
+    //WriteReg ( fStrDDRControl, 0 );
     std::this_thread::sleep_for ( cWait );
     //std::cout << "Starting block read of " << fStrDDR << std::endl;
 
     std::vector<uint32_t> cData = ReadBlockRegValue ( fStrDDR, cBlockSize );
-    WriteReg ( fStrDDRControl , 1 );
+    //WriteReg ( fStrDDRControl , 1 );
     std::this_thread::sleep_for ( cWait );
     WriteReg ( fStrReadout, 1 );
     std::this_thread::sleep_for ( cWait );
@@ -634,7 +633,7 @@ std::cout << "This translates into " << cBlockSize << " words in the current mod
 
     WriteReg ( fStrReadout, 0 );
 
-    if (cAcq_mode == 1) prettyprintTBMFIFO (cData);
+    if (fAcq_mode == 1) prettyprintTBMFIFO (cData);
     else prettyprintSlink (expandto64(cData));
 
     fNthAcq++;

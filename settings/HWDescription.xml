@@ -56,5 +56,5 @@
     <Setting name="BlockSize">512</Setting>
     <Setting name="NEventsCommissioningMode">4</Setting>
     <!--if set to 0, loop will run forever-->
-    <!--<Setting name="NAcq">100</Setting>-->
+    <Setting name="NAcq">100</Setting>
 </Settings>

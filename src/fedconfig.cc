@@ -83,8 +83,8 @@ int main(int argc, char* argv[] )
              cSystemController.fFEDInterface->readSpyFIFO(cFED);
              cSystemController.fFEDInterface->readFIFO1(cFED);
              cSystemController.fFEDInterface->readOSDWord(cFED, cROCOfInterest, cChannelOfInterest);
-             //cSystemController.fFEDInterface->ReadData(cFED, 0 );
-             cSystemController.fFEDInterface->ReadNEvents(cFED, cNEventsCommMode );
+             cSystemController.fFEDInterface->ReadData(cFED, 0 );
+             //cSystemController.fFEDInterface->ReadNEvents(cFED, cNEventsCommMode );
          }
     }
     

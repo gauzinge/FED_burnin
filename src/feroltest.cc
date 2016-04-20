@@ -65,7 +65,7 @@ int main(int argc, char* argv[] )
 
     uint32_t iAcq = 0;
     bool running = true;
-    while ( running )
+    while ( true )
     {
 //std::cout << cNAcq << " ##########################" << std::endl;
          for (auto& cFED : cSystemController.fPixFEDVector)

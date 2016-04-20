@@ -565,7 +565,7 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData ( PixFED* pPixFED, uint32_t pB
     WriteReg ( fStrReadout, 0 );
 
     if (fAcq_mode == 1) prettyprintTBMFIFO (cData);
-    else prettyprintSlink (expandto64(cData));
+    else if(fAcq_mode == 2) prettyprintSlink (expandto64(cData));
     fNthAcq++;
     return cData;
 }
@@ -634,7 +634,7 @@ std::cout << "This translates into " << cBlockSize << " words in the current mod
     WriteReg ( fStrReadout, 0 );
 
     if (fAcq_mode == 1) prettyprintTBMFIFO (cData);
-    else prettyprintSlink (expandto64(cData));
+    else if(fAcq_mode == 2) prettyprintSlink (expandto64(cData));
 
     fNthAcq++;
     return cData;
@@ -685,6 +685,13 @@ void PixFEDFWInterface::prettyprintTBMFIFO (const std::vector<uint32_t>& pData )
 
 void PixFEDFWInterface::prettyprintSlink (const std::vector<uint64_t>& pData )
 {
+    for(auto& cWord : pData)
+    {
+	uint32_t cWord1 = (cWord>>32) & 0xFFFFFFFF;
+	uint32_t cWord2 = cWord & 0xFFFFFFFF;
+	std::cout << std::hex << cWord1 << " " << cWord2 << std::dec << std::endl;
+	//std::cout << std::hex << cWord << std::dec << std::endl;
+    }
     for (auto& cWord : pData)
     {
         //now run Jordans decoder. First, check the header

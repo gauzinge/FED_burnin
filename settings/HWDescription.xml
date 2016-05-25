@@ -7,7 +7,7 @@
         <!--This is used to send a calibration Trigger via the AMC13s internal BGO mechanism, 0x2c is the command configured as BGO15 
              on the TTCci - repeat is obvious, prescale is in orbits, the bx is selected such that it occurs 98 BX before the local
              L1A which is periodic at BX500 every orbit-->
-        <BGO command="0x2c" repeat="1" prescale="0" bx="380" />
+        <BGO command="0x2c" repeat="1" prescale="0" bx="381" />
         <!-- Local enables Local L1A, mode 0 means a trigger every orbit at BX500, rate is 1 for every orbit and burst is 1 
              for 1 trigger when sending burst (equivalent to single trigger -->
         <Trigger local="1" mode="0" rate="1" burst="1" rules="0" /> 

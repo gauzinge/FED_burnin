@@ -80,9 +80,9 @@ int main(int argc, char* argv[] )
             cSystemController.fFEDInterface->WriteBoardReg(cFED, "fe_ctrl_regs.decode_reg_reset", 1);
              mypause();
              //cSystemController.fFEDInterface->readTransparentFIFO(cFED);
-             cSystemController.fFEDInterface->readSpyFIFO(cFED);
+             //cSystemController.fFEDInterface->readSpyFIFO(cFED);
              cSystemController.fFEDInterface->readFIFO1(cFED);
-             cSystemController.fFEDInterface->readOSDWord(cFED, cROCOfInterest, cChannelOfInterest);
+             //cSystemController.fFEDInterface->readOSDWord(cFED, cROCOfInterest, cChannelOfInterest);
              //cSystemController.fFEDInterface->ReadData(cFED, 0 );
              cSystemController.fFEDInterface->ReadNEvents(cFED, cNEventsCommMode );
          }

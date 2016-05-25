@@ -16,13 +16,12 @@
     </AMC13>
     <PixFED Id="0" boardType="CTA">
         <connection id="board0" uri="chtcp-2.0://cmsuppixch:10203?target=pilotfed:50001" address_table="file://settings/address_table.xml" />
-        <!-- Trigger & Acquisition -->
-        <!--Used to set the CLK input to the TTC clock from the BP - 3 is XTAL, 0 is BP-->
-        <Register name="ctrl.ttc_xpoint_A_out3">0</Register>
-        <!--0: real data, 1: constants after TBM fifo, 2: pattern before TBM fifo-->
-        <Register name="pixfed_ctrl_regs.data_type">0</Register>
+
+        <!-- ACQUISITION MODE & DATA TYPE -->
         <!--1: TBM fifo, 2: Slink FIFO, 3: FEROL-->
         <Register name="pixfed_ctrl_regs.acq_ctrl.acq_mode">2</Register>
+        <!--0: real data, 1: constants after TBM fifo, 2: pattern before TBM fifo-->
+        <Register name="pixfed_ctrl_regs.data_type">0</Register>
 
         <!--SLINK-->
         <Register name="pixfed_ctrl_regs.slink_ctrl.privateEvtNb">0x00</Register>
@@ -33,9 +32,20 @@
 
         <!-- TBM MASK -->
         <Register name="pixfed_ctrl_regs.TBM_MASK_1">0xFFFFFF3F</Register>
-        <Register name="pixfed_ctrl_regs.TBM_MASK_2">0xFFFFFFFF</Register>
+        <Register name="pixfed_ctrl_regs.TBM_MASK_2">0x0000FFFF</Register>
         <Register name="pixfed_ctrl_regs.tbm_trailer_status_mask">0x00</Register>
         <!--<Register name="pixfed_ctrl_regs.PACKET_NB">10</Register>-->
+
+        <!--TTS CONFIG-->
+        <Register name="pixfed_ctrl_regs.tts.timeout_check_valid"> 0 </Register>
+        <Register name="pixfed_ctrl_regs.timeout_value"> 0 </Register>
+        <Register name="pixfed_ctrl_regs.tts.evt_err_nb_oos_thresh"> 10 </Register>
+        <Register name="pixfed_ctrl_regs.tts.timeout_nb_oos_thresh"> 20 </Register>
+        <Register name="pixfed_ctrl_regs.tts.bc0_ec0_polar"> 0 </Register>
+
+        <!--CLOCK-->
+        <!--Used to set the CLK input to the TTC clock from the BP - 3 is XTAL, 0 is BP-->
+        <Register name="ctrl.ttc_xpoint_A_out3">0</Register>
 
         <!-- FITELS -->
         <Fitel_Files path="./settings/" />
@@ -47,8 +57,6 @@
 </HwDescription>
 
 <Settings>
-    <!--Setting name="NTBM">2</Setting-->
-    <!--<Setting name="ChannelOfInterest">0</Setting>-->
     <!-- 0 indexed -->
     <Setting name="ChannelOfInterest">3</Setting>
     <!-- 0 indexed -->

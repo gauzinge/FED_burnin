@@ -408,18 +408,13 @@ bool PixFEDFWInterface::ConfigureBoard ( const PixFED* pPixFED, bool pFakeData )
     std::chrono::milliseconds cPause ( 200 );
     //WriteReg( "pixfed_ctrl_regs.PC_CONFIG_OK", 0 );
     //Primary Configuration
-    cVecReg.push_back ( {"pixfed_ctrl_regs.PC_CONFIG_OK", 0} );
-    //cVecReg.push_back( {"pixfed_ctrl_regs.INT_TRIGGER_EN", 0} );
+    WriteReg ( "pixfed_ctrl_regs.PC_CONFIG_OK", 0 );
     cVecReg.push_back ( {"pixfed_ctrl_regs.rx_index_sel_en", 0} );
-
     cVecReg.push_back ( {"pixfed_ctrl_regs.DDR0_end_readout", 0} );
     cVecReg.push_back ( {"pixfed_ctrl_regs.DDR1_end_readout", 0} );
 
-    //cVecReg.push_back( {"pixfed_ctrl_regs.CMD_START_BY_PC", 0} );
-
     // fitel I2C bus reset & fifo TX & RX reset
     cVecReg.push_back ({"pixfed_ctrl_regs.fitel_i2c_cmd_reset", 1});
-
 
     // the FW needs to be aware of the true 32 bit workd Block size for some reason! This is the Packet_nb_true in the python script?!
     computeBlockSize ( pFakeData );
@@ -439,8 +434,9 @@ bool PixFEDFWInterface::ConfigureBoard ( const PixFED* pPixFED, bool pFakeData )
     cVecReg.push_back ({"pixfed_ctrl_regs.fitel_i2c_cmd_reset", 0});
     cVecReg.push_back ({"pixfed_ctrl_regs.acq_ctrl.calib_mode", 0});
     cVecReg.push_back ({"pixfed_ctrl_regs.fitel_config_req", 0});
-    cVecReg.push_back ( {"pixfed_ctrl_regs.PC_CONFIG_OK", 1} );
     WriteStackReg ( cVecReg );
+
+    WriteReg ( "pixfed_ctrl_regs.PC_CONFIG_OK", 1 );
 
     cVecReg.clear();
 
@@ -566,7 +562,8 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData ( PixFED* pPixFED, uint32_t pB
     WriteReg ( fStrReadout, 0 );
 
     if (fAcq_mode == 1) prettyprintTBMFIFO (cData);
-    else if(fAcq_mode == 2) prettyprintSlink (expandto64(cData));
+    else if (fAcq_mode == 2) prettyprintSlink (expandto64 (cData) );
+
     fNthAcq++;
     return cData;
 }
@@ -576,13 +573,13 @@ std::vector<uint32_t> PixFEDFWInterface::ReadNEvents ( PixFED* pPixFED, uint32_t
     std::cout << "Requesting " << pNEvents << " Events from FW!" << std::endl;
     //first, set up calibration mode
     std::vector< std::pair<std::string, uint32_t> > cVecReg;
-    cVecReg.push_back ( {"pixfed_ctrl_regs.PC_CONFIG_OK", 0} );
+    WriteReg ( "pixfed_ctrl_regs.PC_CONFIG_OK", 0 );
     cVecReg.push_back ({"pixfed_ctrl_regs.acq_ctrl.calib_mode", 1});
     cVecReg.push_back ({"pixfed_ctrl_regs.acq_ctrl.calib_mode_NEvents", pNEvents - 1});
     WriteStackReg ( cVecReg );
     cVecReg.clear();
 
-    WriteReg("pixfed_ctrl_regs.PC_CONFIG_OK", 1);
+    WriteReg ("pixfed_ctrl_regs.PC_CONFIG_OK", 1);
 
     // first set DDR bank to 0
     SelectDaqDDR ( 0 );
@@ -611,11 +608,12 @@ std::vector<uint32_t> PixFEDFWInterface::ReadNEvents ( PixFED* pPixFED, uint32_t
     //now figure out how many 32 bit words to read
     uint32_t cNWords32 = ReadReg ("pixfed_stat_regs.cnt_word32from_start");
     std::cout << "Reading " << cNWords32 << " 32 bit words from DDR " << 0 << std::endl;
-    //in normal TBM Fifo mode read 2* the number of words read from the FW (+1 fake trigger)
+    //in normal TBM Fifo mode read 2* the number of words read from the FW 
     //in FEROL IPBUS mode read the number of 32 bit words + 2*2*pNEvents (1 factor 2 is for 64 bit words)
-uint32_t cBlockSize = (fAcq_mode == 1) ?  2 * cNWords32 + 1 :
-                          cNWords32 + (2 * 2 * pNEvents) + 1;
-std::cout << "This translates into " << cBlockSize << " words in the current mode: " << fAcq_mode << std::endl;
+    //TODO: both cases had a +1 in the old calibration mode!
+    uint32_t cBlockSize = (fAcq_mode == 1) ?  2 * cNWords32 :
+                          cNWords32 + (2 * 2 * pNEvents);
+    std::cout << "This translates into " << cBlockSize << " words in the current mode: " << fAcq_mode << std::endl;
 
     // DDR control: 0 = ipbus, 1 = user
     //WriteReg ( fStrDDRControl, 0 );
@@ -635,7 +633,7 @@ std::cout << "This translates into " << cBlockSize << " words in the current mod
     WriteReg ( fStrReadout, 0 );
 
     if (fAcq_mode == 1) prettyprintTBMFIFO (cData);
-    else if(fAcq_mode == 2) prettyprintSlink (expandto64(cData));
+    else if (fAcq_mode == 2) prettyprintSlink (expandto64 (cData) );
 
     fNthAcq++;
     return cData;
@@ -686,39 +684,40 @@ void PixFEDFWInterface::prettyprintTBMFIFO (const std::vector<uint32_t>& pData )
 
 void PixFEDFWInterface::prettyprintSlink (const std::vector<uint64_t>& pData )
 {
-    for(auto& cWord : pData)
+    for (auto& cWord : pData)
     {
-	uint32_t cWord1 = (cWord>>32) & 0xFFFFFFFF;
-	uint32_t cWord2 = cWord & 0xFFFFFFFF;
-	std::cout << std::hex << cWord1 << " " << cWord2 << std::dec << std::endl;
-	//std::cout << std::hex << cWord << std::dec << std::endl;
+        uint32_t cWord1 = (cWord >> 32) & 0xFFFFFFFF;
+        uint32_t cWord2 = cWord & 0xFFFFFFFF;
+        std::cout << std::hex << cWord1 << " " << cWord2 << std::dec << std::endl;
+        //std::cout << std::hex << cWord << std::dec << std::endl;
     }
+
     for (auto& cWord : pData)
     {
         //now run Jordans decoder. First, check the header
         if ( (cWord >> 60) == 0x5 )
         {
             //Header
-            std::cout << BOLDGREEN << "Evt. ty " << ((cWord >> 56) & 0xF )<< " L1A Id " << ((cWord >> 32) & 0xFFFFFF) << " BX Id " << ((cWord >> 20) & 0xFFF ) << " Source Id " << ((cWord >> 8) & 0xFFF) << " FOV " << ((cWord >> 4) & 0xF) << RESET << std::endl;
+            std::cout << BOLDGREEN << "Evt. ty " << ( (cWord >> 56) & 0xF ) << " L1A Id " << ( (cWord >> 32) & 0xFFFFFF) << " BX Id " << ( (cWord >> 20) & 0xFFF ) << " Source Id " << ( (cWord >> 8) & 0xFFF) << " FOV " << ( (cWord >> 4) & 0xF) << RESET << std::endl;
 
         }
-        else if( (cWord >> 60) == 0xa )
+        else if ( (cWord >> 60) == 0xa )
         {
             //Trailer
-            std::cout << BOLDRED << "Evt. Length " << ((cWord >> 32) & 0xFFFFFF )<< " CRC " << ((cWord >> 16) & 0xFFFF) << RESET << std::endl;
-            
+            std::cout << BOLDRED << "Evt. Length " << ( (cWord >> 32) & 0xFFFFFF ) << " CRC " << ( (cWord >> 16) & 0xFFFF) << RESET << std::endl;
+
         }
         else //if (cWord != 0xFFFFFFFFFFFFFFFF)
         {
-           //Payload
-           //2 32 bit data words in each 64 bit word containing a hit each 
+            //Payload
+            //2 32 bit data words in each 64 bit word containing a hit each
             uint32_t cWord1 = cWord & 0xFFFFFFFF;
             uint32_t cWord2 = (cWord >> 32) & 0xFFFFFFFF;
-            
-            std::cout << "Channel " << ((cWord1 >> 26) & 0x3F) << " ROC " <<  ((cWord1 >> 21) & 0x1F) << " DC " << ((cWord1 >> 16) & 0x1F) << " Pxl " << ((cWord1 >> 8) & 0xFF) << " PH " << (cWord1 & 0xFF) << std::endl; 
-            std::cout << "Channel " << ((cWord2 >> 26) & 0x3F) << " ROC " <<  ((cWord2 >> 21) & 0x1F) << " DC " << ((cWord2 >> 16) & 0x1F) << " Pxl " << ((cWord2 >> 8) & 0xFF) << " PH " << (cWord2 & 0xFF) << std::endl; 
+
+            std::cout << "Channel " << ( (cWord1 >> 26) & 0x3F) << " ROC " <<  ( (cWord1 >> 21) & 0x1F) << " DC " << ( (cWord1 >> 16) & 0x1F) << " Pxl " << ( (cWord1 >> 8) & 0xFF) << " PH " << (cWord1 & 0xFF) << std::endl;
+            std::cout << "Channel " << ( (cWord2 >> 26) & 0x3F) << " ROC " <<  ( (cWord2 >> 21) & 0x1F) << " DC " << ( (cWord2 >> 16) & 0x1F) << " Pxl " << ( (cWord2 >> 8) & 0xFF) << " PH " << (cWord2 & 0xFF) << std::endl;
         }
-    } 
+    }
 }
 
 uint32_t PixFEDFWInterface::computeBlockSize ( bool pFakeData )

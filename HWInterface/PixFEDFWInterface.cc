@@ -409,7 +409,7 @@ bool PixFEDFWInterface::ConfigureBoard ( const PixFED* pPixFED, bool pFakeData )
     //WriteReg( "pixfed_ctrl_regs.PC_CONFIG_OK", 0 );
     //Primary Configuration
     WriteReg ( "pixfed_ctrl_regs.PC_CONFIG_OK", 0 );
-    cVecReg.push_back ( {"pixfed_ctrl_regs.rx_index_sel_en", 0} );
+    //cVecReg.push_back ( {"pixfed_ctrl_regs.rx_index_sel_en", 0} );
     cVecReg.push_back ( {"pixfed_ctrl_regs.DDR0_end_readout", 0} );
     cVecReg.push_back ( {"pixfed_ctrl_regs.DDR1_end_readout", 0} );
 

@@ -574,11 +574,15 @@ std::vector<uint32_t> PixFEDFWInterface::ReadNEvents ( PixFED* pPixFED, uint32_t
 {
     //first, set up calibration mode
     std::vector< std::pair<std::string, uint32_t> > cVecReg;
+    cVecReg.push_back ( {"pixfed_ctrl_regs.PC_CONFIG_OK", 0} );
     cVecReg.push_back ({"pixfed_ctrl_regs.acq_ctrl.calib_mode", 1});
     cVecReg.push_back ({"pixfed_ctrl_regs.acq_ctrl.calib_mode_NEvents", pNEvents - 1});
     WriteStackReg ( cVecReg );
     cVecReg.clear();
 
+    cVecReg.push_back ( {"pixfed_ctrl_regs.PC_CONFIG_OK", 1} );
+    WriteStackReg ( cVecReg );
+    cVecReg.clear();
     // first set DDR bank to 0
     SelectDaqDDR ( 0 );
     //uint32_t cBlockSize = 0;

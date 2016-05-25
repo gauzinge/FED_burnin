@@ -81,13 +81,16 @@ uint32_t convertAnyInt( const char* pRegValue )
 
 }
 
-std::vector<uint64> expandto64(const std::vector<uint32_t>& pVector)
+std::vector<uint64_t> expandto64(const std::vector<uint32_t>& pVector)
 {
 //first, pack the 32 bit words into 64 bit words
         std::vector<uint64_t> cSlinkData;
 
-        for (uint32_t cIndex = 0; cIndex < ceil (cData.size() / 2.); cIndex++ )
-            cSlinkData.push_back (pData.at (2 * cIndex) << 32) | pData.at (2 * cIndex + 1) );
+        for (uint32_t cIndex = 0; cIndex < floor (pVector.size() / 2.); cIndex++ )
+{
+ 	    //std::cout << cIndex << " ### " << 2*cIndex << " ### " << 2*cIndex +1 <<std::hex << " : "  << pVector.at(2*cIndex) << " | " << pVector.at(2*cIndex+1) << " ############################ " <<  std::dec << std::endl;
+            cSlinkData.push_back(((uint64_t)pVector.at (2 * cIndex)) << 32 | pVector.at (2 * cIndex + 1));
+}
         return cSlinkData;
 }
 

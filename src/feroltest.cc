@@ -7,15 +7,9 @@
 #include "../System/SystemController.h"
 #include "../AMC13/Amc13Controller.h"
 #include "../Utils/Data.h"
-void mypause()
-{
-    std::cout << "Press [Enter] to read FIFOs ...";
-    std::cin.get();
 
-}
 int main(int argc, char* argv[] )
 {
-
     const char* cHWFile = argv[1];
     std::cout << "HW Description File: " << cHWFile << std::endl;
 
@@ -55,10 +49,6 @@ int main(int argc, char* argv[] )
     // get the board info of all boards and start the acquistion
     for (auto& cFED : cSystemController.fPixFEDVector)
     {
-        for (auto& cFitel : cFED->fFitelVector)
-        {
-            cSystemController.fFEDInterface->ReadADC(cFitel, cChannelOfInterest, true);
-        }
         cSystemController.fFEDInterface->getBoardInfo(cFED);
         cSystemController.fFEDInterface->findPhases(cFED, cChannelOfInterest);
     }
@@ -73,21 +63,27 @@ int main(int argc, char* argv[] )
         //}
     //}
 
-    for (int i = 0; i < 11; i++)
+    uint32_t iAcq = 0;
+    bool running = true;
+    while ( true )
     {
+//std::cout << cNAcq << " ##########################" << std::endl;
          for (auto& cFED : cSystemController.fPixFEDVector)
          {
-            cSystemController.fFEDInterface->WriteBoardReg(cFED, "fe_ctrl_regs.decode_reg_reset", 1);
-             mypause();
+            //cSystemController.fFEDInterface->WriteBoardReg(cFED, "fe_ctrl_regs.decode_reg_reset", 1);
+            // mypause();
              //cSystemController.fFEDInterface->readTransparentFIFO(cFED);
-             cSystemController.fFEDInterface->readSpyFIFO(cFED);
-             cSystemController.fFEDInterface->readFIFO1(cFED);
-             cSystemController.fFEDInterface->readOSDWord(cFED, cROCOfInterest, cChannelOfInterest);
-             //cSystemController.fFEDInterface->ReadData(cFED, 0 );
-             cSystemController.fFEDInterface->ReadNEvents(cFED, cNEventsCommMode );
+//             cSystemController.fFEDInterface->readSpyFIFO(cFED);
+//            cSystemController.fFEDInterface->readFIFO1(cFED);
+//             cSystemController.fFEDInterface->readOSDWord(cFED, cROCOfInterest, cChannelOfInterest);
+            cSystemController.fFEDInterface->ReadData(cFED, 0 );
+//             cSystemController.fFEDInterface->ReadNEvents(cFED, cNEventsCommMode );
          }
-    }
-    
+        iAcq++;
+        if (iAcq < cNAcq && cNAcq > 0 )running = true;
+        else if (cNAcq == 0 ) running = true;
+        else running = false;
+ }   
     cAmc13Controller.fAmc13Interface->StopL1A();
 
 //    cSystemController.HaltHw();

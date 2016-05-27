@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-16"?>
+<?xml version="1.0" encoding="utf-8"?>
 <?xml-stylesheet type="text/xsl" href="param_table.xsl"?>
 <!-- G. Auzinger, georg.auzinger@SPAMNOTcern.ch, 30.11.2015 -->
 <node id="PixFED">
@@ -175,7 +175,9 @@
         <node id="ddr3_init_calib_done" address="0x40000004" mask="0x00000001" permission="r" />
         <node id="DDR0_full" address="0x40000004" mask="0x00000010" permission="r" />
         <node id="DDR1_full" address="0x40000004" mask="0x00000020" permission="r" />
-        <node id="fitel_config_ack" address="0x40000004" mask="0x00000300" permission="r" />
+        <!--node id="fitel_config_ack" address="0x40000004" mask="0x00000300" permission="r" /-->
+        <node id="fitel_i2c_ack" address="0x40000004" mask="0x00000300" permission="r" />
+        <node id="fitel_config_fifo_rx_empty" address="0x40000004" mask="0x00000400" permission="r" />
         <node id="calibModeOvf" address="0x40000004" mask="0x00000800" permission="r" />
         <!--FSM flags-->
         <node id="fsm_flags" address="0x40000005" permission="r">
@@ -295,7 +297,9 @@
         <node id="trig_6to9" address="0x40010000" mask="0x00700000" />
         <node id="trig_10to12" address="0x40010000" mask="0x07000000" />
         <node id="PACKET_NB" address="0x40010001" mask="0x001fffff" />
-        <node id="fitel_config_req" address="0x40010002" mask="0x00000003" />
+        <!--node id="fitel_config_req" address="0x40010002" mask="0x00000003" /-->
+        <node id="fitel_rx_i2c_req" address="0x40010002" mask="0x00000003" />
+        <node id="fitel_sfp_i2c_req" address="0x40010002" mask="0x0000000c" />
         <node id="fitel_i2c_addr" address="0x40010002" mask="0x000007f0" />
         <node id="fitel_i2c_cmd_reset" address="0x40010002" mask="0x00000800" />
         <!--<node id="chipscope_tbm_index" address="0x40010003" mask="0x0000007f" />-->

@@ -105,6 +105,11 @@ void PixFEDFWInterface::getBoardInfo()
 
     std::cout << "FMC 8 Present : " << ReadReg ( "status.fmc_l8_present" ) << std::endl;
     std::cout << "FMC 12 Present : " << ReadReg ( "status.fmc_l12_present" ) << std::endl << std::endl;
+
+    PrintSlinkStatus();
+
+    std::cout << "TTS state: " << ReadReg("pixfed_stat_regs.tts.word") << std::endl;
+
 }
 
 
@@ -433,7 +438,7 @@ bool PixFEDFWInterface::ConfigureBoard ( const PixFED* pPixFED, bool pFakeData )
 
     cVecReg.push_back ({"pixfed_ctrl_regs.fitel_i2c_cmd_reset", 0});
     cVecReg.push_back ({"pixfed_ctrl_regs.acq_ctrl.calib_mode", 0});
-    cVecReg.push_back ({"pixfed_ctrl_regs.fitel_config_req", 0});
+    cVecReg.push_back ({"pixfed_ctrl_regs.fitel_rx_i2c_req", 0});
     WriteStackReg ( cVecReg );
 
     WriteReg ( "pixfed_ctrl_regs.PC_CONFIG_OK", 1 );
@@ -532,6 +537,13 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData ( PixFED* pPixFED, uint32_t pB
     SelectDaqDDR ( fNthAcq );
     //std::cout << "Querying " << fStrDDR << " for FULL condition!" << std::endl;
 
+    //check the link status
+    PrintSlinkStatus();
+
+
+    std::cout << "TTS state: " << ReadReg("pixfed_stat_regs.tts.word") << std::endl;
+
+
     uhal::ValWord<uint32_t> cVal;
 
     do
@@ -592,6 +604,12 @@ std::vector<uint32_t> PixFEDFWInterface::ReadNEvents ( PixFED* pPixFED, uint32_t
     // the fNthAcq variable is automatically used to determine which DDR FIFO to read - so it has to be incremented in this method!
 
     //std::cout << "Querying " << fStrDDR << " for FULL condition!" << std::endl;
+
+    uhal::ValWord<uint32_t> cSlinkStatus;
+    cSlinkStatus = ReadReg("pixfed_stat_regs.slink_core_status.sync_loss");
+
+    //check the link status
+    PrintSlinkStatus();
 
     uhal::ValWord<uint32_t> cVal;
 
@@ -779,9 +797,9 @@ void PixFEDFWInterface::i2cRelease (uint32_t pTries)
 {
     uint32_t cCounter = 0;
     // release
-    WriteReg ("pixfed_ctrl_regs.fitel_config_req", 0);
+    WriteReg ("pixfed_ctrl_regs.fitel_rx_i2c_req", 0);
 
-    while (ReadReg ("pixfed_stat_regs.fitel_config_ack") != 0)
+    while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") != 0)
     {
         if (cCounter > pTries)
         {
@@ -802,7 +820,7 @@ bool PixFEDFWInterface::polli2cAcknowledge (uint32_t pTries)
     uint32_t cCounter = 0;
 
     // wait for command acknowledge
-    while (ReadReg ("pixfed_stat_regs.fitel_config_ack") == 0)
+    while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") == 0)
     {
         if (cCounter > pTries)
         {
@@ -818,9 +836,9 @@ bool PixFEDFWInterface::polli2cAcknowledge (uint32_t pTries)
     }
 
     // check the value of that register
-    if (ReadReg ("pixfed_stat_regs.fitel_config_ack") == 1)
+    if (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") == 1)
         cSuccess = true;
-    else if (ReadReg ("pixfed_stat_regs.fitel_config_ack") == 3)
+    else if (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") == 3)
         cSuccess = false;
 
     return cSuccess;
@@ -833,17 +851,17 @@ bool PixFEDFWInterface::WriteFitelBlockReg (std::vector<uint32_t>& pVecReq)
     // write the encoded registers in the tx fifo
     WriteBlockReg ("fitel_config_fifo_tx", pVecReq);
     // sent an I2C write request
-    WriteReg ("pixfed_ctrl_regs.fitel_config_req", 1);
+    WriteReg ("pixfed_ctrl_regs.fitel_rx_i2c_req", 1);
 
     // wait for command acknowledge
-    while (ReadReg ("pixfed_stat_regs.fitel_config_ack") == 0) usleep (100);
+    while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") == 0) usleep (100);
 
-    uint32_t cVal = ReadReg ("pixfed_stat_regs.fitel_config_ack");
+    uint32_t cVal = ReadReg ("pixfed_stat_regs.fitel_i2c_ack");
 
-    //if (ReadReg("pixfed_stat_regs.fitel_config_ack") == 1)
+    //if (ReadReg("pixfed_stat_regs.fitel_i2c_ack") == 1)
     if (cVal == 1)
         cSuccess = true;
-    //else if (ReadReg("pixfed_stat_regs.fitel_config_ack") == 3)
+    //else if (ReadReg("pixfed_stat_regs.fitel_i2c_ack") == 3)
     else if (cVal == 3)
     {
         std::cout << "Error writing Registers!" << std::endl;
@@ -864,17 +882,17 @@ bool PixFEDFWInterface::ReadFitelBlockReg (std::vector<uint32_t>& pVecReq)
     // write the encoded registers in the tx fifo
     WriteBlockReg ("fitel_config_fifo_tx", pVecReq);
     // sent an I2C write request
-    WriteReg ("pixfed_ctrl_regs.fitel_config_req", 3);
+    WriteReg ("pixfed_ctrl_regs.fitel_rx_i2c_req", 3);
 
     // wait for command acknowledge
-    while (ReadReg ("pixfed_stat_regs.fitel_config_ack") == 0) usleep (100);
+    while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") == 0) usleep (100);
 
-    uint32_t cVal = ReadReg ("pixfed_stat_regs.fitel_config_ack");
+    uint32_t cVal = ReadReg ("pixfed_stat_regs.fitel_i2c_ack");
 
-    //if (ReadReg("pixfed_stat_regs.fitel_config_ack") == 1)
+    //if (ReadReg("pixfed_stat_regs.fitel_i2c_ack") == 1)
     if (cVal == 1)
         cSuccess = true;
-    //else if (ReadReg("pixfed_stat_regs.fitel_config_ack") == 3)
+    //else if (ReadReg("pixfed_stat_regs.fitel_i2c_ack") == 3)
     else if (cVal == 3)
     {
         cSuccess = false;
@@ -902,7 +920,7 @@ std::vector<double> PixFEDFWInterface::ReadADC ( const uint8_t pFMCId, const uin
 
     std::vector<std::pair<std::string, uint32_t> > cVecReg;
     cVecReg.push_back ({"pixfed_ctrl_regs.fitel_i2c_cmd_reset", 0});
-    cVecReg.push_back ({"pixfed_ctrl_regs.fitel_config_req", 0});
+    cVecReg.push_back ({"pixfed_ctrl_regs.fitel_rx_i2c_req", 0});
     //Laurent is a Bastard because he changes the i2c addr register!
     cVecReg.push_back ({"pixfed_ctrl_regs.fitel_i2c_addr", 0x77});
 
@@ -922,12 +940,12 @@ std::vector<double> PixFEDFWInterface::ReadADC ( const uint8_t pFMCId, const uin
     WriteBlockReg ("fitel_config_fifo_tx", cVecWrite);
 
     // sent an I2C write request
-    WriteReg ("pixfed_ctrl_regs.fitel_config_req", 1);
+    WriteReg ("pixfed_ctrl_regs.fitel_rx_i2c_req", 1);
 
     // wait for command acknowledge
-    while (ReadReg ("pixfed_stat_regs.fitel_config_ack") == 0) usleep (100);
+    while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") == 0) usleep (100);
 
-    uint32_t cVal = ReadReg ("pixfed_stat_regs.fitel_config_ack");
+    uint32_t cVal = ReadReg ("pixfed_stat_regs.fitel_i2c_ack");
 
     if (cVal == 3)
         std::cout << "Error reading registers!" << std::endl;
@@ -946,12 +964,12 @@ std::vector<double> PixFEDFWInterface::ReadADC ( const uint8_t pFMCId, const uin
 
     WriteBlockReg ( "fitel_config_fifo_tx", cVecRead );
     // sent an I2C write request
-    WriteReg ("pixfed_ctrl_regs.fitel_config_req", 3);
+    WriteReg ("pixfed_ctrl_regs.fitel_rx_i2c_req", 3);
 
     // wait for command acknowledge
-    while (ReadReg ("pixfed_stat_regs.fitel_config_ack") == 0) usleep (100);
+    while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") == 0) usleep (100);
 
-    cVal = ReadReg ("pixfed_stat_regs.fitel_config_ack");
+    cVal = ReadReg ("pixfed_stat_regs.fitel_i2c_ack");
 
     if (cVal == 3)
         std::cout << "Error reading registers!" << std::endl;
@@ -996,6 +1014,123 @@ std::vector<double> PixFEDFWInterface::ReadADC ( const uint8_t pFMCId, const uin
     double cADCVal = fabs (cLTCValues.at (2) - cLTCValues.at (3) ) / 150.0;
     std::cout << BOLDBLUE << "FMC " << +pFMCId << " Fitel " << +pFitelId << " RSSI " << cADCVal * 1000  << " mA" << RESET << std::endl;
     return cLTCValues;
+}
+
+void PixFEDFWInterface::PrintSlinkStatus(){
+  // A function to print all Slink status values
+
+    //check the link status
+  std::cout << BOLDGREEN <<"SLINK information : " << RESET <<std::endl;
+    std::cout << "sync_loss " <<  ReadReg("pixfed_stat_regs.slink_core_status.sync_loss") << std::endl;
+    std::cout << "link_down " <<  ReadReg("pixfed_stat_regs.slink_core_status.link_down") << std::endl;
+    std::cout << "link_full " <<  ReadReg("pixfed_stat_regs.slink_core_status.link_full") << std::endl;
+
+
+    //LINK status
+    std::cout << "LINK status : " << std::endl;
+    WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0x1);
+    std::cout << "data_31to0 " <<  ReadReg("pixfed_stat_regs.slink_core_status.data_31to0") << std::endl;
+    uint32_t cLinkStatus =  ReadReg("pixfed_stat_regs.slink_core_status.data_31to0") ;
+    ((cLinkStatus & 0x80000000) >> 31)? std::cout << "\tTest mode" << std::endl : std::cout << "\tFED data" << std::endl;
+    ((cLinkStatus & 0x40000000) >> 30)? std::cout << "\tLink up" << std::endl : std::cout << "\tLink down" << std::endl;
+    ((cLinkStatus & 0x20000000) >> 29)? std::cout << "\tLink not in backpressure" << std::endl : std::cout << "\tLink in backpressure" << std::endl;
+    ((cLinkStatus & 0x10000000) >> 28)? std::cout << "\tAt least one block free to receive data" << std::endl : std::cout << "\tNo blocks free to recive data" << std::endl;
+    ((cLinkStatus & 0x00000040) >> 6)? std::cout << "\tFound two consecutive fragments with the same trigger number" << std::endl : std::cout << "\tTrigger numbers unique" << std::endl;
+    ((cLinkStatus & 0x00000020) >> 5)? std::cout << "\tTrailer duplicated" << std::endl : std::cout << "\tTrailers unique" << std::endl;
+    ((cLinkStatus & 0x00000010) >> 4)? std::cout << "\tHeader duplicated" << std::endl : std::cout << "\tHeaders unique" << std::endl;
+    ((cLinkStatus & 0x00000008) >> 3)? std::cout << "\tBetween header and trailer" << std::endl : std::cout << "\t" << std::endl;
+
+    if((cLinkStatus & 0x00000007) == 1)
+      {
+	std::cout << "\tState machine: idle" << std::endl;
+      }
+    else if((cLinkStatus & 0x00000007) == 2)
+      {
+	std::cout << "\tState machine: Read data from FED" << std::endl;
+      }
+    else if((cLinkStatus & 0x00000007) == 4)
+      {
+	std::cout << "\tState machine: Closing block" << std::endl;
+      }
+    else
+      {
+     	std::cout << "\tState machine: fucked. returned " <<  (cLinkStatus & 0x00000007) << std::endl;
+      }
+
+
+
+    //Data counter
+    std::cout << "Data counter : ";
+    WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0x2);
+    uint64_t val = ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
+    std::cout <<  val << std::endl;
+
+    //Event counter
+    std::cout << "Event counter : ";
+    WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0x3);
+    val = ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
+    std::cout <<  val << std::endl;
+
+    //Block counter
+    std::cout << "Block counter: ";
+    WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0x4);
+    val = ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
+    std::cout <<  val << std::endl;
+
+    //Packets recieved counter
+    std::cout << "Pckt rcv counter: ";
+    WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0x5);
+    val = ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
+    std::cout <<  val << std::endl;
+    
+    //Status CORE
+    std::cout << "Status CORE: " << std::endl;
+    WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0x6);
+    std::cout << "data_63to32 " <<  ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << std::endl;
+    std::cout << "data_31to0 " <<  ReadReg("pixfed_stat_regs.slink_core_status.data_31to0") << std::endl;
+
+    //Packets send counter
+    std::cout << "Pckt snd counter: ";
+    WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0x7);
+    val = ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
+    std::cout <<  val << std::endl;
+
+    //Status build
+    std::cout << "Status build: " << std::endl;
+    WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0x8);
+    std::cout << "data_63to32 " <<  ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << std::endl;
+    std::cout << "data_31to0 " <<  ReadReg("pixfed_stat_regs.slink_core_status.data_31to0") << std::endl;
+
+    //Back pressure counter
+    std::cout << "BackP counter: ";
+    WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0x9);
+    val = ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
+    std::cout <<  val << std::endl;
+
+    //Version number
+    std::cout << "Version number: " << std::endl;
+    WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0xa);
+    std::cout << "data_63to32 " <<  ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << std::endl;
+    std::cout << "data_31to0 " <<  ReadReg("pixfed_stat_regs.slink_core_status.data_31to0") << std::endl;
+
+    //SERDES status
+    std::cout << "SERDES status: " << std::endl;
+    WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0xb);
+    std::cout << "data_63to32 " <<  ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << std::endl;
+    std::cout << "data_31to0 " <<  ReadReg("pixfed_stat_regs.slink_core_status.data_31to0") << std::endl;
+
+    //Retransmitted packages counter
+    std::cout << "Retrand counter: ";
+    WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0xc);
+    val = ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
+    std::cout <<  val << std::endl;
+
+    //FED CRC error
+    std::cout << "FED CRC error: " << std::endl;
+    WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0xd);
+    std::cout << "data_63to32 " <<  ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << std::endl;
+    std::cout << "data_31to0 " <<  ReadReg("pixfed_stat_regs.slink_core_status.data_31to0") << std::endl;
+
 }
 
 /////////////////////////////////////////////

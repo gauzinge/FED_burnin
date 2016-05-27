@@ -221,6 +221,12 @@ public:
      */
     std::vector<double> ReadADC( const uint8_t pFMCId, const uint8_t pFitelId, bool pPrintAll);
 
+    /*!
+     * \brief Read and print the status of the SLINK
+     *  
+     */
+    void PrintSlinkStatus();
+
 private:
     void getFEDNetworkParameters();
     /*!

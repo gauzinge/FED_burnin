@@ -128,6 +128,10 @@ public:
      */
     void monitorPhases(uint32_t pScopeFIFOCh = 0);
     /*!
+     * \brief: initialize Slink to send data
+     */
+    void InitSlink(const uint8_t pFMCId);
+    /*!
      * \brief: read the bistream FIFO of the PixFED
      */
     std::vector<uint32_t> readTransparentFIFO();

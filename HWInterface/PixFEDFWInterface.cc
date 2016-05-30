@@ -238,6 +238,67 @@ void PixFEDFWInterface::prettyprintPhase (const std::vector<uint32_t>& pData, in
               ( (pData.at ( (pChannel * 4 ) + 2 )       ) & 0x1f ) << std::endl;
 }
 
+void PixFEDFWInterface::InitSlink(uint8_t pFMCId)
+{
+
+  WriteReg ("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 1);
+  sleep(0.5);
+  WriteReg ("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 0);
+  
+  std::vector<std::pair<std::string, uint32_t> > cVecReg;
+  cVecReg.push_back ({"pixfed_ctrl_regs.fitel_sfp_i2c_req", 0});
+  cVecReg.push_back ({"pixfed_ctrl_regs.fitel_rx_i2c_req", 0});
+  
+  cVecReg.push_back ({"pixfed_ctrl_regs.fitel_i2c_addr", 0x38});
+  
+  WriteStackReg (cVecReg);
+  
+  // Vectors for write and read data!
+  std::vector<uint32_t> cVecWrite;
+  std::vector<uint32_t> cVecRead;
+  
+  //encode them in a 32 bit word and write, no readback yet
+  cVecWrite.push_back (  pFMCId  << 24 |   0x02 );
+  WriteBlockReg ("fitel_config_fifo_tx", cVecWrite);
+  
+
+  // sent an I2C write request
+  WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 1);
+  
+  // wait for command acknowledge
+  while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") == 0) usleep (100);
+  
+  uint32_t cVal = ReadReg ("pixfed_stat_regs.fitel_i2c_ack");
+  
+  if (cVal == 3)
+    std::cout << "Error reading registers!" << cVal << std::endl;
+
+  usleep(500000);  
+  //DISP FIFO RX - I2C READING
+  std::cout << "DISP FIFO RX - I2C READING" << std::endl;
+  cVecRead = ReadBlockRegValue ("fitel_config_fifo_rx", cVecWrite.size() );
+
+  std::cout << "Checking: " << std::endl;
+  for(auto& cRead :cVecRead)
+    {
+      std::cout << "rdBuffer: " << std::hex << cRead << std::endl;
+      cRead = cRead & 0xFF;
+      std::cout << "-> SFP_MOD_ABS = "  << (cRead >> 0 & 0x1) << std::endl; 
+      std::cout << "-> SFP_TX_DIS = "   << (cRead >> 1 & 0x1) << std::endl; 
+      std::cout << "-> SFP_TX_FAULT = " << (cRead >> 2 & 0x1) << std::endl; 
+      std::cout << "-> SFP_RX_LOS = :"  << (cRead >> 3 & 0x1) << std::endl; 
+    }
+
+  //release handshake with I2C
+  WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 0);
+  
+  // wait for command acknowledge
+  while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") != 0) usleep (100);
+  
+  std::cout << "DONE" << std::endl;
+
+}
+
 std::vector<uint32_t> PixFEDFWInterface::readTransparentFIFO()
 {
     //WriteReg("fe_ctrl_regs.decode_reg_reset", 1);

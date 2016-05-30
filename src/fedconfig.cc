@@ -36,7 +36,6 @@ int main(int argc, char* argv[] )
     cAmc13Controller.ConfigureAmc13( std::cout );
     cSystemController.ConfigureHw(std::cout );
 
-    cAmc13Controller.fAmc13Interface->StartL1A();
 
     auto cSetting = cSystemController.fSettingsMap.find("NAcq");
     int cNAcq = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 10;
@@ -73,6 +72,7 @@ int main(int argc, char* argv[] )
         //}
     //}
 
+    cAmc13Controller.fAmc13Interface->StartL1A();
     for (int i = 0; i < 11; i++)
     {
          for (auto& cFED : cSystemController.fPixFEDVector)

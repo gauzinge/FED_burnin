@@ -108,7 +108,7 @@ void PixFEDFWInterface::getBoardInfo()
 
     PrintSlinkStatus();
 
-    std::cout << "TTS state: " << ReadReg("pixfed_stat_regs.tts.word") << std::endl;
+    std::cout << GREEN << "TTS state: " << ReadReg("pixfed_stat_regs.tts.word") << RESET << std::endl;
 
 }
 
@@ -208,6 +208,7 @@ void PixFEDFWInterface::findPhases (uint32_t pScopeFIFOCh)
     cVecReg.push_back ( { "pixfed_ctrl_regs.PC_CONFIG_OK", 1} );
     WriteStackReg (cVecReg);
     cVecReg.clear();
+    std::cout << GREEN << "TTS state: " << ReadReg("pixfed_stat_regs.tts.word") << RESET << std::endl;
 }
 
 void PixFEDFWInterface::monitorPhases (uint32_t pScopeFIFOCh)
@@ -240,6 +241,7 @@ void PixFEDFWInterface::prettyprintPhase (const std::vector<uint32_t>& pData, in
 
 void PixFEDFWInterface::InitSlink(uint8_t pFMCId)
 {
+//pFMCId = 0;
 
   std::cout << "Initializing SLINK" << std::endl;
 
@@ -260,7 +262,7 @@ void PixFEDFWInterface::InitSlink(uint8_t pFMCId)
   std::vector<uint32_t> cVecRead;
   
   //encode them in a 32 bit word and write, no readback yet
-  cVecWrite.push_back (  pFMCId  << 24 |   0x02 );
+  cVecWrite.push_back (  pFMCId  << 24 |   0x00 );
   WriteBlockReg ("fitel_config_fifo_tx", cVecWrite);
   
 
@@ -269,7 +271,6 @@ void PixFEDFWInterface::InitSlink(uint8_t pFMCId)
   // write 1 to sfp_i2c_reg to trigger an I2C write transaction - Laurent's BS python script is ambiguous....
   WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 1);
   
-std::cout << "Entering first poll for i2c_ac" << std::endl;
   // wait for command acknowledge
   while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") == 0) usleep (100);
 
@@ -284,10 +285,8 @@ std::cout << "Entering first poll for i2c_ac" << std::endl;
   
   // wait for command acknowledge
 
-std::cout << "Entering second poll for i2c_ac" << std::endl;
   while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") != 0) usleep (100);
   
-  std::cout << "I2C BUS released!" << std::endl;
   usleep(500);  
   ////////////////////////////////////////////////
   //THIS SHOULD BE THE END OF THE WRITE OPERATION, BUS SHOULD BE IDLE
@@ -313,8 +312,8 @@ std::cout << "Entering second poll for i2c_ac" << std::endl;
   std::cout << "Checking: " << std::endl;
   for(auto& cRead :cVecRead)
     {
-      std::cout << "rdBuffer: " << std::hex << cRead << std::endl;
-      cRead = cRead & 0xFF;
+      std::cout << "rdBuffer: " << std::hex <<std::setw(8) << "0x" << cRead << std::endl;
+      cRead = cRead & 0xF;
       std::cout << "-> SFP_MOD_ABS = "  << (cRead >> 0 & 0x1) << std::endl; 
       std::cout << "-> SFP_TX_DIS = "   << (cRead >> 1 & 0x1) << std::endl; 
       std::cout << "-> SFP_TX_FAULT = " << (cRead >> 2 & 0x1) << std::endl; 
@@ -327,8 +326,7 @@ std::cout << "Entering second poll for i2c_ac" << std::endl;
   // wait for command acknowledge
   while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") != 0) usleep (100);
   
-  std::cout << "I2C Bus Released!" << std::endl;
-
+    std::cout << GREEN << "TTS state: " << ReadReg("pixfed_stat_regs.tts.word") << RESET << std::endl;
 }
 
 std::vector<uint32_t> PixFEDFWInterface::readTransparentFIFO()
@@ -542,6 +540,7 @@ bool PixFEDFWInterface::ConfigureBoard ( const PixFED* pPixFED, bool pFakeData )
 
     std::this_thread::sleep_for ( cPause );
 
+    std::cout << GREEN << "TTS state: " << ReadReg("pixfed_stat_regs.tts.word") << RESET << std::endl;
     // Read back the DDR3 calib done flag
     bool cDDR3calibrated = ( ReadReg ( "pixfed_stat_regs.ddr3_init_calib_done" ) & 0x00000001 );
 
@@ -565,9 +564,10 @@ void PixFEDFWInterface::Start()
     std::vector< std::pair<std::string, uint32_t> > cVecReg;
     //cVecReg.push_back( {"pixfed_ctrl_regs.CMD_START_BY_PC", 1} );
     cVecReg.push_back ( {"pixfed_ctrl_regs.PC_CONFIG_OK", 1} );
-    cVecReg.push_back ( {"pixfed_ctrl_regs.INT_TRIGGER_EN", 0} );
+    //cVecReg.push_back ( {"pixfed_ctrl_regs.INT_TRIGGER_EN", 0} );
 
     //WriteStackReg( cVecReg );
+    std::cout << GREEN << "TTS state: " << ReadReg("pixfed_stat_regs.tts.word") << RESET << std::endl;
 }
 
 void PixFEDFWInterface::Stop()
@@ -586,7 +586,7 @@ void PixFEDFWInterface::Stop()
 
     //Wait for the selected SRAM to be full then empty it
     //Select SRAM
-    uhal::ValWord<uint32_t> cVal;
+    /*uhal::ValWord<uint32_t> cVal;
 
     SelectDaqDDR ( fNthAcq );
 
@@ -602,6 +602,7 @@ void PixFEDFWInterface::Stop()
 
     WriteReg ( fStrReadout, 0 );
     fNthAcq++;
+*/
 }
 
 
@@ -634,7 +635,7 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData ( PixFED* pPixFED, uint32_t pB
     //PrintSlinkStatus();
 
 
-    std::cout << "TTS state: " << ReadReg("pixfed_stat_regs.tts.word") << std::endl;
+    std::cout << GREEN << "TTS state: " << ReadReg("pixfed_stat_regs.tts.word") << RESET << std::endl;
 
 
     uhal::ValWord<uint32_t> cVal;
@@ -684,7 +685,9 @@ std::vector<uint32_t> PixFEDFWInterface::ReadNEvents ( PixFED* pPixFED, uint32_t
     WriteStackReg ( cVecReg );
     cVecReg.clear();
 
+    std::cout << GREEN << "TTS state: " << ReadReg("pixfed_stat_regs.tts.word") << RESET << std::endl;
     WriteReg ("pixfed_ctrl_regs.PC_CONFIG_OK", 1);
+    std::cout << GREEN << "TTS state: " << ReadReg("pixfed_stat_regs.tts.word") << RESET << std::endl;
 
     // first set DDR bank to 0
     SelectDaqDDR ( 0 );
@@ -747,6 +750,7 @@ std::vector<uint32_t> PixFEDFWInterface::ReadNEvents ( PixFED* pPixFED, uint32_t
     else if (fAcq_mode == 2) prettyprintSlink (expandto64 (cData) );
 
     fNthAcq++;
+    std::cout << GREEN << "TTS state: " << ReadReg("pixfed_stat_regs.tts.word") << RESET << std::endl;
     return cData;
 }
 
@@ -939,7 +943,6 @@ bool PixFEDFWInterface::polli2cAcknowledge (uint32_t pTries)
 
 bool PixFEDFWInterface::WriteFitelBlockReg (std::vector<uint32_t>& pVecReq)
 {
-std::cout << "Getting here 1 " << std::endl;
     WriteReg ("pixfed_ctrl_regs.fitel_i2c_addr", 0x4d);
     bool cSuccess = false;
     // write the encoded registers in the tx fifo
@@ -1112,6 +1115,7 @@ std::vector<double> PixFEDFWInterface::ReadADC ( const uint8_t pFMCId, const uin
 
 void PixFEDFWInterface::PrintSlinkStatus(){
   // A function to print all Slink status values
+    std::cout << GREEN << "TTS state: " << ReadReg("pixfed_stat_regs.tts.word") << RESET << std::endl;
 
     //check the link status
   std::cout << BOLDGREEN <<"SLINK information : " << RESET <<std::endl;

@@ -10,7 +10,7 @@
         <BGO command="0x2c" repeat="1" prescale="0" bx="381" />
         <!-- Local enables Local L1A, mode 0 means a trigger every orbit at BX500, rate is 1 for every orbit and burst is 1 
              for 1 trigger when sending burst (equivalent to single trigger -->
-        <Trigger local="1" mode="0" rate="1" burst="1" rules="0" /> 
+        <Trigger local="1" mode="0" rate="10000" burst="1" rules="0" /> 
         <!--<Register tounge="T1" name="test.test">0</Register>-->
         <TTCSimulator>0</TTCSimulator>
     </AMC13>
@@ -19,7 +19,7 @@
 
         <!-- ACQUISITION MODE & DATA TYPE -->
         <!--1: TBM fifo, 2: Slink FIFO, 3: FEROL-->
-        <Register name="pixfed_ctrl_regs.acq_ctrl.acq_mode">3</Register>
+        <Register name="pixfed_ctrl_regs.acq_ctrl.acq_mode">2</Register>
         <!--0: real data, 1: constants after TBM fifo, 2: pattern before TBM fifo-->
         <Register name="pixfed_ctrl_regs.data_type">0</Register>
 

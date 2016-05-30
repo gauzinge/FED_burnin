@@ -120,7 +120,6 @@ public:
     void ConfigureFitel( Fitel* pFitel, bool pVerifLoop = true);
 
     std::vector<double> ReadADC( Fitel* pFitel, uint32_t pChan, bool pPrintAll = false );
-    void InitSlink( Fitel* pFitel);
 
     /////////////////////////////////////
     // PixFED System Methods
@@ -216,6 +215,11 @@ public:
      * \return cData: the data in 32 bit words
      */
     std::vector<uint32_t> ReadNEvents( PixFED* pFED, uint32_t pNEvents = 1 );
+    /*!
+    * \brief: Initialize the Slink
+    * \param: pointer to PixFED
+    */ 
+    void InitSlink( const PixFED* pFED);
     /*!
      * \brief Prints the status of the Slink
      * \param pFED

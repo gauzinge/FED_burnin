@@ -342,12 +342,6 @@ std::cout << cChannel << " " <<  tmp << " " << +cValue << std::endl;
     }
 }
 
-void PixFEDInterface::InitSlink( Fitel* pFitel)
-{
-  std::cout << "Initializing SFP on FMC " << +pFitel->getFMCId() << std::endl;
-  fFEDFW->InitSlink(pFitel->getFMCId());
-}
-
 std::vector<double> PixFEDInterface::ReadADC( Fitel* pFitel, uint32_t pChan, bool pPrintAll)
 {
     pChan = (pChan % 12 ) + 1;
@@ -414,6 +408,15 @@ void PixFEDInterface::disableFMCs( const PixFED * pFED )
 {
     setBoard( pFED->getBeId() );
     fFEDFW->disableFMCs();
+}
+
+void PixFEDInterface::InitSlink( const PixFED* pFED)
+{
+  setBoard( pFED->getBeId() );
+  //TODO: this needs to change to 0 once the FMC is in the correct place
+  uint8_t cFMCId = 1;  
+  std::cout << "Initializing SFP on FMC " << +cFMCId << std::endl;
+  fFEDFW->InitSlink(cFMCId);
 }
 
 void PixFEDInterface::ConfigureFED( const PixFED * pFED )

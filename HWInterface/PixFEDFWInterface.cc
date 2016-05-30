@@ -241,6 +241,8 @@ void PixFEDFWInterface::prettyprintPhase (const std::vector<uint32_t>& pData, in
 void PixFEDFWInterface::InitSlink(uint8_t pFMCId)
 {
 
+  std::cout << "Initializing SLINK" << std::endl;
+
   WriteReg ("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 1);
   sleep(0.5);
   WriteReg ("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 0);
@@ -263,20 +265,50 @@ void PixFEDFWInterface::InitSlink(uint8_t pFMCId)
   
 
   // sent an I2C write request
+  // Edit G. Auzinger
+  // write 1 to sfp_i2c_reg to trigger an I2C write transaction - Laurent's BS python script is ambiguous....
   WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 1);
   
+std::cout << "Entering first poll for i2c_ac" << std::endl;
   // wait for command acknowledge
   while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") == 0) usleep (100);
+
   
   uint32_t cVal = ReadReg ("pixfed_stat_regs.fitel_i2c_ack");
   
   if (cVal == 3)
-    std::cout << "Error reading registers!" << cVal << std::endl;
+    std::cout << "Error during i2c write!" << cVal << std::endl;
 
-  usleep(500000);  
-  //DISP FIFO RX - I2C READING
+  //release handshake with I2C
+  WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 0);
+  
+  // wait for command acknowledge
+
+std::cout << "Entering second poll for i2c_ac" << std::endl;
+  while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") != 0) usleep (100);
+  
+  std::cout << "I2C BUS released!" << std::endl;
+  usleep(500);  
+  ////////////////////////////////////////////////
+  //THIS SHOULD BE THE END OF THE WRITE OPERATION, BUS SHOULD BE IDLE
+  ///////////////////////////////////////////////
+
   std::cout << "DISP FIFO RX - I2C READING" << std::endl;
-  cVecRead = ReadBlockRegValue ("fitel_config_fifo_rx", cVecWrite.size() );
+  cVecRead.push_back( pFMCId << 24 | 0x00 );
+  WriteBlockReg ("fitel_config_fifo_tx", cVecRead);
+  //this issues an I2C read request via FW
+  WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 3);
+
+  // wait for command acknowledge
+  while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") == 0) usleep (100);
+
+  
+  cVal = ReadReg ("pixfed_stat_regs.fitel_i2c_ack");
+  
+  if (cVal == 3)
+    std::cout << "Error during i2c write!" << cVal << std::endl;
+
+  cVecRead = ReadBlockRegValue ("fitel_config_fifo_rx", cVecRead.size() );
 
   std::cout << "Checking: " << std::endl;
   for(auto& cRead :cVecRead)
@@ -295,7 +327,7 @@ void PixFEDFWInterface::InitSlink(uint8_t pFMCId)
   // wait for command acknowledge
   while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") != 0) usleep (100);
   
-  std::cout << "DONE" << std::endl;
+  std::cout << "I2C Bus Released!" << std::endl;
 
 }
 
@@ -599,7 +631,7 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData ( PixFED* pPixFED, uint32_t pB
     //std::cout << "Querying " << fStrDDR << " for FULL condition!" << std::endl;
 
     //check the link status
-    PrintSlinkStatus();
+    //PrintSlinkStatus();
 
 
     std::cout << "TTS state: " << ReadReg("pixfed_stat_regs.tts.word") << std::endl;
@@ -666,11 +698,11 @@ std::vector<uint32_t> PixFEDFWInterface::ReadNEvents ( PixFED* pPixFED, uint32_t
 
     //std::cout << "Querying " << fStrDDR << " for FULL condition!" << std::endl;
 
-    uhal::ValWord<uint32_t> cSlinkStatus;
-    cSlinkStatus = ReadReg("pixfed_stat_regs.slink_core_status.sync_loss");
+    //uhal::ValWord<uint32_t> cSlinkStatus;
+    //cSlinkStatus = ReadReg("pixfed_stat_regs.slink_core_status.sync_loss");
 
     //check the link status
-    PrintSlinkStatus();
+    //PrintSlinkStatus();
 
     uhal::ValWord<uint32_t> cVal;
 
@@ -907,6 +939,7 @@ bool PixFEDFWInterface::polli2cAcknowledge (uint32_t pTries)
 
 bool PixFEDFWInterface::WriteFitelBlockReg (std::vector<uint32_t>& pVecReq)
 {
+std::cout << "Getting here 1 " << std::endl;
     WriteReg ("pixfed_ctrl_regs.fitel_i2c_addr", 0x4d);
     bool cSuccess = false;
     // write the encoded registers in the tx fifo

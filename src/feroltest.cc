@@ -29,8 +29,8 @@ int main(int argc, char* argv[] )
     // configure the HW
     cAmc13Controller.ConfigureAmc13( std::cout );
     cSystemController.ConfigureHw(std::cout );
-
     cAmc13Controller.fAmc13Interface->StartL1A();
+
 
     auto cSetting = cSystemController.fSettingsMap.find("NAcq");
     int cNAcq = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 10;
@@ -49,12 +49,9 @@ int main(int argc, char* argv[] )
     // get the board info of all boards and start the acquistion
     for (auto& cFED : cSystemController.fPixFEDVector)
     {
-      for (auto& cFitel : cFED->fFitelVector)
-        {
-	  cSystemController.fFEDInterface->InitSlink(cFitel);
-        }
       cSystemController.fFEDInterface->getBoardInfo(cFED);
       cSystemController.fFEDInterface->findPhases(cFED, cChannelOfInterest);
+      cSystemController.fFEDInterface->InitSlink(cFED);
     }
 
     //std::cout << "Monitoring Phases for selected Channel of Interest for 10 seconds ... " << std::endl << std::endl;
@@ -66,7 +63,6 @@ int main(int argc, char* argv[] )
             //cSystemController.fFEDInterface->monitorPhases(cFED, cChannelOfInterest);
         //}
     //}
-
 
 
     uint32_t iAcq = 0;
@@ -83,8 +79,9 @@ int main(int argc, char* argv[] )
 //             cSystemController.fFEDInterface->readSpyFIFO(cFED);
 //            cSystemController.fFEDInterface->readFIFO1(cFED);
 //             cSystemController.fFEDInterface->readOSDWord(cFED, cROCOfInterest, cChannelOfInterest);
-	   cSystemController.fFEDInterface->ReadData(cFED, 0 );
+//	   cSystemController.fFEDInterface->ReadData(cFED, 0 );
 	   cSystemController.fFEDInterface->PrintSlinkStatus(cFED);
+		usleep(1000);
 //             cSystemController.fFEDInterface->ReadNEvents(cFED, cNEventsCommMode );
          }
         iAcq++;

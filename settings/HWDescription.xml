@@ -3,7 +3,7 @@
     <AMC13>
         <connection id="T1" uri="chtcp-2.0://cmsuppixch:10203?target=devamc13T1:50001" address_table="file://settings/AMC13XG_T1.xml" />
         <connection id="T2" uri="chtcp-2.0://cmsuppixch:10203?target=devamc13T2:50001" address_table="file://settings/AMC13XG_T2.xml" />
-        <AMCmask enable="3,4,5,7,8,9,10" />
+        <AMCmask enable="1,2,3,4,5,6,7,8,9,10,11,12" />
         <!--This is used to send a calibration Trigger via the AMC13s internal BGO mechanism, 0x2c is the command configured as BGO15 
              on the TTCci - repeat is obvious, prescale is in orbits, the bx is selected such that it occurs 98 BX before the local
              L1A which is periodic at BX500 every orbit-->
@@ -64,5 +64,5 @@
     <Setting name="BlockSize">512</Setting>
     <Setting name="NEventsCommissioningMode">6</Setting>
     <!--if set to 0, loop will run forever-->
-    <Setting name="NAcq">100</Setting>
+    <Setting name="NAcq">0</Setting>
 </Settings>

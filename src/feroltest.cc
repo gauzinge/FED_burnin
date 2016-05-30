@@ -94,6 +94,11 @@ int main(int argc, char* argv[] )
         else running = false;
  }   
     cAmc13Controller.fAmc13Interface->StopL1A();
+         for (auto& cFED : cSystemController.fPixFEDVector)
+         {
+             cSystemController.fFEDInterface->Start(cFED);
+       	}
+
 
 //    cSystemController.HaltHw();
 //    cAmc13Controller.HaltAmc13();

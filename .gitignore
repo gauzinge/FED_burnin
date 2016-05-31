@@ -5,6 +5,7 @@ src/clt
 src/fpgaconfig
 src/amc13test
 src/fedconfig
+src/feroltest
 logifle*
 *.txt
 *.*~

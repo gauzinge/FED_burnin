@@ -12,7 +12,7 @@
         <BGO command="0x2e" repeat="0" prescale="0" bx="0" />
         <!-- Local enables Local L1A, mode 0 means a trigger every orbit at BX500, rate is 1 for every orbit and burst is 1 
              for 1 trigger when sending burst (equivalent to single trigger -->
-        <Trigger local="1" mode="0" rate="100" burst="1" rules="0" /> 
+        <Trigger local="1" mode="0" rate="1000" burst="1" rules="0" /> 
         <!--<Register tounge="T1" name="test.test">0</Register>-->
         <TTCSimulator>0</TTCSimulator>
     </AMC13>
@@ -64,8 +64,9 @@
     <!-- 0 indexed -->
     <Setting name="ROCOfInterest">1</Setting>
     <Setting name="BlockSize">512</Setting>
-    <Setting name="CommissioningMode">0</Setting>
-    <Setting name="NEventsCommissioningMode">6</Setting>
+    <!-- set to 1 to enable Calibration mode with the number of events below -->
+    <Setting name="CommissioningMode">1</Setting>
+    <Setting name="NEventsCommissioningMode">16</Setting>
     <!--if set to 0, loop will run forever-->
     <Setting name="NAcq">0</Setting>
 </Settings>

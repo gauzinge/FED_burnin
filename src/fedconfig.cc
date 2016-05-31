@@ -51,6 +51,9 @@ int main(int argc, char* argv[] )
     cSetting = cSystemController.fSettingsMap.find("NEventsCommissioningMode");
     int cNEventsCommMode = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 1;
 
+    cSetting = cSystemController.fSettingsMap.find("CommissioningMode");
+    bool cCommMode = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 0;
+
     // get the board info of all boards and start the acquistion
     for (auto& cFED : cSystemController.fPixFEDVector)
     {
@@ -72,23 +75,36 @@ int main(int argc, char* argv[] )
         //}
     //}
 
+    std::cout << "FED Configured, SLink Enabled, pressing Enter will set PC_CONFIG_OK to 1 and thus start the FED, send an EC0 & start periodic L1As" << std::endl;
+    mypause();
+    for (auto& cFED : cSystemController.fPixFEDVector)
+    {
+        cSystemController.fFEDInterface->Start(cFED);
+    }
+    cAmc13Controller.fAmc13Interface->SendBGO();
+    cAmc13Controller.fAmc13Interface->SendEC0();
     cAmc13Controller.fAmc13Interface->StartL1A();
     for (int i = 0; i < 11; i++)
     {
          for (auto& cFED : cSystemController.fPixFEDVector)
          {
-            cSystemController.fFEDInterface->WriteBoardReg(cFED, "fe_ctrl_regs.decode_reg_reset", 1);
+             cSystemController.fFEDInterface->WriteBoardReg(cFED, "fe_ctrl_regs.decode_reg_reset", 1);
              mypause();
              //cSystemController.fFEDInterface->readTransparentFIFO(cFED);
              //cSystemController.fFEDInterface->readSpyFIFO(cFED);
              cSystemController.fFEDInterface->readFIFO1(cFED);
              //cSystemController.fFEDInterface->readOSDWord(cFED, cROCOfInterest, cChannelOfInterest);
-             //cSystemController.fFEDInterface->ReadData(cFED, 0 );
-             cSystemController.fFEDInterface->ReadNEvents(cFED, cNEventsCommMode );
+             if(cCommMode) cSystemController.fFEDInterface->ReadNEvents(cFED, cNEventsCommMode );
+             else cSystemController.fFEDInterface->ReadData(cFED, 0 );
+             //cSystemController.fFEDInterface->ReadNEvents(cFED, cNEventsCommMode );
          }
-    }
+   }
     
-    cAmc13Controller.fAmc13Interface->StopL1A();
+   cAmc13Controller.fAmc13Interface->StopL1A();
+   for (auto& cFED : cSystemController.fPixFEDVector)
+   {
+       cSystemController.fFEDInterface->Stop(cFED);
+   }
 
 //    cSystemController.HaltHw();
 //    cAmc13Controller.HaltAmc13();

@@ -28,9 +28,10 @@ public:
     void StopL1A();
     void BurstL1A();
 
-    //void SendBGO();
+    void SendBGO();
     void EnableBGO(int pChan);
     void DisableBGO(int pChan);
+    void SendEC0(); 
 
     // TTC History methods!
     void ConfigureTTCHistory(std::vector<std::pair<int, uint32_t>> pFilterConfig);

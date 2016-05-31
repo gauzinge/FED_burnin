@@ -107,9 +107,6 @@ void PixFEDFWInterface::getBoardInfo()
     std::cout << "FMC 12 Present : " << ReadReg ( "status.fmc_l12_present" ) << std::endl << std::endl;
 
     PrintSlinkStatus();
-
-    std::cout << GREEN << "TTS state: " << ReadReg("pixfed_stat_regs.tts.word") << RESET << std::endl;
-
 }
 
 
@@ -208,7 +205,7 @@ void PixFEDFWInterface::findPhases (uint32_t pScopeFIFOCh)
     cVecReg.push_back ( { "pixfed_ctrl_regs.PC_CONFIG_OK", 1} );
     WriteStackReg (cVecReg);
     cVecReg.clear();
-    std::cout << GREEN << "TTS state: " << ReadReg("pixfed_stat_regs.tts.word") << RESET << std::endl;
+    readTTSState();
 }
 
 void PixFEDFWInterface::monitorPhases (uint32_t pScopeFIFOCh)
@@ -326,7 +323,7 @@ void PixFEDFWInterface::InitSlink(uint8_t pFMCId)
   // wait for command acknowledge
   while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") != 0) usleep (100);
   
-    std::cout << GREEN << "TTS state: " << ReadReg("pixfed_stat_regs.tts.word") << RESET << std::endl;
+    readTTSState();
 }
 
 std::vector<uint32_t> PixFEDFWInterface::readTransparentFIFO()
@@ -496,6 +493,27 @@ uint32_t PixFEDFWInterface::readOSDWord (uint32_t pROCId, uint32_t pScopeFIFOCh)
     return cReadValues.at (3);
 }
 
+uint8_t PixFEDFWInterface::readTTSState()
+{
+    uint8_t cWord = ReadReg("pixfed_stat_regs.tts.word") & 0x0000000F; 
+    std::cout << BOLDBLUE << "TTS State: ";
+    switch(cWord)
+    {
+	case 8: std::cout << "RDY" << RESET << std::endl;
+		break;
+	case 4: std::cout << "BSY" << RESET << std::endl;
+		break;
+	case 2: std::cout << "OOS" << RESET << std::endl;
+		break;
+	case 1: std::cout << "OVF" << RESET << std::endl;
+		break;
+	case 0: std::cout << "DIC" << RESET << std::endl;
+		break;
+	case 12: std::cout << "ERR" << RESET << std::endl;
+		break;
+    }
+    return cWord;
+}
 
 bool PixFEDFWInterface::ConfigureBoard ( const PixFED* pPixFED, bool pFakeData )
 {
@@ -540,7 +558,7 @@ bool PixFEDFWInterface::ConfigureBoard ( const PixFED* pPixFED, bool pFakeData )
 
     std::this_thread::sleep_for ( cPause );
 
-    std::cout << GREEN << "TTS state: " << ReadReg("pixfed_stat_regs.tts.word") << RESET << std::endl;
+    readTTSState();
     // Read back the DDR3 calib done flag
     bool cDDR3calibrated = ( ReadReg ( "pixfed_stat_regs.ddr3_init_calib_done" ) & 0x00000001 );
 
@@ -567,7 +585,7 @@ void PixFEDFWInterface::Start()
     //cVecReg.push_back ( {"pixfed_ctrl_regs.INT_TRIGGER_EN", 0} );
 
     //WriteStackReg( cVecReg );
-    std::cout << GREEN << "TTS state: " << ReadReg("pixfed_stat_regs.tts.word") << RESET << std::endl;
+    readTTSState();
 }
 
 void PixFEDFWInterface::Stop()
@@ -635,7 +653,7 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData ( PixFED* pPixFED, uint32_t pB
     //PrintSlinkStatus();
 
 
-    std::cout << GREEN << "TTS state: " << ReadReg("pixfed_stat_regs.tts.word") << RESET << std::endl;
+    readTTSState();
 
 
     uhal::ValWord<uint32_t> cVal;
@@ -685,9 +703,8 @@ std::vector<uint32_t> PixFEDFWInterface::ReadNEvents ( PixFED* pPixFED, uint32_t
     WriteStackReg ( cVecReg );
     cVecReg.clear();
 
-    std::cout << GREEN << "TTS state: " << ReadReg("pixfed_stat_regs.tts.word") << RESET << std::endl;
     WriteReg ("pixfed_ctrl_regs.PC_CONFIG_OK", 1);
-    std::cout << GREEN << "TTS state: " << ReadReg("pixfed_stat_regs.tts.word") << RESET << std::endl;
+    readTTSState();
 
     // first set DDR bank to 0
     SelectDaqDDR ( 0 );
@@ -750,7 +767,7 @@ std::vector<uint32_t> PixFEDFWInterface::ReadNEvents ( PixFED* pPixFED, uint32_t
     else if (fAcq_mode == 2) prettyprintSlink (expandto64 (cData) );
 
     fNthAcq++;
-    std::cout << GREEN << "TTS state: " << ReadReg("pixfed_stat_regs.tts.word") << RESET << std::endl;
+    readTTSState();
     return cData;
 }
 
@@ -1115,7 +1132,7 @@ std::vector<double> PixFEDFWInterface::ReadADC ( const uint8_t pFMCId, const uin
 
 void PixFEDFWInterface::PrintSlinkStatus(){
   // A function to print all Slink status values
-    std::cout << GREEN << "TTS state: " << ReadReg("pixfed_stat_regs.tts.word") << RESET << std::endl;
+    readTTSState();
 
     //check the link status
   std::cout << BOLDGREEN <<"SLINK information : " << RESET <<std::endl;

@@ -485,6 +485,12 @@ uint32_t PixFEDInterface::readOSDWord( const PixFED* pFED, uint32_t pROCId, uint
     return fFEDFW->readOSDWord(pROCId, pChannelOfInterest);
 }
 
+uint8_t PixFEDInterface::readTTSState(const PixFED* pFED)
+{
+   setBoard( pFED->getBeId() );
+   return fFEDFW->readTTSState();
+}
+
 ///////////////
 // Readout  Methods
 //////////////

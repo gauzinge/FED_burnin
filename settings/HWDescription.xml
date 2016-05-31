@@ -7,10 +7,12 @@
         <!--This is used to send a calibration Trigger via the AMC13s internal BGO mechanism, 0x2c is the command configured as BGO15 
              on the TTCci - repeat is obvious, prescale is in orbits, the bx is selected such that it occurs 98 BX before the local
              L1A which is periodic at BX500 every orbit-->
+        <!-- for the DEV lab setup in B186, the bx has to be 381 for the BU clock source and 380 for the TTCci as clock source -->
         <BGO command="0x2c" repeat="1" prescale="0" bx="381" />
+        <BGO command="0x2e" repeat="0" prescale="0" bx="0" />
         <!-- Local enables Local L1A, mode 0 means a trigger every orbit at BX500, rate is 1 for every orbit and burst is 1 
              for 1 trigger when sending burst (equivalent to single trigger -->
-        <Trigger local="1" mode="0" rate="10000" burst="1" rules="0" /> 
+        <Trigger local="1" mode="0" rate="100" burst="1" rules="0" /> 
         <!--<Register tounge="T1" name="test.test">0</Register>-->
         <TTCSimulator>0</TTCSimulator>
     </AMC13>
@@ -24,7 +26,7 @@
         <Register name="pixfed_ctrl_regs.data_type">0</Register>
 
         <!--SLINK-->
-        <Register name="pixfed_ctrl_regs.slink_ctrl.privateEvtNb">0x00</Register>
+        <!--<Register name="pixfed_ctrl_regs.slink_ctrl.privateEvtNb">0x00</Register>-->
         <Register name="pixfed_ctrl_regs.slink_ctrl.slinkFormatH_source_id">0x1</Register>
         <Register name="pixfed_ctrl_regs.slink_ctrl.slinkFormatH_FOV">0xe</Register>
         <Register name="pixfed_ctrl_regs.slink_ctrl.slinkFormatH_Evt_ty">0xa</Register>
@@ -38,9 +40,9 @@
 
         <!--TTS CONFIG-->
         <Register name="pixfed_ctrl_regs.tts.timeout_check_valid"> 0 </Register>
-        <Register name="pixfed_ctrl_regs.timeout_value"> 0 </Register>
-        <Register name="pixfed_ctrl_regs.tts.evt_err_nb_oos_thresh"> 10 </Register>
-        <Register name="pixfed_ctrl_regs.tts.timeout_nb_oos_thresh"> 20 </Register>
+        <Register name="pixfed_ctrl_regs.timeout_value"> 255 </Register>
+        <Register name="pixfed_ctrl_regs.tts.evt_err_nb_oos_thresh"> 255</Register>
+        <Register name="pixfed_ctrl_regs.tts.timeout_nb_oos_thresh"> 255 </Register>
         <Register name="pixfed_ctrl_regs.tts.bc0_ec0_polar"> 0 </Register>
 
         <!--CLOCK-->
@@ -62,6 +64,7 @@
     <!-- 0 indexed -->
     <Setting name="ROCOfInterest">1</Setting>
     <Setting name="BlockSize">512</Setting>
+    <Setting name="CommissioningMode">0</Setting>
     <Setting name="NEventsCommissioningMode">6</Setting>
     <!--if set to 0, loop will run forever-->
     <Setting name="NAcq">0</Setting>

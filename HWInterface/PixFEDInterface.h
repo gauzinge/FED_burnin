@@ -180,6 +180,9 @@ public:
      * \return: 32 bit word containing OSD words both both TBM cores
      */
     uint32_t readOSDWord(const PixFED* pFED, uint32_t pROCId, uint32_t pChannelOfInterest);
+
+    uint8_t readTTSState( const PixFED* pFED );
+
     /*!
      * \brief Start a DAQ
      * \param pFED

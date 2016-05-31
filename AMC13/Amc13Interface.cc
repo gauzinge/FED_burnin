@@ -219,6 +219,12 @@ void Amc13Interface::configureBGO(int pChan, uint8_t pCommand, uint16_t pBX, uin
         fAMC13->write( amc13::AMC13Simple::T1, tmp, 0);
 }
 
+void Amc13Interface::SendBGO()
+{
+    fAMC13->sendBGO();
+    //fAMC13->write(amc13::AMC13Simple::T1, "ACTION.TTC.SINGLE_COMMAND", 1);
+}
+
 void Amc13Interface::enableBGO(int pChan)
 {
     char tmp[32];
@@ -253,3 +259,9 @@ void Amc13Interface::disableBGO(int pChan)
     // Edit by Georg Auzinger, not in official AMC13 SW package but required
     fAMC13->write( amc13::AMC13Simple::T1, "CONF.TTC.ENABLE_BGO", 0);
 }
+
+void Amc13Interface::SendEC0()
+{
+    fAMC13->sendLocalEvnOrnReset(1, 0);
+}
+

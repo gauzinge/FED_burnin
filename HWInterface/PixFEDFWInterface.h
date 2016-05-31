@@ -150,6 +150,10 @@ public:
      */
     uint32_t readOSDWord( uint32_t pROCId, uint32_t pScopeFIFOCh );
     /*!
+     * \brief: Read the TTS State
+     */
+    uint8_t readTTSState(); 
+    /*!
      * \brief Start a DAQ
      */
     void Start();

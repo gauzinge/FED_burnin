@@ -51,7 +51,6 @@ int main(int argc, char* argv[] )
       cSystemController.fFEDInterface->InitSlink(cFED);
       cSystemController.fFEDInterface->getBoardInfo(cFED);
       cSystemController.fFEDInterface->findPhases(cFED, cChannelOfInterest);
-      cSystemController.fFEDInterface->Start(cFED);
     }
 
     //std::cout << "Monitoring Phases for selected Channel of Interest for 10 seconds ... " << std::endl << std::endl;
@@ -67,37 +66,36 @@ int main(int argc, char* argv[] )
 
     uint32_t iAcq = 0;
     bool running = true;
+    std::cout << "FED Configured, SLink Enabled, pressing Enter will set PC_CONFIG_OK to 1 and thus start the FED, send an EC0 & start periodic L1As" << std::endl;
     mypause();
+    for (auto& cFED : cSystemController.fPixFEDVector)
+    {
+        cSystemController.fFEDInterface->Start(cFED);
+    }
+    cAmc13Controller.fAmc13Interface->SendBGO();
+    cAmc13Controller.fAmc13Interface->SendEC0();
     cAmc13Controller.fAmc13Interface->StartL1A();
-    //cSystemController.fFEDInterface->Start();
     while ( true )
     {
 //std::cout << cNAcq << " ##########################" << std::endl;
          for (auto& cFED : cSystemController.fPixFEDVector)
          {
 
-            //cSystemController.fFEDInterface->WriteBoardReg(cFED, "fe_ctrl_regs.decode_reg_reset", 1);
-            // mypause();
-             //cSystemController.fFEDInterface->readTransparentFIFO(cFED);
-//             cSystemController.fFEDInterface->readSpyFIFO(cFED);
 //            cSystemController.fFEDInterface->readFIFO1(cFED);
-//             cSystemController.fFEDInterface->readOSDWord(cFED, cROCOfInterest, cChannelOfInterest);
 //	   cSystemController.fFEDInterface->ReadData(cFED, 0 );
 	   cSystemController.fFEDInterface->PrintSlinkStatus(cFED);
-	   usleep(10000);
-//           mypause();
-//             cSystemController.fFEDInterface->ReadNEvents(cFED, cNEventsCommMode );
+	   usleep(1000000);
          }
         iAcq++;
         if (iAcq < cNAcq && cNAcq > 0 )running = true;
         else if (cNAcq == 0 ) running = true;
         else running = false;
- }   
-    cAmc13Controller.fAmc13Interface->StopL1A();
-         for (auto& cFED : cSystemController.fPixFEDVector)
-         {
-             cSystemController.fFEDInterface->Start(cFED);
-       	}
+   }   
+   cAmc13Controller.fAmc13Interface->StopL1A();
+   for (auto& cFED : cSystemController.fPixFEDVector)
+   {
+       cSystemController.fFEDInterface->Stop(cFED);
+   }
 
 
 //    cSystemController.HaltHw();

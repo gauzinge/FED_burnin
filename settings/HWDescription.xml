@@ -26,8 +26,8 @@
         <Register name="pixfed_ctrl_regs.data_type">0</Register>
 
         <!--SLINK-->
-        <!--<Register name="pixfed_ctrl_regs.slink_ctrl.privateEvtNb">0x00</Register>-->
-        <Register name="pixfed_ctrl_regs.slink_ctrl.slinkFormatH_source_id">0x1</Register>
+        <Register name="pixfed_ctrl_regs.slink_ctrl.privateEvtNb">0x01</Register>
+        <Register name="pixfed_ctrl_regs.slink_ctrl.slinkFormatH_source_id">0x01</Register>
         <Register name="pixfed_ctrl_regs.slink_ctrl.slinkFormatH_FOV">0xe</Register>
         <Register name="pixfed_ctrl_regs.slink_ctrl.slinkFormatH_Evt_ty">0xa</Register>
         <Register name="pixfed_ctrl_regs.slink_ctrl.slinkFormatH_Evt_stat">0xf</Register>
@@ -65,7 +65,7 @@
     <Setting name="ROCOfInterest">1</Setting>
     <Setting name="BlockSize">512</Setting>
     <!-- set to 1 to enable Calibration mode with the number of events below -->
-    <Setting name="CommissioningMode">1</Setting>
+    <Setting name="CommissioningMode">0</Setting>
     <Setting name="NEventsCommissioningMode">16</Setting>
     <!--if set to 0, loop will run forever-->
     <Setting name="NAcq">0</Setting>

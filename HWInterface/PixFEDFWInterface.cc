@@ -742,8 +742,8 @@ std::vector<uint32_t> PixFEDFWInterface::ReadNEvents ( PixFED* pPixFED, uint32_t
     //in normal TBM Fifo mode read 2* the number of words read from the FW 
     //in FEROL IPBUS mode read the number of 32 bit words + 2*2*pNEvents (1 factor 2 is for 64 bit words)
     //TODO: both cases had a +1 in the old calibration mode!
-    uint32_t cBlockSize = (fAcq_mode == 1) ?  2 * cNWords32 :
-                          cNWords32 + (2 * 2 * pNEvents);
+    uint32_t cBlockSize = (fAcq_mode == 1) ?  2 * cNWords32 + 1 :
+                          cNWords32 + (2 * 2 * pNEvents) + 1;
     std::cout << "This translates into " << cBlockSize << " words in the current mode: " << fAcq_mode << std::endl;
 
     // DDR control: 0 = ipbus, 1 = user
@@ -1144,7 +1144,7 @@ void PixFEDFWInterface::PrintSlinkStatus(){
     //LINK status
     std::cout << "LINK status : " << std::endl;
     WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0x1);
-    std::cout << "data_31to0 " <<  ReadReg("pixfed_stat_regs.slink_core_status.data_31to0") << std::endl;
+    //    std::cout << "data_31to0 " <<  ReadReg("pixfed_stat_regs.slink_core_status.data_31to0") << std::endl;
     uint32_t cLinkStatus =  ReadReg("pixfed_stat_regs.slink_core_status.data_31to0") ;
     ((cLinkStatus & 0x80000000) >> 31)? std::cout << "\tTest mode" << std::endl : std::cout << "\tFED data" << std::endl;
     ((cLinkStatus & 0x40000000) >> 30)? std::cout << "\tLink up" << std::endl : std::cout << "\tLink down" << std::endl;
@@ -1201,8 +1201,27 @@ void PixFEDFWInterface::PrintSlinkStatus(){
     //Status CORE
     std::cout << "Status CORE: " << std::endl;
     WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0x6);
-    std::cout << "data_63to32 " <<  ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << std::endl;
-    std::cout << "data_31to0 " <<  ReadReg("pixfed_stat_regs.slink_core_status.data_31to0") << std::endl;
+    cLinkStatus = ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
+    ((cLinkStatus & 0x80000000) >> 31)? std::cout << "\tCore initialized" << std::endl : std::cout << "\tCore not initialized" << std::endl;
+    std::cout << "\tData transfer block status: " << std::endl;
+    std::cout << "\tBlock1: ";
+    ((cLinkStatus & 0x00000080) >> 7)? std::cout << "ready" << std::endl : std::cout << "not ready";
+    std::cout << " | Block2: ";
+    ((cLinkStatus & 0x00000040) >> 6)? std::cout << "ready" << std::endl : std::cout << "not ready";
+    std::cout << " | Block3: ";
+    ((cLinkStatus & 0x00000020) >> 5)? std::cout << "ready" << std::endl : std::cout << "not ready";
+    std::cout << " | Block4: ";
+    ((cLinkStatus & 0x00000010) >> 4)? std::cout << "ready" << std::endl : std::cout << "not ready" << std::endl;
+
+    std::cout << "\tData transfer block usage: " << std::endl;
+    std::cout << "\tBlock1: ";
+    ((cLinkStatus & 0x00000008) >> 3)? std::cout << "used" << std::endl : std::cout << "not used";
+    std::cout << " | Block2: ";
+    ((cLinkStatus & 0x00000004) >> 2)? std::cout << "used" << std::endl : std::cout << "not used";
+    std::cout << " | Block3: ";
+    ((cLinkStatus & 0x00000002) >> 1)? std::cout << "used" << std::endl : std::cout << "not used";
+    std::cout << " | Block4: ";
+    ((cLinkStatus & 0x00000001) >> 0)? std::cout << "used" << std::endl : std::cout << "not used" << std::endl;
 
     //Packets send counter
     std::cout << "Pckt snd counter: ";

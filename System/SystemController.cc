@@ -42,6 +42,7 @@ void SystemController::ConfigureHw( std::ostream& os )
     for (auto& cFED : fPixFEDVector)
     {
         fFEDInterface->ConfigureFED(cFED);
+        fFEDInterface->InitSlink(cFED);
 
         if (!cFED->fFitelVector.empty())
         {

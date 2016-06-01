@@ -199,12 +199,12 @@ void PixFEDFWInterface::findPhases (uint32_t pScopeFIFOCh)
 
     //std::this_thread::sleep_for( cWait );
 
-    cVecReg.push_back ( { "pixfed_ctrl_regs.PC_CONFIG_OK", 0} );
-    WriteStackReg (cVecReg);
-    cVecReg.clear();
-    cVecReg.push_back ( { "pixfed_ctrl_regs.PC_CONFIG_OK", 1} );
-    WriteStackReg (cVecReg);
-    cVecReg.clear();
+    //cVecReg.push_back ( { "pixfed_ctrl_regs.PC_CONFIG_OK", 0} );
+    //WriteStackReg (cVecReg);
+    //cVecReg.clear();
+    //cVecReg.push_back ( { "pixfed_ctrl_regs.PC_CONFIG_OK", 1} );
+    //WriteStackReg (cVecReg);
+    //cVecReg.clear();
     readTTSState();
 }
 
@@ -236,93 +236,88 @@ void PixFEDFWInterface::prettyprintPhase (const std::vector<uint32_t>& pData, in
               ( (pData.at ( (pChannel * 4 ) + 2 )       ) & 0x1f ) << std::endl;
 }
 
-void PixFEDFWInterface::InitSlink(uint8_t pFMCId)
+void PixFEDFWInterface::InitSlink (uint8_t pFMCId)
 {
-//pFMCId = 0;
+    //pFMCId = 0;
 
-  std::cout << "Initializing SLINK" << std::endl;
+    std::cout << "Initializing SFP+ for SLINK" << std::endl;
 
-  WriteReg ("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 1);
-  sleep(0.5);
-  WriteReg ("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 0);
-  
-  std::vector<std::pair<std::string, uint32_t> > cVecReg;
-  cVecReg.push_back ({"pixfed_ctrl_regs.fitel_sfp_i2c_req", 0});
-  cVecReg.push_back ({"pixfed_ctrl_regs.fitel_rx_i2c_req", 0});
-  
-  cVecReg.push_back ({"pixfed_ctrl_regs.fitel_i2c_addr", 0x38});
-  
-  WriteStackReg (cVecReg);
-  
-  // Vectors for write and read data!
-  std::vector<uint32_t> cVecWrite;
-  std::vector<uint32_t> cVecRead;
-  
-  //encode them in a 32 bit word and write, no readback yet
-  cVecWrite.push_back (  pFMCId  << 24 |   0x00 );
-  WriteBlockReg ("fitel_config_fifo_tx", cVecWrite);
-  
+    WriteReg ("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 1);
+    sleep (0.5);
+    WriteReg ("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 0);
 
-  // sent an I2C write request
-  // Edit G. Auzinger
-  // write 1 to sfp_i2c_reg to trigger an I2C write transaction - Laurent's BS python script is ambiguous....
-  WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 1);
-  
-  // wait for command acknowledge
-  while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") == 0) usleep (100);
+    std::vector<std::pair<std::string, uint32_t> > cVecReg;
+    cVecReg.push_back ({"pixfed_ctrl_regs.fitel_sfp_i2c_req", 0});
+    cVecReg.push_back ({"pixfed_ctrl_regs.fitel_rx_i2c_req", 0});
 
-  
-  uint32_t cVal = ReadReg ("pixfed_stat_regs.fitel_i2c_ack");
-  
-  if (cVal == 3)
-    std::cout << "Error during i2c write!" << cVal << std::endl;
+    cVecReg.push_back ({"pixfed_ctrl_regs.fitel_i2c_addr", 0x38});
 
-  //release handshake with I2C
-  WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 0);
-  
-  // wait for command acknowledge
+    WriteStackReg (cVecReg);
 
-  while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") != 0) usleep (100);
-  
-  usleep(500);  
-  ////////////////////////////////////////////////
-  //THIS SHOULD BE THE END OF THE WRITE OPERATION, BUS SHOULD BE IDLE
-  ///////////////////////////////////////////////
+    // Vectors for write and read data!
+    std::vector<uint32_t> cVecWrite;
+    std::vector<uint32_t> cVecRead;
 
-  std::cout << "DISP FIFO RX - I2C READING" << std::endl;
-  cVecRead.push_back( pFMCId << 24 | 0x00 );
-  WriteBlockReg ("fitel_config_fifo_tx", cVecRead);
-  //this issues an I2C read request via FW
-  WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 3);
+    //encode them in a 32 bit word and write, no readback yet
+    cVecWrite.push_back (  pFMCId  << 24 |   0x00 );
+    WriteBlockReg ("fitel_config_fifo_tx", cVecWrite);
 
-  // wait for command acknowledge
-  while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") == 0) usleep (100);
 
-  
-  cVal = ReadReg ("pixfed_stat_regs.fitel_i2c_ack");
-  
-  if (cVal == 3)
-    std::cout << "Error during i2c write!" << cVal << std::endl;
+    // sent an I2C write request
+    // Edit G. Auzinger
+    // write 1 to sfp_i2c_reg to trigger an I2C write transaction - Laurent's BS python script is ambiguous....
+    WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 1);
 
-  cVecRead = ReadBlockRegValue ("fitel_config_fifo_rx", cVecRead.size() );
+    // wait for command acknowledge
+    while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") == 0) usleep (100);
 
-  std::cout << "Checking: " << std::endl;
-  for(auto& cRead :cVecRead)
+    uint32_t cVal = ReadReg ("pixfed_stat_regs.fitel_i2c_ack");
+
+    if (cVal == 3)
+        std::cout << "Error during i2c write!" << cVal << std::endl;
+
+    //release handshake with I2C
+    WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 0);
+
+    // wait for command acknowledge
+    while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") != 0) usleep (100);
+
+    usleep (500);
+    ////////////////////////////////////////////////
+    //THIS SHOULD BE THE END OF THE WRITE OPERATION, BUS SHOULD BE IDLE
+    ///////////////////////////////////////////////
+
+    cVecRead.push_back ( pFMCId << 24 | 0x00 );
+    WriteBlockReg ("fitel_config_fifo_tx", cVecRead);
+    //this issues an I2C read request via FW
+    WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 3);
+
+    // wait for command acknowledge
+    while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") == 0) usleep (100);
+
+
+    cVal = ReadReg ("pixfed_stat_regs.fitel_i2c_ack");
+
+    if (cVal == 3)
+        std::cout << "Error during i2c write!" << cVal << std::endl;
+
+    cVecRead = ReadBlockRegValue ("fitel_config_fifo_rx", cVecRead.size() );
+
+    for (auto& cRead : cVecRead)
     {
-      std::cout << "rdBuffer: " << std::hex <<std::setw(8) << "0x" << cRead << std::endl;
-      cRead = cRead & 0xF;
-      std::cout << "-> SFP_MOD_ABS = "  << (cRead >> 0 & 0x1) << std::endl; 
-      std::cout << "-> SFP_TX_DIS = "   << (cRead >> 1 & 0x1) << std::endl; 
-      std::cout << "-> SFP_TX_FAULT = " << (cRead >> 2 & 0x1) << std::endl; 
-      std::cout << "-> SFP_RX_LOS = :"  << (cRead >> 3 & 0x1) << std::endl; 
+        cRead = cRead & 0xF;
+        std::cout << "-> SFP_MOD_ABS = "  << (cRead >> 0 & 0x1) << std::endl;
+        std::cout << "-> SFP_TX_DIS = "   << (cRead >> 1 & 0x1) << std::endl;
+        std::cout << "-> SFP_TX_FAULT = " << (cRead >> 2 & 0x1) << std::endl;
+        std::cout << "-> SFP_RX_LOS = :"  << (cRead >> 3 & 0x1) << std::endl;
     }
 
-  //release handshake with I2C
-  WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 0);
-  
-  // wait for command acknowledge
-  while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") != 0) usleep (100);
-  
+    //release handshake with I2C
+    WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 0);
+
+    // wait for command acknowledge
+    while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") != 0) usleep (100);
+
     readTTSState();
 }
 
@@ -495,23 +490,36 @@ uint32_t PixFEDFWInterface::readOSDWord (uint32_t pROCId, uint32_t pScopeFIFOCh)
 
 uint8_t PixFEDFWInterface::readTTSState()
 {
-    uint8_t cWord = ReadReg("pixfed_stat_regs.tts.word") & 0x0000000F; 
+    uint8_t cWord = ReadReg ("pixfed_stat_regs.tts.word") & 0x0000000F;
     std::cout << BOLDBLUE << "TTS State: ";
-    switch(cWord)
+
+    switch (cWord)
     {
-	case 8: std::cout << "RDY" << RESET << std::endl;
-		break;
-	case 4: std::cout << "BSY" << RESET << std::endl;
-		break;
-	case 2: std::cout << "OOS" << RESET << std::endl;
-		break;
-	case 1: std::cout << "OVF" << RESET << std::endl;
-		break;
-	case 0: std::cout << "DIC" << RESET << std::endl;
-		break;
-	case 12: std::cout << "ERR" << RESET << std::endl;
-		break;
+        case 8:
+            std::cout << "RDY" << RESET << std::endl;
+            break;
+
+        case 4:
+            std::cout << "BSY" << RESET << std::endl;
+            break;
+
+        case 2:
+            std::cout << "OOS" << RESET << std::endl;
+            break;
+
+        case 1:
+            std::cout << "OVF" << RESET << std::endl;
+            break;
+
+        case 0:
+            std::cout << "DIC" << RESET << std::endl;
+            break;
+
+        case 12:
+            std::cout << "ERR" << RESET << std::endl;
+            break;
     }
+
     return cWord;
 }
 
@@ -520,7 +528,6 @@ bool PixFEDFWInterface::ConfigureBoard ( const PixFED* pPixFED, bool pFakeData )
     std::vector< std::pair<std::string, uint32_t> > cVecReg;
 
     std::chrono::milliseconds cPause ( 200 );
-    //WriteReg( "pixfed_ctrl_regs.PC_CONFIG_OK", 0 );
     //Primary Configuration
     WriteReg ( "pixfed_ctrl_regs.PC_CONFIG_OK", 0 );
     //cVecReg.push_back ( {"pixfed_ctrl_regs.rx_index_sel_en", 0} );
@@ -546,15 +553,16 @@ bool PixFEDFWInterface::ConfigureBoard ( const PixFED* pPixFED, bool pFakeData )
     cVecReg.clear();
 
     cVecReg.push_back ({"pixfed_ctrl_regs.fitel_i2c_cmd_reset", 0});
-    cVecReg.push_back ({"pixfed_ctrl_regs.acq_ctrl.calib_mode", 0});
     cVecReg.push_back ({"pixfed_ctrl_regs.fitel_rx_i2c_req", 0});
     WriteStackReg ( cVecReg );
 
-    WriteReg ( "pixfed_ctrl_regs.PC_CONFIG_OK", 1 );
+    //WriteReg ( "pixfed_ctrl_regs.PC_CONFIG_OK", 1 );
 
     cVecReg.clear();
 
     fAcq_mode = ReadReg ("pixfed_ctrl_regs.acq_ctrl.acq_mode");
+    fNEvents_calmode = ReadReg ("pixfed_ctrl_regs.acq_ctrl.calib_mode_NEvents") + 1;
+    fCalibMode = ReadReg ("pixfed_ctrl_regs.acq_ctrl.calib_mode");
 
     std::this_thread::sleep_for ( cPause );
 
@@ -579,48 +587,14 @@ void PixFEDFWInterface::Start()
 {
     //set fNthAcq to 0 since I am starting from scratch and thus start with DDR0
     fNthAcq = 0;
-    std::vector< std::pair<std::string, uint32_t> > cVecReg;
-    //cVecReg.push_back( {"pixfed_ctrl_regs.CMD_START_BY_PC", 1} );
-    cVecReg.push_back ( {"pixfed_ctrl_regs.PC_CONFIG_OK", 1} );
-    //cVecReg.push_back ( {"pixfed_ctrl_regs.INT_TRIGGER_EN", 0} );
-
-    //WriteStackReg( cVecReg );
+    WriteReg( "pixfed_ctrl_regs.PC_CONFIG_OK", 1 );
     readTTSState();
 }
 
 void PixFEDFWInterface::Stop()
 {
     //Stop the DAQ
-    std::vector< std::pair<std::string, uint32_t> > cVecReg;
-    //cVecReg.push_back( {"pixfed_ctrl_regs.CMD_START_BY_PC", 0} );
-    //cVecReg.push_back( {"pixfed_ctrl_regs.INT_TRIGGER_EN", 0} );
-    cVecReg.push_back ( {"pixfed_ctrl_regs.PC_CONFIG_OK", 0} );
-    //cVecReg.push_back( {"pixfed_ctrl_regs.rx_index_sel_en", 0} );
-
-    WriteStackReg ( cVecReg );
-    cVecReg.clear();
-
-    std::chrono::milliseconds cWait ( 100 );
-
-    //Wait for the selected SRAM to be full then empty it
-    //Select SRAM
-    /*uhal::ValWord<uint32_t> cVal;
-
-    SelectDaqDDR ( fNthAcq );
-
-    do
-    {
-        cVal = ReadReg ( fStrFull );
-
-        if ( cVal == 1 )
-            std::this_thread::sleep_for ( cWait );
-
-    }
-    while ( cVal == 1 );
-
-    WriteReg ( fStrReadout, 0 );
-    fNthAcq++;
-*/
+    WriteReg ( "pixfed_ctrl_regs.PC_CONFIG_OK", 0 );
 }
 
 
@@ -637,25 +611,15 @@ void PixFEDFWInterface::Resume()
 
 std::vector<uint32_t> PixFEDFWInterface::ReadData ( PixFED* pPixFED, uint32_t pBlockSize )
 {
+    readTTSState();
+
     uint32_t cBlockSize = 0;
-
-    if (pBlockSize == 0) cBlockSize = fBlockSize;
-    else cBlockSize = pBlockSize;
-
     std::chrono::milliseconds cWait ( 10 );
-    // the fNthAcq variable is automatically used to determine which DDR FIFO to read - so it has to be incremented in this method!
 
-    // first find which DDR bank to read
+    // first find which DDR bank to read - this is always 0 in calibration mode and SelectDaqDDR() knows about it
     SelectDaqDDR ( fNthAcq );
-    //std::cout << "Querying " << fStrDDR << " for FULL condition!" << std::endl;
 
-    //check the link status
-    //PrintSlinkStatus();
-
-
-    readTTSState();
-
-
+    //poll for the selected DDR bank to be full
     uhal::ValWord<uint32_t> cVal;
 
     do
@@ -666,12 +630,22 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData ( PixFED* pPixFED, uint32_t pB
     }
     while ( cVal == 0 );
 
-    //std::cout << fStrDDR << " full: " << ReadReg( fStrFull ) << std::endl;
-
-    // DDR control: 0 = ipbus, 1 = user
-    //WriteReg ( fStrDDRControl, 0 );
-    //std::this_thread::sleep_for ( cWait );
-    //std::cout << "Starting block read of " << fStrDDR << std::endl;
+    if (fCalibMode == 1)
+    {
+        //I am in calibration mode and thus the FW gets to decide how many words to read and they come from DDR0!
+        uint32_t cNWords32 = ReadReg ("pixfed_stat_regs.cnt_word32from_start");
+        std::cout << "Requesting " << fNEvents_calmode << " Events in Calibration Mode and thus reading " << cNWords32 << " 32 bit words from DDR " << 0 << std::endl;
+        //in normal TBM Fifo mode read 2* the number of words read from the FW
+        //in FEROL IPBUS mode read the number of 32 bit words + 2*2*pNEvents (1 factor 2 is for 64 bit words)
+        cBlockSize = (fAcq_mode == 1) ?  2 * cNWords32/* + 1*/ :
+                     cNWords32 + (2 * 2 * fNEvents_calmode)/* + 1*/;
+        std::cout << "This translates into " << cBlockSize << " words in the current mode: " << fAcq_mode << std::endl;
+    }
+    else
+    {
+        if (pBlockSize == 0) cBlockSize = fBlockSize;
+        else cBlockSize = pBlockSize;
+    }
 
     std::vector<uint32_t> cData = ReadBlockRegValue ( fStrDDR, cBlockSize );
     //WriteReg ( fStrDDRControl , 1 );
@@ -688,88 +662,12 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData ( PixFED* pPixFED, uint32_t pB
     if (fAcq_mode == 1) prettyprintTBMFIFO (cData);
     else if (fAcq_mode == 2) prettyprintSlink (expandto64 (cData) );
 
-    fNthAcq++;
-    return cData;
-}
+    if (!fCalibMode) fNthAcq++;
 
-std::vector<uint32_t> PixFEDFWInterface::ReadNEvents ( PixFED* pPixFED, uint32_t pNEvents )
-{
-    std::cout << "Requesting " << pNEvents << " Events from FW!" << std::endl;
-    //first, set up calibration mode
-    std::vector< std::pair<std::string, uint32_t> > cVecReg;
-    WriteReg ( "pixfed_ctrl_regs.PC_CONFIG_OK", 0 );
-    cVecReg.push_back ({"pixfed_ctrl_regs.acq_ctrl.calib_mode", 1});
-    cVecReg.push_back ({"pixfed_ctrl_regs.acq_ctrl.calib_mode_NEvents", pNEvents - 1});
-    WriteStackReg ( cVecReg );
-    cVecReg.clear();
-
-    WriteReg ("pixfed_ctrl_regs.PC_CONFIG_OK", 1);
-    readTTSState();
-
-    // first set DDR bank to 0
-    SelectDaqDDR ( 0 );
-    //uint32_t cBlockSize = 0;
-
-    //if (pBlockSize == 0) cBlockSize = fBlockSize;
-    //else cBlockSize = pBlockSize;
-
-    std::chrono::milliseconds cWait ( 10 );
-    // the fNthAcq variable is automatically used to determine which DDR FIFO to read - so it has to be incremented in this method!
-
-    //std::cout << "Querying " << fStrDDR << " for FULL condition!" << std::endl;
-
-    //uhal::ValWord<uint32_t> cSlinkStatus;
-    //cSlinkStatus = ReadReg("pixfed_stat_regs.slink_core_status.sync_loss");
-
-    //check the link status
-    //PrintSlinkStatus();
-
-    uhal::ValWord<uint32_t> cVal;
-
-    do
-    {
-        cVal = ReadReg ( fStrFull );
-
-        if ( cVal == 0 ) std::this_thread::sleep_for ( cWait );
-    }
-    while ( cVal == 0 );
-
-    //std::cout << fStrDDR << " full: " << ReadReg( fStrFull ) << std::endl;
-
-    //now figure out how many 32 bit words to read
-    uint32_t cNWords32 = ReadReg ("pixfed_stat_regs.cnt_word32from_start");
-    std::cout << "Reading " << cNWords32 << " 32 bit words from DDR " << 0 << std::endl;
-    //in normal TBM Fifo mode read 2* the number of words read from the FW 
-    //in FEROL IPBUS mode read the number of 32 bit words + 2*2*pNEvents (1 factor 2 is for 64 bit words)
-    //TODO: both cases had a +1 in the old calibration mode!
-    uint32_t cBlockSize = (fAcq_mode == 1) ?  2 * cNWords32 + 1 :
-                          cNWords32 + (2 * 2 * pNEvents) + 1;
-    std::cout << "This translates into " << cBlockSize << " words in the current mode: " << fAcq_mode << std::endl;
-
-    // DDR control: 0 = ipbus, 1 = user
-    //WriteReg ( fStrDDRControl, 0 );
-    std::this_thread::sleep_for ( cWait );
-    //std::cout << "Starting block read of " << fStrDDR << std::endl;
-
-    std::vector<uint32_t> cData = ReadBlockRegValue ( fStrDDR, cBlockSize );
-    //WriteReg ( fStrDDRControl , 1 );
-    std::this_thread::sleep_for ( cWait );
-    WriteReg ( fStrReadout, 1 );
-    std::this_thread::sleep_for ( cWait );
-
-    // full handshake between SW & FW
-    while ( ReadReg ( fStrFull ) == 1 )
-        std::this_thread::sleep_for ( cWait );
-
-    WriteReg ( fStrReadout, 0 );
-
-    if (fAcq_mode == 1) prettyprintTBMFIFO (cData);
-    else if (fAcq_mode == 2) prettyprintSlink (expandto64 (cData) );
-
-    fNthAcq++;
     readTTSState();
     return cData;
 }
+
 
 void PixFEDFWInterface::prettyprintTBMFIFO (const std::vector<uint32_t>& pData )
 {
@@ -880,6 +778,8 @@ bool PixFEDFWInterface::WriteBlockReg ( const std::string& pRegNode, const std::
 
 void PixFEDFWInterface::SelectDaqDDR ( uint32_t pNthAcq )
 {
+    if (fCalibMode == 1) pNthAcq = 0;
+
     fStrDDR  = ( ( pNthAcq % 2 + 1 ) == 1 ? "DDR0" : "DDR1" );
     fStrDDRControl = ( ( pNthAcq % 2 + 1 ) == 1 ? "pixfed_ctrl_regs.DDR0_ctrl_sel" : "pixfed_ctrl_regs.DDR1_ctrl_sel" );
     fStrFull = ( ( pNthAcq % 2 + 1 ) == 1 ? "pixfed_stat_regs.DDR0_full" : "pixfed_stat_regs.DDR1_full" );
@@ -1130,139 +1030,132 @@ std::vector<double> PixFEDFWInterface::ReadADC ( const uint8_t pFMCId, const uin
     return cLTCValues;
 }
 
-void PixFEDFWInterface::PrintSlinkStatus(){
-  // A function to print all Slink status values
+void PixFEDFWInterface::PrintSlinkStatus()
+{
+    // A function to print all Slink status values
     readTTSState();
 
     //check the link status
-  std::cout << BOLDBLUE <<"SLINK information : " << RESET <<std::endl;
-    std::cout << "sync_loss " <<  ReadReg("pixfed_stat_regs.slink_core_status.sync_loss") << std::endl;
-    std::cout << "link_down " <<  ReadReg("pixfed_stat_regs.slink_core_status.link_down") << std::endl;
-    std::cout << "link_full " <<  ReadReg("pixfed_stat_regs.slink_core_status.link_full") << std::endl;
+    std::cout << BOLDBLUE << "SLINK information : " << RESET << std::endl;
+    std::cout << "sync_loss " <<  ReadReg ("pixfed_stat_regs.slink_core_status.sync_loss") << std::endl;
+    std::cout << "link_down " <<  ReadReg ("pixfed_stat_regs.slink_core_status.link_down") << std::endl;
+    std::cout << "link_full " <<  ReadReg ("pixfed_stat_regs.slink_core_status.link_full") << std::endl;
 
 
     //LINK status
     std::cout << "LINK status : " << std::endl;
-    WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0x1);
+    WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0x1);
     //    std::cout << "data_31to0 " <<  ReadReg("pixfed_stat_regs.slink_core_status.data_31to0") << std::endl;
-    uint32_t cLinkStatus =  ReadReg("pixfed_stat_regs.slink_core_status.data_31to0") ;
-    ((cLinkStatus & 0x80000000) >> 31)? std::cout << "   Test mode" << std::endl : std::cout << "   FED data" << std::endl;
-    ((cLinkStatus & 0x40000000) >> 30)? std::cout << "   Link up" << RESET << std::endl : std::cout << RED << "   Link down" << RESET << std::endl;
-    ((cLinkStatus & 0x20000000) >> 29)? std::cout << "\0"  : std::cout << "   Link backpressured" << std::endl;
-    ((cLinkStatus & 0x10000000) >> 28)? std::cout << "   At least one block free to receive data" << std::endl : std::cout << "\0";
-    ((cLinkStatus & 0x00000040) >> 6)? std::cout << "   Found two consecutive fragments with the same trigger number" << std::endl : std::cout << "\0";
-    ((cLinkStatus & 0x00000020) >> 5)? std::cout << "   Trailer duplicated" << std::endl : std::cout << "\0";
-    ((cLinkStatus & 0x00000010) >> 4)? std::cout << "   Header duplicated" << std::endl : std::cout << "\0";
-    ((cLinkStatus & 0x00000008) >> 3)? std::cout << "   Between header and trailer" << std::endl : std::cout << "\0";
+    uint32_t cLinkStatus =  ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0") ;
+    ( (cLinkStatus & 0x80000000) >> 31) ? std::cout << "   Test mode" << std::endl : std::cout << "   FED data" << std::endl;
+    ( (cLinkStatus & 0x40000000) >> 30) ? std::cout << "   Link up" << RESET << std::endl : std::cout << RED << "   Link down" << RESET << std::endl;
+    ( (cLinkStatus & 0x20000000) >> 29) ? std::cout << "\0"  : std::cout << "   Link backpressured" << std::endl;
+    ( (cLinkStatus & 0x10000000) >> 28) ? std::cout << "   At least one block free to receive data" << std::endl : std::cout << "\0";
+    ( (cLinkStatus & 0x00000040) >> 6) ? std::cout << "   Found two consecutive fragments with the same trigger number" << std::endl : std::cout << "\0";
+    ( (cLinkStatus & 0x00000020) >> 5) ? std::cout << "   Trailer duplicated" << std::endl : std::cout << "\0";
+    ( (cLinkStatus & 0x00000010) >> 4) ? std::cout << "   Header duplicated" << std::endl : std::cout << "\0";
+    ( (cLinkStatus & 0x00000008) >> 3) ? std::cout << "   Between header and trailer" << std::endl : std::cout << "\0";
 
-    if((cLinkStatus & 0x00000007) == 1)
-      {
-	std::cout << "   State machine: idle" << std::endl;
-      }
-    else if((cLinkStatus & 0x00000007) == 2)
-      {
-	std::cout << "   State machine: Read data from FED" << std::endl;
-      }
-    else if((cLinkStatus & 0x00000007) == 4)
-      {
-	std::cout << "   State machine: Closing block" << std::endl;
-      }
+    if ( (cLinkStatus & 0x00000007) == 1)
+        std::cout << "   State machine: idle" << std::endl;
+    else if ( (cLinkStatus & 0x00000007) == 2)
+        std::cout << "   State machine: Read data from FED" << std::endl;
+    else if ( (cLinkStatus & 0x00000007) == 4)
+        std::cout << "   State machine: Closing block" << std::endl;
     else
-      {
-     	std::cout << "   State machine: fucked (Return value: " <<  (cLinkStatus & 0x00000007) << ")" << std::endl;
-      }
+        std::cout << "   State machine: fucked (Return value: " <<  (cLinkStatus & 0x00000007) << ")" << std::endl;
 
 
 
     //Data counter
     std::cout << "Data counter: ";
-    WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0x2);
-    uint64_t val = ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
+    WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0x2);
+    uint64_t val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << std::endl;
 
     //Event counter
     std::cout << "Event counter: ";
-    WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0x3);
-    val = ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
+    WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0x3);
+    val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << std::endl;
 
     //Block counter
     std::cout << "Block counter: ";
-    WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0x4);
-    val = ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
+    WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0x4);
+    val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << std::endl;
 
     //Packets recieved counter
     std::cout << "Pckt rcv counter: ";
-    WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0x5);
-    val = ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
+    WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0x5);
+    val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << std::endl;
-    
+
     //Status CORE
     std::cout << "Status CORE: " << std::endl;
-    WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0x6);
-    cLinkStatus = ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
-    ((cLinkStatus & 0x80000000) >> 31)? std::cout << "   Core initialized" << std::endl : std::cout << "   Core not initialized" << std::endl;
+    WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0x6);
+    cLinkStatus = ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
+    ( (cLinkStatus & 0x80000000) >> 31) ? std::cout << "   Core initialized" << std::endl : std::cout << "   Core not initialized" << std::endl;
     std::cout << "   Data transfer block status: " << std::endl;
     std::cout << "      Block1: ";
-    ((cLinkStatus & 0x00000080) >> 7)? std::cout << BOLDGREEN << "ready    " << RESET : std::cout << BOLDRED << "not ready" << RESET;
+    ( (cLinkStatus & 0x00000080) >> 7) ? std::cout << BOLDGREEN << "ready    " << RESET : std::cout << BOLDRED << "not ready" << RESET;
     std::cout << " | Block2: ";
-    ((cLinkStatus & 0x00000040) >> 6)? std::cout << BOLDGREEN << "ready    " << RESET : std::cout << BOLDRED << "not ready" << RESET;
+    ( (cLinkStatus & 0x00000040) >> 6) ? std::cout << BOLDGREEN << "ready    " << RESET : std::cout << BOLDRED << "not ready" << RESET;
     std::cout << " | Block3: ";
-    ((cLinkStatus & 0x00000020) >> 5)? std::cout << BOLDGREEN << "ready    " << RESET : std::cout << BOLDRED << "not ready" << RESET;
+    ( (cLinkStatus & 0x00000020) >> 5) ? std::cout << BOLDGREEN << "ready    " << RESET : std::cout << BOLDRED << "not ready" << RESET;
     std::cout << " | Block4: ";
-    ((cLinkStatus & 0x00000010) >> 4)? std::cout << BOLDGREEN << "ready" << RESET : std::cout << BOLDRED << "not ready" << RESET << std::endl;
+    ( (cLinkStatus & 0x00000010) >> 4) ? std::cout << BOLDGREEN << "ready" << RESET : std::cout << BOLDRED << "not ready" << RESET << std::endl;
 
     std::cout << "   Data transfer block usage: " << std::endl;
     std::cout << "      Block1: ";
-    ((cLinkStatus & 0x00000008) >> 3)? std::cout << BOLDRED << "used    " << RESET : std::cout << BOLDGREEN << "not used " << RESET;
+    ( (cLinkStatus & 0x00000008) >> 3) ? std::cout << BOLDRED << "used    " << RESET : std::cout << BOLDGREEN << "not used " << RESET;
     std::cout << " | Block2: ";
-    ((cLinkStatus & 0x00000004) >> 2)? std::cout << BOLDRED << "used    " << RESET : std::cout << BOLDGREEN << "not used " << RESET;
+    ( (cLinkStatus & 0x00000004) >> 2) ? std::cout << BOLDRED << "used    " << RESET : std::cout << BOLDGREEN << "not used " << RESET;
     std::cout << " | Block3: ";
-    ((cLinkStatus & 0x00000002) >> 1)? std::cout << BOLDRED << "used    " << RESET : std::cout << BOLDGREEN << "not used " << RESET;
+    ( (cLinkStatus & 0x00000002) >> 1) ? std::cout << BOLDRED << "used    " << RESET : std::cout << BOLDGREEN << "not used " << RESET;
     std::cout << " | Block4: ";
-    ((cLinkStatus & 0x00000001) >> 0)? std::cout << BOLDRED << "used    " << RESET : std::cout << BOLDGREEN << "not used " << RESET << std::endl;
+    ( (cLinkStatus & 0x00000001) >> 0) ? std::cout << BOLDRED << "used    " << RESET : std::cout << BOLDGREEN << "not used " << RESET << std::endl;
 
     //Packets send counter
     std::cout << "Pckt send counter: ";
-    WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0x7);
-    val = ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
+    WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0x7);
+    val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << std::endl;
 
     //Status build
     std::cout << "Status build: " << std::endl;
-    WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0x8);
-    std::cout << "data_63to32 " <<  ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << std::endl;
-    std::cout << "data_31to0 " <<  ReadReg("pixfed_stat_regs.slink_core_status.data_31to0") << std::endl;
+    WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0x8);
+    std::cout << "data_63to32 " <<  ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << std::endl;
+    std::cout << "data_31to0 " <<  ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0") << std::endl;
 
     //Back pressure counter
     std::cout << "BackP counter: ";
-    WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0x9);
-    val = ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
+    WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0x9);
+    val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << std::endl;
 
     //Version number
     std::cout << "Version number: ";
-    WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0xa);
-    val = ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
+    WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0xa);
+    val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << std::endl;
 
     //SERDES status
     std::cout << "SERDES status: ";
-    WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0xb);
-    val = ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
+    WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0xb);
+    val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << std::endl;
 
     //Retransmitted packages counter
     std::cout << "Retrans pkg counter: ";
-    WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0xc);
-    val = ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
+    WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0xc);
+    val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << std::endl;
 
     //FED CRC error
     std::cout << "FED CRC error counter: ";
-    WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0xd);
-    val = ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
+    WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0xd);
+    val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << std::endl;
 
 }
@@ -1313,3 +1206,81 @@ void PixFEDFWInterface::checkIfUploading()
     if ( !fpgaConfig )
         fpgaConfig = new CtaFpgaConfig ( this );
 }
+
+//std::vector<uint32_t> PixFEDFWInterface::ReadNEvents ( PixFED* pPixFED, uint32_t pNEvents )
+//{
+//std::cout << "Requesting " << pNEvents << " Events from FW!" << std::endl;
+////first, set up calibration mode
+//std::vector< std::pair<std::string, uint32_t> > cVecReg;
+//WriteReg ( "pixfed_ctrl_regs.PC_CONFIG_OK", 0 );
+//cVecReg.push_back ({"pixfed_ctrl_regs.acq_ctrl.calib_mode", 1});
+//cVecReg.push_back ({"pixfed_ctrl_regs.acq_ctrl.calib_mode_NEvents", pNEvents - 1});
+//WriteStackReg ( cVecReg );
+//cVecReg.clear();
+
+//WriteReg ("pixfed_ctrl_regs.PC_CONFIG_OK", 1);
+//readTTSState();
+
+//// first set DDR bank to 0
+//SelectDaqDDR ( 0 );
+////uint32_t cBlockSize = 0;
+
+////if (pBlockSize == 0) cBlockSize = fBlockSize;
+////else cBlockSize = pBlockSize;
+
+//std::chrono::milliseconds cWait ( 10 );
+//// the fNthAcq variable is automatically used to determine which DDR FIFO to read - so it has to be incremented in this method!
+
+////std::cout << "Querying " << fStrDDR << " for FULL condition!" << std::endl;
+
+////uhal::ValWord<uint32_t> cSlinkStatus;
+////cSlinkStatus = ReadReg("pixfed_stat_regs.slink_core_status.sync_loss");
+
+////check the link status
+////PrintSlinkStatus();
+
+//uhal::ValWord<uint32_t> cVal;
+
+//do
+//{
+//cVal = ReadReg ( fStrFull );
+
+//if ( cVal == 0 ) std::this_thread::sleep_for ( cWait );
+//}
+//while ( cVal == 0 );
+
+////std::cout << fStrDDR << " full: " << ReadReg( fStrFull ) << std::endl;
+
+////now figure out how many 32 bit words to read
+//uint32_t cNWords32 = ReadReg ("pixfed_stat_regs.cnt_word32from_start");
+//std::cout << "Reading " << cNWords32 << " 32 bit words from DDR " << 0 << std::endl;
+////in normal TBM Fifo mode read 2* the number of words read from the FW
+////in FEROL IPBUS mode read the number of 32 bit words + 2*2*pNEvents (1 factor 2 is for 64 bit words)
+//uint32_t cBlockSize = (fAcq_mode == 1) ?  2 * cNWords32 + 1 :
+//cNWords32 + (2 * 2 * pNEvents) + 1;
+//std::cout << "This translates into " << cBlockSize << " words in the current mode: " << fAcq_mode << std::endl;
+
+//// DDR control: 0 = ipbus, 1 = user
+////WriteReg ( fStrDDRControl, 0 );
+//std::this_thread::sleep_for ( cWait );
+////std::cout << "Starting block read of " << fStrDDR << std::endl;
+
+//std::vector<uint32_t> cData = ReadBlockRegValue ( fStrDDR, cBlockSize );
+////WriteReg ( fStrDDRControl , 1 );
+//std::this_thread::sleep_for ( cWait );
+//WriteReg ( fStrReadout, 1 );
+//std::this_thread::sleep_for ( cWait );
+
+//// full handshake between SW & FW
+//while ( ReadReg ( fStrFull ) == 1 )
+//std::this_thread::sleep_for ( cWait );
+
+//WriteReg ( fStrReadout, 0 );
+
+//if (fAcq_mode == 1) prettyprintTBMFIFO (cData);
+//else if (fAcq_mode == 2) prettyprintSlink (expandto64 (cData) );
+
+//fNthAcq++;
+//readTTSState();
+//return cData;
+//}

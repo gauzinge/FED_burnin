@@ -217,7 +217,7 @@ public:
      * \param pNEvents: number of Events to read
      * \return cData: the data in 32 bit words
      */
-    std::vector<uint32_t> ReadNEvents( PixFED* pFED, uint32_t pNEvents = 1 );
+    //std::vector<uint32_t> ReadNEvents( PixFED* pFED, uint32_t pNEvents = 1 );
     /*!
     * \brief: Initialize the Slink
     * \param: pointer to PixFED

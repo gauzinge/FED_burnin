@@ -50,6 +50,8 @@ private:
     uint32_t fBlockSize32; // the number of 32-bit words to read from DDR memory
     uint32_t fNthAcq;       // the index of the current Acquistion - to be used to select the correct DDR bank
     uint32_t fAcq_mode;
+    uint32_t fNEvents_calmode;
+    uint32_t fCalibMode;
     //struct timeval fStartVeto;
     CtaFpgaConfig* fpgaConfig;
     // strings fro DDR control
@@ -182,7 +184,7 @@ public:
      * \param pPixFED
      * \return vector<uint32_t> cData
      */
-    std::vector<uint32_t> ReadNEvents( PixFED* pPixFED, uint32_t pNEvents = 1 );
+    //std::vector<uint32_t> ReadNEvents( PixFED* pPixFED, uint32_t pNEvents = 1 );
 
     // EVENT HANDLING
     //const Event* GetNextEvent( const PixFED* pPixFED ) const;

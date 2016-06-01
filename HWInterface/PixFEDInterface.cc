@@ -529,11 +529,11 @@ std::vector<uint32_t> PixFEDInterface::ReadData( PixFED * pFED, uint32_t pBlockS
     return fFEDFW->ReadData( pFED, pBlockSize );
 }
 
-std::vector<uint32_t> PixFEDInterface::ReadNEvents( PixFED * pFED, uint32_t pNEvents )
-{
-    setBoard( pFED->getBeId() );
-    return fFEDFW->ReadNEvents( pFED, pNEvents );
-}
+//std::vector<uint32_t> PixFEDInterface::ReadNEvents( PixFED * pFED, uint32_t pNEvents )
+//{
+    //setBoard( pFED->getBeId() );
+    //return fFEDFW->ReadNEvents( pFED, pNEvents );
+//}
 
 void PixFEDInterface::PrintSlinkStatus( PixFED * pFED )
 {

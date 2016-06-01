@@ -19,14 +19,17 @@
     <PixFED Id="0" boardType="CTA">
         <connection id="board0" uri="chtcp-2.0://cmsuppixch:10203?target=devfed:50001" address_table="file://settings/address_table.xml" />
 
-        <!-- ACQUISITION MODE & DATA TYPE -->
+        <!-- ACQUISITION MODE & CALIBRATION MODE & DATA TYPE -->
         <!--1: TBM fifo, 2: Slink FIFO, 3: FEROL-->
-        <Register name="pixfed_ctrl_regs.acq_ctrl.acq_mode">3</Register>
+        <Register name="pixfed_ctrl_regs.acq_ctrl.acq_mode">2</Register>
+        <Register name="pixfed_ctrl_regs.acq_ctrl.calib_mode"> 0 </Register>
+        <!--this is 0-indexed so 9 will correspond to 10 events-->
+        <Register name="pixfed_ctrl_regs.acq_ctrl.calib_mode_NEvents"> 9 </Register>
         <!--0: real data, 1: constants after TBM fifo, 2: pattern before TBM fifo-->
         <Register name="pixfed_ctrl_regs.data_type">0</Register>
 
-        <!--SLINK-->
-        <Register name="pixfed_ctrl_regs.slink_ctrl.privateEvtNb">0x01</Register>
+        <!--SLINK HEADER & TRAILER-->
+        <Register name="pixfed_ctrl_regs.slink_ctrl.privateEvtNb">0x02</Register>
         <Register name="pixfed_ctrl_regs.slink_ctrl.slinkFormatH_source_id">0x01</Register>
         <Register name="pixfed_ctrl_regs.slink_ctrl.slinkFormatH_FOV">0xe</Register>
         <Register name="pixfed_ctrl_regs.slink_ctrl.slinkFormatH_Evt_ty">0xa</Register>
@@ -64,9 +67,6 @@
     <!-- 0 indexed -->
     <Setting name="ROCOfInterest">1</Setting>
     <Setting name="BlockSize">512</Setting>
-    <!-- set to 1 to enable Calibration mode with the number of events below -->
-    <Setting name="CommissioningMode">1</Setting>
-    <Setting name="NEventsCommissioningMode">16</Setting>
     <!--if set to 0, loop will run forever-->
     <Setting name="NAcq">0</Setting>
 </Settings>

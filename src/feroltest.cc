@@ -83,6 +83,7 @@ int main(int argc, char* argv[] )
 
 //            cSystemController.fFEDInterface->readFIFO1(cFED);
 //	   cSystemController.fFEDInterface->ReadData(cFED, 0 );
+           cSystemController.fFEDInterface->readFIFO1(cFED);
 	   cSystemController.fFEDInterface->PrintSlinkStatus(cFED);
 	   usleep(1000000);
          }

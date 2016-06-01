@@ -1135,7 +1135,7 @@ void PixFEDFWInterface::PrintSlinkStatus(){
     readTTSState();
 
     //check the link status
-  std::cout << BOLDGREEN <<"SLINK information : " << RESET <<std::endl;
+  std::cout << BOLDBLUE <<"SLINK information : " << RESET <<std::endl;
     std::cout << "sync_loss " <<  ReadReg("pixfed_stat_regs.slink_core_status.sync_loss") << std::endl;
     std::cout << "link_down " <<  ReadReg("pixfed_stat_regs.slink_core_status.link_down") << std::endl;
     std::cout << "link_full " <<  ReadReg("pixfed_stat_regs.slink_core_status.link_full") << std::endl;
@@ -1146,42 +1146,42 @@ void PixFEDFWInterface::PrintSlinkStatus(){
     WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0x1);
     //    std::cout << "data_31to0 " <<  ReadReg("pixfed_stat_regs.slink_core_status.data_31to0") << std::endl;
     uint32_t cLinkStatus =  ReadReg("pixfed_stat_regs.slink_core_status.data_31to0") ;
-    ((cLinkStatus & 0x80000000) >> 31)? std::cout << "\tTest mode" << std::endl : std::cout << "\tFED data" << std::endl;
-    ((cLinkStatus & 0x40000000) >> 30)? std::cout << "\tLink up" << std::endl : std::cout << "\tLink down" << std::endl;
-    ((cLinkStatus & 0x20000000) >> 29)? std::cout << "\tLink not in backpressure" << std::endl : std::cout << "\tLink in backpressure" << std::endl;
-    ((cLinkStatus & 0x10000000) >> 28)? std::cout << "\tAt least one block free to receive data" << std::endl : std::cout << "\tNo blocks free to recive data" << std::endl;
-    ((cLinkStatus & 0x00000040) >> 6)? std::cout << "\tFound two consecutive fragments with the same trigger number" << std::endl : std::cout << "\tTrigger numbers unique" << std::endl;
-    ((cLinkStatus & 0x00000020) >> 5)? std::cout << "\tTrailer duplicated" << std::endl : std::cout << "\tTrailers unique" << std::endl;
-    ((cLinkStatus & 0x00000010) >> 4)? std::cout << "\tHeader duplicated" << std::endl : std::cout << "\tHeaders unique" << std::endl;
-    ((cLinkStatus & 0x00000008) >> 3)? std::cout << "\tBetween header and trailer" << std::endl : std::cout << "\t" << std::endl;
+    ((cLinkStatus & 0x80000000) >> 31)? std::cout << "   Test mode" << std::endl : std::cout << "   FED data" << std::endl;
+    ((cLinkStatus & 0x40000000) >> 30)? std::cout << "   Link up" << RESET << std::endl : std::cout << RED << "   Link down" << RESET << std::endl;
+    ((cLinkStatus & 0x20000000) >> 29)? std::cout << "\0"  : std::cout << "   Link backpressured" << std::endl;
+    ((cLinkStatus & 0x10000000) >> 28)? std::cout << "   At least one block free to receive data" << std::endl : std::cout << "\0";
+    ((cLinkStatus & 0x00000040) >> 6)? std::cout << "   Found two consecutive fragments with the same trigger number" << std::endl : std::cout << "\0";
+    ((cLinkStatus & 0x00000020) >> 5)? std::cout << "   Trailer duplicated" << std::endl : std::cout << "\0";
+    ((cLinkStatus & 0x00000010) >> 4)? std::cout << "   Header duplicated" << std::endl : std::cout << "\0";
+    ((cLinkStatus & 0x00000008) >> 3)? std::cout << "   Between header and trailer" << std::endl : std::cout << "\0";
 
     if((cLinkStatus & 0x00000007) == 1)
       {
-	std::cout << "\tState machine: idle" << std::endl;
+	std::cout << "   State machine: idle" << std::endl;
       }
     else if((cLinkStatus & 0x00000007) == 2)
       {
-	std::cout << "\tState machine: Read data from FED" << std::endl;
+	std::cout << "   State machine: Read data from FED" << std::endl;
       }
     else if((cLinkStatus & 0x00000007) == 4)
       {
-	std::cout << "\tState machine: Closing block" << std::endl;
+	std::cout << "   State machine: Closing block" << std::endl;
       }
     else
       {
-     	std::cout << "\tState machine: fucked. returned " <<  (cLinkStatus & 0x00000007) << std::endl;
+     	std::cout << "   State machine: fucked (Return value: " <<  (cLinkStatus & 0x00000007) << ")" << std::endl;
       }
 
 
 
     //Data counter
-    std::cout << "Data counter : ";
+    std::cout << "Data counter: ";
     WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0x2);
     uint64_t val = ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << std::endl;
 
     //Event counter
-    std::cout << "Event counter : ";
+    std::cout << "Event counter: ";
     WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0x3);
     val = ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << std::endl;
@@ -1202,29 +1202,29 @@ void PixFEDFWInterface::PrintSlinkStatus(){
     std::cout << "Status CORE: " << std::endl;
     WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0x6);
     cLinkStatus = ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
-    ((cLinkStatus & 0x80000000) >> 31)? std::cout << "\tCore initialized" << std::endl : std::cout << "\tCore not initialized" << std::endl;
-    std::cout << "\tData transfer block status: " << std::endl;
-    std::cout << "\tBlock1: ";
-    ((cLinkStatus & 0x00000080) >> 7)? std::cout << "ready" << std::endl : std::cout << "not ready";
+    ((cLinkStatus & 0x80000000) >> 31)? std::cout << "   Core initialized" << std::endl : std::cout << "   Core not initialized" << std::endl;
+    std::cout << "   Data transfer block status: " << std::endl;
+    std::cout << "      Block1: ";
+    ((cLinkStatus & 0x00000080) >> 7)? std::cout << BOLDGREEN << "ready    " << RESET : std::cout << BOLDRED << "not ready" << RESET;
     std::cout << " | Block2: ";
-    ((cLinkStatus & 0x00000040) >> 6)? std::cout << "ready" << std::endl : std::cout << "not ready";
+    ((cLinkStatus & 0x00000040) >> 6)? std::cout << BOLDGREEN << "ready    " << RESET : std::cout << BOLDRED << "not ready" << RESET;
     std::cout << " | Block3: ";
-    ((cLinkStatus & 0x00000020) >> 5)? std::cout << "ready" << std::endl : std::cout << "not ready";
+    ((cLinkStatus & 0x00000020) >> 5)? std::cout << BOLDGREEN << "ready    " << RESET : std::cout << BOLDRED << "not ready" << RESET;
     std::cout << " | Block4: ";
-    ((cLinkStatus & 0x00000010) >> 4)? std::cout << "ready" << std::endl : std::cout << "not ready" << std::endl;
+    ((cLinkStatus & 0x00000010) >> 4)? std::cout << BOLDGREEN << "ready" << RESET : std::cout << BOLDRED << "not ready" << RESET << std::endl;
 
-    std::cout << "\tData transfer block usage: " << std::endl;
-    std::cout << "\tBlock1: ";
-    ((cLinkStatus & 0x00000008) >> 3)? std::cout << "used" << std::endl : std::cout << "not used";
+    std::cout << "   Data transfer block usage: " << std::endl;
+    std::cout << "      Block1: ";
+    ((cLinkStatus & 0x00000008) >> 3)? std::cout << BOLDRED << "used    " << RESET : std::cout << BOLDGREEN << "not used " << RESET;
     std::cout << " | Block2: ";
-    ((cLinkStatus & 0x00000004) >> 2)? std::cout << "used" << std::endl : std::cout << "not used";
+    ((cLinkStatus & 0x00000004) >> 2)? std::cout << BOLDRED << "used    " << RESET : std::cout << BOLDGREEN << "not used " << RESET;
     std::cout << " | Block3: ";
-    ((cLinkStatus & 0x00000002) >> 1)? std::cout << "used" << std::endl : std::cout << "not used";
+    ((cLinkStatus & 0x00000002) >> 1)? std::cout << BOLDRED << "used    " << RESET : std::cout << BOLDGREEN << "not used " << RESET;
     std::cout << " | Block4: ";
-    ((cLinkStatus & 0x00000001) >> 0)? std::cout << "used" << std::endl : std::cout << "not used" << std::endl;
+    ((cLinkStatus & 0x00000001) >> 0)? std::cout << BOLDRED << "used    " << RESET : std::cout << BOLDGREEN << "not used " << RESET << std::endl;
 
     //Packets send counter
-    std::cout << "Pckt snd counter: ";
+    std::cout << "Pckt send counter: ";
     WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0x7);
     val = ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << std::endl;
@@ -1242,28 +1242,28 @@ void PixFEDFWInterface::PrintSlinkStatus(){
     std::cout <<  val << std::endl;
 
     //Version number
-    std::cout << "Version number: " << std::endl;
+    std::cout << "Version number: ";
     WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0xa);
-    std::cout << "data_63to32 " <<  ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << std::endl;
-    std::cout << "data_31to0 " <<  ReadReg("pixfed_stat_regs.slink_core_status.data_31to0") << std::endl;
+    val = ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
+    std::cout <<  val << std::endl;
 
     //SERDES status
-    std::cout << "SERDES status: " << std::endl;
+    std::cout << "SERDES status: ";
     WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0xb);
-    std::cout << "data_63to32 " <<  ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << std::endl;
-    std::cout << "data_31to0 " <<  ReadReg("pixfed_stat_regs.slink_core_status.data_31to0") << std::endl;
+    val = ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
+    std::cout <<  val << std::endl;
 
     //Retransmitted packages counter
-    std::cout << "Retrand counter: ";
+    std::cout << "Retrans pkg counter: ";
     WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0xc);
     val = ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << std::endl;
 
     //FED CRC error
-    std::cout << "FED CRC error: " << std::endl;
+    std::cout << "FED CRC error counter: ";
     WriteReg("pixfed_ctrl_regs.slink_core_status_addr",0xd);
-    std::cout << "data_63to32 " <<  ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << std::endl;
-    std::cout << "data_31to0 " <<  ReadReg("pixfed_stat_regs.slink_core_status.data_31to0") << std::endl;
+    val = ReadReg("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg("pixfed_stat_regs.slink_core_status.data_31to0");
+    std::cout <<  val << std::endl;
 
 }
 

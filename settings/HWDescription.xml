@@ -21,7 +21,7 @@
 
         <!-- ACQUISITION MODE & DATA TYPE -->
         <!--1: TBM fifo, 2: Slink FIFO, 3: FEROL-->
-        <Register name="pixfed_ctrl_regs.acq_ctrl.acq_mode">2</Register>
+        <Register name="pixfed_ctrl_regs.acq_ctrl.acq_mode">3</Register>
         <!--0: real data, 1: constants after TBM fifo, 2: pattern before TBM fifo-->
         <Register name="pixfed_ctrl_regs.data_type">0</Register>
 
@@ -65,7 +65,7 @@
     <Setting name="ROCOfInterest">1</Setting>
     <Setting name="BlockSize">512</Setting>
     <!-- set to 1 to enable Calibration mode with the number of events below -->
-    <Setting name="CommissioningMode">0</Setting>
+    <Setting name="CommissioningMode">1</Setting>
     <Setting name="NEventsCommissioningMode">16</Setting>
     <!--if set to 0, loop will run forever-->
     <Setting name="NAcq">0</Setting>

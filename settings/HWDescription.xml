@@ -56,10 +56,10 @@
 
         <!-- FITELS -->
         <Fitel_Files path="./settings/" />
-        <!--<Fitel FMC="0" Id="0" file="FMCFITEL.txt" Enable="" />-->
-        <!--<Fitel FMC="0" Id="1" file="FMCFITEL.txt" Enable="1" />-->
-        <Fitel FMC="1" Id="0" file="FMCFITEL.txt" Enable=""/>
-        <Fitel FMC="1" Id="1" file="FMCFITEL.txt" Enable="9"/>
+        <Fitel FMC="0" Id="0" file="FMCFITEL.txt" Enable="" />
+        <Fitel FMC="0" Id="1" file="FMCFITEL.txt" Enable="4" />
+        <!--<Fitel FMC="1" Id="0" file="FMCFITEL.txt" Enable=""/>-->
+        <!--<Fitel FMC="1" Id="1" file="FMCFITEL.txt" Enable="9"/>-->
     </PixFED>
 </HwDescription>
 

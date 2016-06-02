@@ -132,7 +132,7 @@ public:
     /*!
      * \brief: initialize Slink to send data
      */
-    void InitSlink(const uint8_t pFMCId);
+    void getSFPStatus (uint8_t pFMCId);
     /*!
      * \brief: read the bistream FIFO of the PixFED
      */

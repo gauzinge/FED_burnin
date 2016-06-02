@@ -410,13 +410,13 @@ void PixFEDInterface::disableFMCs( const PixFED * pFED )
     fFEDFW->disableFMCs();
 }
 
-void PixFEDInterface::InitSlink( const PixFED* pFED)
+void PixFEDInterface::getSFPStatus( const PixFED* pFED)
 {
   setBoard( pFED->getBeId() );
   //TODO: this needs to change to 0 once the FMC is in the correct place
-  uint8_t cFMCId = 1;  
+  uint8_t cFMCId = 0;  
   std::cout << "Initializing SFP on FMC " << +cFMCId << std::endl;
-  fFEDFW->InitSlink(cFMCId);
+  fFEDFW->getSFPStatus(cFMCId);
 }
 
 void PixFEDInterface::ConfigureFED( const PixFED * pFED )

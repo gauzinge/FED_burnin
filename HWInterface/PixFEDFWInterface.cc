@@ -236,37 +236,61 @@ void PixFEDFWInterface::prettyprintPhase (const std::vector<uint32_t>& pData, in
               ( (pData.at ( (pChannel * 4 ) + 2 )       ) & 0x1f ) << std::endl;
 }
 
-void PixFEDFWInterface::InitSlink (uint8_t pFMCId)
+void PixFEDFWInterface::getSFPStatus (uint8_t pFMCId)
 {
-    //pFMCId = 0;
+    //std::cout << "Initializing SFP+ for SLINK" << std::endl;
 
-    std::cout << "Initializing SFP+ for SLINK" << std::endl;
+    //WriteReg ("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 1);
+    //sleep (0.5);
+    //WriteReg ("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 0);
 
-    WriteReg ("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 1);
-    sleep (0.5);
-    WriteReg ("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 0);
+    //std::vector<std::pair<std::string, uint32_t> > cVecReg;
+    //cVecReg.push_back ({"pixfed_ctrl_regs.fitel_sfp_i2c_req", 0});
+    //cVecReg.push_back ({"pixfed_ctrl_regs.fitel_rx_i2c_req", 0});
 
-    std::vector<std::pair<std::string, uint32_t> > cVecReg;
-    cVecReg.push_back ({"pixfed_ctrl_regs.fitel_sfp_i2c_req", 0});
-    cVecReg.push_back ({"pixfed_ctrl_regs.fitel_rx_i2c_req", 0});
+    //cVecReg.push_back ({"pixfed_ctrl_regs.fitel_i2c_addr", 0x38});
 
-    cVecReg.push_back ({"pixfed_ctrl_regs.fitel_i2c_addr", 0x38});
+    //WriteStackReg (cVecReg);
 
-    WriteStackReg (cVecReg);
+    //// Vectors for write and read data!
+    //std::vector<uint32_t> cVecWrite;
+    //std::vector<uint32_t> cVecRead;
 
-    // Vectors for write and read data!
-    std::vector<uint32_t> cVecWrite;
+    ////encode them in a 32 bit word and write, no readback yet
+    //cVecWrite.push_back (  pFMCId  << 24 |   0x00 );
+    //WriteBlockReg ("fitel_config_fifo_tx", cVecWrite);
+
+
+    //// sent an I2C write request
+    //// Edit G. Auzinger
+    //// write 1 to sfp_i2c_reg to trigger an I2C write transaction - Laurent's BS python script is ambiguous....
+    //WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 1);
+
+    //// wait for command acknowledge
+    //while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") == 0) usleep (100);
+
+    //uint32_t cVal = ReadReg ("pixfed_stat_regs.fitel_i2c_ack");
+
+    //if (cVal == 3)
+        //std::cout << "Error during i2c write!" << cVal << std::endl;
+
+    ////release handshake with I2C
+    //WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 0);
+
+    //// wait for command acknowledge
+    //while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") != 0) usleep (100);
+
+    //usleep (500);
+    //////////////////////////////////////////////////
+    ////THIS SHOULD BE THE END OF THE WRITE OPERATION, BUS SHOULD BE IDLE
+    /////////////////////////////////////////////////
+
+    //Vector for the reply
     std::vector<uint32_t> cVecRead;
-
-    //encode them in a 32 bit word and write, no readback yet
-    cVecWrite.push_back (  pFMCId  << 24 |   0x00 );
-    WriteBlockReg ("fitel_config_fifo_tx", cVecWrite);
-
-
-    // sent an I2C write request
-    // Edit G. Auzinger
-    // write 1 to sfp_i2c_reg to trigger an I2C write transaction - Laurent's BS python script is ambiguous....
-    WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 1);
+    cVecRead.push_back ( pFMCId << 24 | 0x00 );
+    WriteBlockReg ("fitel_config_fifo_tx", cVecRead);
+    //this issues an I2C read request via FW
+    WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 3);
 
     // wait for command acknowledge
     while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") == 0) usleep (100);
@@ -276,33 +300,11 @@ void PixFEDFWInterface::InitSlink (uint8_t pFMCId)
     if (cVal == 3)
         std::cout << "Error during i2c write!" << cVal << std::endl;
 
-    //release handshake with I2C
-    WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 0);
+    cVecRead.clear();
+    //only read 1 word
+    cVecRead = ReadBlockRegValue ("fitel_config_fifo_rx", 1 );
 
-    // wait for command acknowledge
-    while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") != 0) usleep (100);
-
-    usleep (500);
-    ////////////////////////////////////////////////
-    //THIS SHOULD BE THE END OF THE WRITE OPERATION, BUS SHOULD BE IDLE
-    ///////////////////////////////////////////////
-
-    cVecRead.push_back ( pFMCId << 24 | 0x00 );
-    WriteBlockReg ("fitel_config_fifo_tx", cVecRead);
-    //this issues an I2C read request via FW
-    WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 3);
-
-    // wait for command acknowledge
-    while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") == 0) usleep (100);
-
-
-    cVal = ReadReg ("pixfed_stat_regs.fitel_i2c_ack");
-
-    if (cVal == 3)
-        std::cout << "Error during i2c write!" << cVal << std::endl;
-
-    cVecRead = ReadBlockRegValue ("fitel_config_fifo_rx", cVecRead.size() );
-
+    std::cout << "SFP+ Status of FMC " << +pFMCId << std::endl;
     for (auto& cRead : cVecRead)
     {
         cRead = cRead & 0xF;
@@ -530,6 +532,7 @@ bool PixFEDFWInterface::ConfigureBoard ( const PixFED* pPixFED, bool pFakeData )
     std::chrono::milliseconds cPause ( 200 );
     //Primary Configuration
     WriteReg ( "pixfed_ctrl_regs.PC_CONFIG_OK", 0 );
+    std::cout << "PC_CONFIG_OK (0) in Configure" << std::endl;
     //cVecReg.push_back ( {"pixfed_ctrl_regs.rx_index_sel_en", 0} );
     cVecReg.push_back ( {"pixfed_ctrl_regs.DDR0_end_readout", 0} );
     cVecReg.push_back ( {"pixfed_ctrl_regs.DDR1_end_readout", 0} );
@@ -566,6 +569,9 @@ bool PixFEDFWInterface::ConfigureBoard ( const PixFED* pPixFED, bool pFakeData )
 
     std::this_thread::sleep_for ( cPause );
 
+    getSFPStatus(0);
+    getSFPStatus(1);
+
     readTTSState();
     // Read back the DDR3 calib done flag
     bool cDDR3calibrated = ( ReadReg ( "pixfed_stat_regs.ddr3_init_calib_done" ) & 0x00000001 );
@@ -588,6 +594,7 @@ void PixFEDFWInterface::Start()
     //set fNthAcq to 0 since I am starting from scratch and thus start with DDR0
     fNthAcq = 0;
     WriteReg( "pixfed_ctrl_regs.PC_CONFIG_OK", 1 );
+    std::cout << "PC_CONFIG_OK (1) in Start" << std::endl;
     readTTSState();
 }
 
@@ -595,6 +602,8 @@ void PixFEDFWInterface::Stop()
 {
     //Stop the DAQ
     WriteReg ( "pixfed_ctrl_regs.PC_CONFIG_OK", 0 );
+    std::cout << "PC_CONFIG_OK (0) in Stop" << std::endl;
+    readTTSState();
 }
 
 

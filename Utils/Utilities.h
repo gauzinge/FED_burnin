@@ -14,6 +14,7 @@
 
 #include <math.h>
 #include <sys/time.h>
+#include <unistd.h>
 #include <stdint.h>
 #include <ios>
 #include <istream>
@@ -37,6 +38,8 @@ void myflush( std::istream& in );
 /*!
  * \brief Wait for Enter key press
  */
+int kbhit();
+
 void mypause();
 /*!
  * \brief get Current Time & Date

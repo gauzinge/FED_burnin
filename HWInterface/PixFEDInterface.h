@@ -222,7 +222,7 @@ public:
     * \brief: Initialize the Slink
     * \param: pointer to PixFED
     */ 
-    void InitSlink( const PixFED* pFED);
+    void getSFPStatus( const PixFED* pFED);
     /*!
      * \brief Prints the status of the Slink
      * \param pFED

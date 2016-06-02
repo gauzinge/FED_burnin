@@ -21,7 +21,7 @@
 
         <!-- ACQUISITION MODE & CALIBRATION MODE & DATA TYPE -->
         <!--1: TBM fifo, 2: Slink FIFO, 3: FEROL-->
-        <Register name="pixfed_ctrl_regs.acq_ctrl.acq_mode">2</Register>
+        <Register name="pixfed_ctrl_regs.acq_ctrl.acq_mode">3</Register>
         <Register name="pixfed_ctrl_regs.acq_ctrl.calib_mode"> 0 </Register>
         <!--this is 0-indexed so 9 will correspond to 10 events-->
         <Register name="pixfed_ctrl_regs.acq_ctrl.calib_mode_NEvents"> 9 </Register>
@@ -43,10 +43,12 @@
 
         <!--TTS CONFIG-->
         <Register name="pixfed_ctrl_regs.tts.timeout_check_valid"> 0 </Register>
-        <Register name="pixfed_ctrl_regs.timeout_value"> 255 </Register>
+        <Register name="pixfed_ctrl_regs.tts.event_cnt_check_valid"> 0 </Register>
+        <Register name="pixfed_ctrl_regs.tts.timeout_value"> 255 </Register>
         <Register name="pixfed_ctrl_regs.tts.evt_err_nb_oos_thresh"> 255</Register>
         <Register name="pixfed_ctrl_regs.tts.timeout_nb_oos_thresh"> 255 </Register>
         <Register name="pixfed_ctrl_regs.tts.bc0_ec0_polar"> 0 </Register>
+        <Register name="pixfed_ctrl_regs.tts.force_RDY"> 0 </Register>
 
         <!--CLOCK-->
         <!--Used to set the CLK input to the TTC clock from the BP - 3 is XTAL, 0 is BP-->

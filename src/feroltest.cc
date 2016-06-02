@@ -62,7 +62,7 @@ int main (int argc, char* argv[] )
     //}
 
     uint32_t iAcq = 0;
-    bool running = true;
+    //bool running = true;
     std::cout << "FED Configured, SLink Enabled, pressing Enter will send an EC0 & start periodic L1As" << std::endl; 
     std::cout << "Pressing Enter again will stop the application" << std::endl;
     mypause();
@@ -84,9 +84,9 @@ int main (int argc, char* argv[] )
 
         iAcq++;
 
-        if (iAcq < cNAcq && cNAcq > 0 ) running = true;
-        else if (cNAcq == 0 ) running = true;
-        else running = false;
+        if (iAcq < cNAcq && cNAcq > 0 ) continue;
+        else if (cNAcq == 0 ) continue;
+        else break;
     }
 
     cAmc13Controller.fAmc13Interface->StopL1A();

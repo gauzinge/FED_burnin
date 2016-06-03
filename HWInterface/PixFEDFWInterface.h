@@ -254,11 +254,13 @@ private:
      * \return Number of 32-bit words to be read at each iteration */
     uint32_t computeBlockSize(bool pFakeData = false);
 
+void prettyPrintTransparentFIFO(const std::vector<uint32_t>& pFifoVec, const std::vector<uint8_t>& p5bSymbol, const std::vector<uint8_t>& p5bNRZI, const std::vector<uint8_t>& p4bNRZI);
     void prettyprintSpyFIFO(const std::vector<uint32_t>& pVec);
     void prettyprintFIFO1( const std::vector<uint32_t>& pFifoVec, const std::vector<uint32_t>& pMarkerVec, std::ostream& os = std::cout);
     void prettyprintTBMFIFO(const std::vector<uint32_t>& pData);
     void prettyprintSlink(const std::vector<uint64_t>& pData);
     void prettyprintPhase( const std::vector<uint32_t>& pData, int pChannel );
+    void decode_symbols (const std::vector<uint32_t>& pInData, std::vector<uint8_t>& p5bSymbol, std::vector<uint8_t>& p5bNRZI, std::vector<uint8_t>& p4bNRZI);
 
     // FPGA CONFIG METHODS
 public:

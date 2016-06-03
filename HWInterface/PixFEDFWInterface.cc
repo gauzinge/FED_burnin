@@ -272,7 +272,7 @@ void PixFEDFWInterface::getSFPStatus (uint8_t pFMCId)
     //uint32_t cVal = ReadReg ("pixfed_stat_regs.fitel_i2c_ack");
 
     //if (cVal == 3)
-        //std::cout << "Error during i2c write!" << cVal << std::endl;
+    //std::cout << "Error during i2c write!" << cVal << std::endl;
 
     ////release handshake with I2C
     //WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 0);
@@ -305,6 +305,7 @@ void PixFEDFWInterface::getSFPStatus (uint8_t pFMCId)
     cVecRead = ReadBlockRegValue ("fitel_config_fifo_rx", 1 );
 
     std::cout << "SFP+ Status of FMC " << +pFMCId << std::endl;
+
     for (auto& cRead : cVecRead)
     {
         cRead = cRead & 0xF;
@@ -326,30 +327,65 @@ void PixFEDFWInterface::getSFPStatus (uint8_t pFMCId)
 std::vector<uint32_t> PixFEDFWInterface::readTransparentFIFO()
 {
     //WriteReg("fe_ctrl_regs.decode_reg_reset", 1);
-    //std::vector<uint32_t> cFifoVec = ReadBlockRegValue( "fifo.bit_stream", 32 );
-    std::cout << std::endl << BOLDBLUE <<  "Transparent FIFO: " << RESET << std::endl;
+    std::vector<uint32_t> cFifoVec = ReadBlockRegValue ( "fifo.bit_stream", 512 );
+    //vectors to pass to the NRZI decoder as reference to be filled by that
+    std::vector<uint8_t> c5bSymbol, c5bNRZI, c4bNRZI;
+    decode_symbols (cFifoVec, c5bSymbol, c5bNRZI, c4bNRZI);
+    prettyPrintTransparentFIFO (cFifoVec, c5bSymbol, c5bNRZI, c4bNRZI);
+    return cFifoVec;
+}
 
-    //for (auto& cWord : cFifoVec)
-    //std::cout << GREEN << std::bitset<30>(cWord) << RESET << std::endl;
+void PixFEDFWInterface::prettyPrintTransparentFIFO(const std::vector<uint32_t>& pFifoVec, const std::vector<uint8_t>& p5bSymbol, const std::vector<uint8_t>& p5bNRZI, const std::vector<uint8_t>& p4bNRZI)
+{
+    std::cout << std::endl << BOLDBLUE <<  "Transparent FIFO: "  << std::endl
+              << " Timestamp      5b Symbol " << std::endl
+              << "                5b NRZI   " << std::endl
+              << "                4b NRZI   " << std::endl
+              << "                TBM Core A" << std::endl
+              << "                TBM Core B" << RESET << std::endl;
 
-    std::vector<uint32_t> cFifoVec;
-
-    //std::cout << "DEBUG: Helmut's way:" << std::endl;
-    for (int i = 0; i < 32; i++)
+    // now print and decode the FIFO data
+    for (uint32_t j = 0; j < 32; j++)
     {
-        uint32_t cWord = ReadReg ("fifo.bit_stream");
-        cFifoVec.push_back (cWord);
+        //first line with the timestamp
+        std::cout << ( (pFifoVec.at ( (j * 16) ) >> 20 ) & 0xfff) << ":     ";
 
-        //        std::cout << GREEN << std::bitset<30>(cWord) << RESET << std::endl;
-        for (int iBit = 29; iBit >= 0; iBit--)
+        for (uint32_t i = 0; i < 16; i++)
+            std::cout << " " << std::bitset<5> ( ( (p5bSymbol.at (i + j * 16) >> 0) & 0x1f) );
+
+        std::cout << std::endl << "               ";
+
+        //now the line with the 5bNRZI word
+        for (uint32_t i = 0; i < 16; i++)
         {
-            if (std::bitset<30> (cWord) [iBit] == 0) std::cout << GREEN << "_";
-            else std::cout << "-";
+            if (p5bNRZI.at (i + j * 16) == 0x1f) std::cout << "ERROR";
+            else std::cout << " " << std::bitset<5> ( ( (p5bNRZI.at (i + j * 16) >> 0) & 0x1f) );
+        }
+
+        std::cout << std::endl << "               ";
+
+        //now the line with the 4bNRZI word
+        for (uint32_t i = 0; i < 16; i++)
+            std::cout << " " << std::bitset<4> ( ( (p4bNRZI.at (i + j * 16) >> 0) & 0x1f) ) << " ";
+
+        std::cout << std::endl << "               ";
+
+        //now the line with TBM Core A word
+        for (uint32_t i = 0; i < 16; i++)
+        {
+            std::cout << " " << std::bitset<4> ( ( (p4bNRZI.at (i + j * 16) >> 3) & 0x1) );
+            std::cout << " " << std::bitset<4> ( ( (p4bNRZI.at (i + j * 16) >> 1) & 0x1) );
+        }
+
+        std::cout << std::endl << "               ";
+
+        //now the line with TBM Core A word
+        for (uint32_t i = 0; i < 16; i++)
+        {
+            std::cout << " " << std::bitset<4> ( ( ( (p4bNRZI.at (i + j * 16) >> 2) & 0x1) ^ 0x1));
+            std::cout << " " << std::bitset<4> ( ( ( (p4bNRZI.at (i + j * 16) >> 0) & 0x1) ^ 0x1));
         }
     }
-
-    std::cout << RESET << std::endl;
-    return cFifoVec;
 }
 
 std::vector<uint32_t> PixFEDFWInterface::readSpyFIFO()
@@ -360,12 +396,12 @@ std::vector<uint32_t> PixFEDFWInterface::readSpyFIFO()
     // cSpyA = ReadBlockRegValue( "fifo.spy_A", fBlockSize / 2 );
     // cSpyB = ReadBlockRegValue( "fifo.spy_B", fBlockSize / 2 );
 
-    cSpyA = ReadBlockRegValue ( "fifo.spy_A", 4096 );
-    cSpyB = ReadBlockRegValue ( "fifo.spy_B", 4096 );
+    cSpyA = ReadBlockRegValue ( "fifo.spy_A", 320 );
+    cSpyB = ReadBlockRegValue ( "fifo.spy_B", 320 );
 
-    std::cout  << std::endl << BOLDBLUE << "TBM_SPY FIFO A: " << RESET << std::endl;
+    std::cout << std::endl << BOLDBLUE << "TBM_SPY FIFO A:       timestamp" << RESET << std::endl;
     prettyprintSpyFIFO (cSpyA);
-    std::cout << std::endl << BOLDBLUE << "TBM_SPY FIFO B: " << RESET << std::endl;
+    std::cout << std::endl << BOLDBLUE << "TBM_SPY FIFO B:       timestamp" << RESET << std::endl;
     prettyprintSpyFIFO (cSpyB);
     //append content of Spy Fifo B to A and return
     std::vector<uint32_t> cAppendedSPyFifo = cSpyA;
@@ -383,13 +419,13 @@ void PixFEDFWInterface::prettyprintSpyFIFO (const std::vector<uint32_t>& pVec)
         {
             if ( (cWord & 0xff) != 0) std::cout << std::hex << (cWord & 0xff) << " " ;
 
-            if ( ( (cWord & cMask) >> 4) == 11 ) std::cout << " " << std::endl;
+            if ( ( (cWord & cMask) >> 4) == 11 ) std::cout << "       " << ( (cWord >> 20) & 0xfff) << std::endl;
 
-            if ( ( (cWord & cMask) >> 4) == 6 ) std::cout << " " << std::endl;
+            if ( ( (cWord & cMask) >> 4) ==  6 ) std::cout << "       " << ( (cWord >> 20) & 0xfff) << std::endl;
 
-            if ( ( (cWord & cMask) >> 4) == 7 ) std::cout << " " << std::endl;
+            if ( ( (cWord & cMask) >> 4) ==  7 ) std::cout << "       " << ( (cWord >> 20) & 0xfff) << std::endl;
 
-            if ( ( (cWord & cMask) >> 4) == 15 ) std::cout << " " << std::endl;
+            if ( ( (cWord & cMask) >> 4) == 15 ) std::cout << "       " << ( (cWord >> 20) & 0xfff) << std::endl;
         }
 
     }
@@ -569,8 +605,8 @@ bool PixFEDFWInterface::ConfigureBoard ( const PixFED* pPixFED, bool pFakeData )
 
     std::this_thread::sleep_for ( cPause );
 
-    getSFPStatus(0);
-    getSFPStatus(1);
+    getSFPStatus (0);
+    getSFPStatus (1);
 
     readTTSState();
     // Read back the DDR3 calib done flag
@@ -593,7 +629,7 @@ void PixFEDFWInterface::Start()
 {
     //set fNthAcq to 0 since I am starting from scratch and thus start with DDR0
     fNthAcq = 0;
-    WriteReg( "pixfed_ctrl_regs.PC_CONFIG_OK", 1 );
+    WriteReg ( "pixfed_ctrl_regs.PC_CONFIG_OK", 1 );
     std::cout << "PC_CONFIG_OK (1) in Start" << std::endl;
     readTTSState();
 }
@@ -647,7 +683,7 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData ( PixFED* pPixFED, uint32_t pB
         //in normal TBM Fifo mode read 2* the number of words read from the FW
         //in FEROL IPBUS mode read the number of 32 bit words + 2*2*pNEvents (1 factor 2 is for 64 bit words)
         cBlockSize = (fAcq_mode == 1) ?  2 * cNWords32/* + 1*/ :
-                     cNWords32 + (2 * 2 * fNEvents_calmode)/* + 1*/;
+                     cNWords32 + (2 * 2 * fNEvents_calmode) /* + 1*/;
         std::cout << "This translates into " << cBlockSize << " words in the current mode: " << fAcq_mode << std::endl;
     }
     else
@@ -1216,6 +1252,94 @@ void PixFEDFWInterface::checkIfUploading()
         fpgaConfig = new CtaFpgaConfig ( this );
 }
 
+void PixFEDFWInterface::decode_symbols (const std::vector<uint32_t>& pInData, std::vector<uint8_t>& p5bSymbol, std::vector<uint8_t>& p5bNRZI, std::vector<uint8_t>& p4bNRZI)
+{
+    //first, clear all the non-const references
+    p5bSymbol.clear();
+    p5bNRZI.clear();
+    p4bNRZI.clear();
+
+    //ok, then internally generate a vector of 5b Symbols and use a uint8_t for that
+    for (auto cWord : pInData)
+    {
+        p5bSymbol.push_back (cWord & 0x1f);
+        //next, fill the 5bNRZI symbols with 0x1f
+        p5bNRZI.push_back (0x1f);
+    }
+
+    for (uint32_t i = 0; i < pInData.size(); i++)
+    {
+        if (p5bSymbol[i] == 0x1f) p5bNRZI[i] = 0x16; //print 10110
+
+        if (p5bSymbol[i] == 0)    p5bNRZI[i] = 0x16; //print 10110
+
+        if ( (p5bSymbol[i] == 0x14) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x1e, p4bNRZI[i] = 0x0; //# print '11110'
+
+        if ( (p5bSymbol[i] == 0x0e) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x09, p4bNRZI[i] = 0x1; //# print '01001'
+
+        if ( (p5bSymbol[i] == 0x18) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x14, p4bNRZI[i] = 0x2; //# print '10100'
+
+        if ( (p5bSymbol[i] == 0x19) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x15, p4bNRZI[i] = 0x3; //# print '10101'
+
+        if ( (p5bSymbol[i] == 0x0c) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x0a, p4bNRZI[i] = 0x4; //# print '01010'
+
+        if ( (p5bSymbol[i] == 0x0d) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x0b, p4bNRZI[i] = 0x5; //# print '01011'
+
+        if ( (p5bSymbol[i] == 0x0b) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x0e, p4bNRZI[i] = 0x6; //# print '01110'
+
+        if ( (p5bSymbol[i] == 0x0a) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x0f, p4bNRZI[i] = 0x7; //# print '01111'
+
+        if ( (p5bSymbol[i] == 0x1c) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x12, p4bNRZI[i] = 0x8; //# print '10010'
+
+        if ( (p5bSymbol[i] == 0x1d) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x13, p4bNRZI[i] = 0x9; //# print '10011'
+
+        if ( (p5bSymbol[i] == 0x1b) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x16, p4bNRZI[i] = 0xa; //# print '10110'
+
+        if ( (p5bSymbol[i] == 0x1a) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x17, p4bNRZI[i] = 0xb; //# print '10111'
+
+        if ( (p5bSymbol[i] == 0x13) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x1a, p4bNRZI[i] = 0xc; //# print '11010'
+
+        if ( (p5bSymbol[i] == 0x12) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x1b, p4bNRZI[i] = 0xd; //# print '11011'
+
+        if ( (p5bSymbol[i] == 0x17) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x1c, p4bNRZI[i] = 0xe; //# print '11100'
+
+        if ( (p5bSymbol[i] == 0x16) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x1d, p4bNRZI[i] = 0xf; //# print '11101'
+
+        if ( (p5bSymbol[i] == 0x0b) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x1e; //# print '11110'
+
+        if ( (p5bSymbol[i] == 0x11) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x09; //# print '01001'
+
+        if ( (p5bSymbol[i] == 0x07) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x14; //# print '10100'
+
+        if ( (p5bSymbol[i] == 0x06) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x15; //# print '10101'
+
+        if ( (p5bSymbol[i] == 0x13) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x0a; //# print '01010'
+
+        if ( (p5bSymbol[i] == 0x12) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x0b; //# print '01011'
+
+        if ( (p5bSymbol[i] == 0x14) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x0e; //# print '01110'
+
+        if ( (p5bSymbol[i] == 0x15) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x0f; //# print '01111'
+
+        if ( (p5bSymbol[i] == 0x03) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x12; //# print '10010'
+
+        if ( (p5bSymbol[i] == 0x02) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x13; //# print '10011'
+
+        if ( (p5bSymbol[i] == 0x04) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x16; //# print '10110'
+
+        if ( (p5bSymbol[i] == 0x05) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x17; //# print '10111'
+
+        if ( (p5bSymbol[i] == 0x0c) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x1a; //# print '11010'
+
+        if ( (p5bSymbol[i] == 0x0d) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x1b; //# print '11011'
+
+        if ( (p5bSymbol[i] == 0x08) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x1c; //# print '11100'
+
+        if ( (p5bSymbol[i] == 0x09) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x1d; //# print '11101'
+
+        if (p5bNRZI[i] == 0x1f) p4bNRZI[i] = 0x0; // # error
+    }
+}
 //std::vector<uint32_t> PixFEDFWInterface::ReadNEvents ( PixFED* pPixFED, uint32_t pNEvents )
 //{
 //std::cout << "Requesting " << pNEvents << " Events from FW!" << std::endl;

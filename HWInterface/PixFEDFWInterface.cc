@@ -133,7 +133,7 @@ void PixFEDFWInterface::enableFMCs()
 void PixFEDFWInterface::findPhases (uint32_t pScopeFIFOCh)
 {
     std::vector< std::pair<std::string, uint32_t> > cVecReg;
-    cVecReg.push_back ( { "fe_ctrl_regs.decode_reset", 1 } ); // reset deocode auto clear
+    //cVecReg.push_back ( { "fe_ctrl_regs.decode_reset", 1 } ); // reset deocode auto clear
     cVecReg.push_back ( { "fe_ctrl_regs.decode_reg_reset", 1 } ); // reset REG auto clear
     // some additional configuration
     cVecReg.push_back ( { "fe_ctrl_regs.fifo_config.overflow_value", 0x700e0}); // set 192val

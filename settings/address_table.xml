@@ -360,6 +360,7 @@
             <node id="overflow_value" mask="0x000fffff" />
             <node id="channel_of_interest" mask="0x03f00000" />
             <node id="OSD_ROC_Nr" mask="0x7c000000" />
+            <node id="TBM_old_new" mask="0x80000000" />
         </node>
     </node>
     <!-- HEPHY SPY FIFOs -->

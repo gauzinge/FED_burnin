@@ -132,60 +132,26 @@ void PixFEDFWInterface::enableFMCs()
 
 void PixFEDFWInterface::findPhases (uint32_t pScopeFIFOCh)
 {
-    // Perform all the resets
     std::vector< std::pair<std::string, uint32_t> > cVecReg;
     cVecReg.push_back ( { "fe_ctrl_regs.decode_reset", 1 } ); // reset deocode auto clear
     cVecReg.push_back ( { "fe_ctrl_regs.decode_reg_reset", 1 } ); // reset REG auto clear
-    cVecReg.push_back ( { "fe_ctrl_regs.idel_ctrl_reset", 1} );
-    WriteStackReg (cVecReg);
-    cVecReg.clear();
-    cVecReg.push_back ( { "fe_ctrl_regs.idel_ctrl_reset", 0} );
-    WriteStackReg (cVecReg);
-    cVecReg.clear();
-
-    // NOTE: here the register idel_individual_ctrl is the base address of the registers for all 48 channels. So each 32-bit word contains the control info for 1 channel. Thus by creating a vector of 48 32-bit words and writing them at the same time I can write to each channel without using relative addresses!
-
-    // set the parameters for IDELAY scan
-    std::vector<uint32_t> cValVec;
-
-    for (uint32_t cChannel = 0; cChannel < 48; cChannel++)
-        // create a Value Vector that contains the write value for each channel
-        cValVec.push_back ( 0x80000000 );
-
-    WriteBlockReg ( "fe_ctrl_regs.idel_individual_ctrl", cValVec );
-    cValVec.clear();
-
-    // set auto_delay_scan and set idel_RST
-    for (uint32_t cChannel = 0; cChannel < 48; cChannel++)
-        cValVec.push_back ( 0xc0000000 );
-
-    WriteBlockReg ( "fe_ctrl_regs.idel_individual_ctrl", cValVec );
-    cValVec.clear();
-
-    // set auto_delay_scan and remove idel_RST
-    for (uint32_t cChannel = 0; cChannel < 48; cChannel++)
-        cValVec.push_back ( 0x80000000 );
-
-    WriteBlockReg ( "fe_ctrl_regs.idel_individual_ctrl", cValVec );
-    cValVec.clear();
-
     // some additional configuration
     cVecReg.push_back ( { "fe_ctrl_regs.fifo_config.overflow_value", 0x700e0}); // set 192val
     cVecReg.push_back ( { "fe_ctrl_regs.fifo_config.channel_of_interest", pScopeFIFOCh} ); // set channel for scope FIFO
     WriteStackReg (cVecReg);
     cVecReg.clear();
 
-    // initialize Phase Finding
+    WriteReg ("fe_ctrl_regs.initialize_swap", 0);
     WriteReg ("fe_ctrl_regs.initialize_swap", 1);
-    std::cout << "Initializing Phase Finding ..." << std::endl << std::endl;
-    std::chrono::milliseconds cWait ( 3000 );
-    std::this_thread::sleep_for ( cWait );
-
-    //here I might do the print loop again as Helmut does it in the latest version of the PixFED python script
     WriteReg ("fe_ctrl_regs.initialize_swap", 0);
 
-    std::this_thread::sleep_for ( cWait );
-
+    std::cout << "Initializing ... " << std::endl;
+    while((ReadBlockRegValue("idel_individual_stat.CH0",4).at(2) >> 29) & 0x03 != 0x0)
+        usleep(1000);
+    std::cout << "Swapping Phases ... " << std::endl;
+    while((ReadBlockRegValue("idel_individual_stat.CH0",4).at(2) >> 29) & 0x03 != 0x2)
+        usleep(1000);
+    std::cout << "Swap Finished!" << std::endl;
     std::cout <<  "Phase finding Results: " << std::endl;
 
     uint32_t cNChannel = 24;
@@ -193,20 +159,81 @@ void PixFEDFWInterface::findPhases (uint32_t pScopeFIFOCh)
 
     std::cout << BOLDGREEN << "FIBRE CTRL_RDY CNTVAL_Hi CNTVAL_Lo   pattern:                     S H1 L1 H0 L0   W R" << RESET << std::endl;
 
-    //for(uint32_t cChannel = 0; cChannel < 48; cChannel++){
     for (uint32_t cChannel = 0; cChannel < cNChannel; cChannel++)
         prettyprintPhase (cReadValues, cChannel);
 
-    //std::this_thread::sleep_for( cWait );
-
-    //cVecReg.push_back ( { "pixfed_ctrl_regs.PC_CONFIG_OK", 0} );
-    //WriteStackReg (cVecReg);
-    //cVecReg.clear();
-    //cVecReg.push_back ( { "pixfed_ctrl_regs.PC_CONFIG_OK", 1} );
-    //WriteStackReg (cVecReg);
-    //cVecReg.clear();
     readTTSState();
+
 }
+
+//void PixFEDFWInterface::findPhases (uint32_t pScopeFIFOCh)
+//{
+    //// Perform all the resets
+    //std::vector< std::pair<std::string, uint32_t> > cVecReg;
+    //cVecReg.push_back ( { "fe_ctrl_regs.decode_reset", 1 } ); // reset deocode auto clear
+    //cVecReg.push_back ( { "fe_ctrl_regs.decode_reg_reset", 1 } ); // reset REG auto clear
+    //cVecReg.push_back ( { "fe_ctrl_regs.idel_ctrl_reset", 1} );
+    //WriteStackReg (cVecReg);
+    //cVecReg.clear();
+    //cVecReg.push_back ( { "fe_ctrl_regs.idel_ctrl_reset", 0} );
+    //WriteStackReg (cVecReg);
+    //cVecReg.clear();
+
+    //// NOTE: here the register idel_individual_ctrl is the base address of the registers for all 48 channels. So each 32-bit word contains the control info for 1 channel. Thus by creating a vector of 48 32-bit words and writing them at the same time I can write to each channel without using relative addresses!
+
+    //// set the parameters for IDELAY scan
+    //std::vector<uint32_t> cValVec;
+
+    //for (uint32_t cChannel = 0; cChannel < 48; cChannel++)
+        //// create a Value Vector that contains the write value for each channel
+        //cValVec.push_back ( 0x80000000 );
+
+    //WriteBlockReg ( "fe_ctrl_regs.idel_individual_ctrl", cValVec );
+    //cValVec.clear();
+
+    //// set auto_delay_scan and set idel_RST
+    //for (uint32_t cChannel = 0; cChannel < 48; cChannel++)
+        //cValVec.push_back ( 0xc0000000 );
+
+    //WriteBlockReg ( "fe_ctrl_regs.idel_individual_ctrl", cValVec );
+    //cValVec.clear();
+
+    //// set auto_delay_scan and remove idel_RST
+    //for (uint32_t cChannel = 0; cChannel < 48; cChannel++)
+        //cValVec.push_back ( 0x80000000 );
+
+    //WriteBlockReg ( "fe_ctrl_regs.idel_individual_ctrl", cValVec );
+    //cValVec.clear();
+
+    //// some additional configuration
+    //cVecReg.push_back ( { "fe_ctrl_regs.fifo_config.overflow_value", 0x700e0}); // set 192val
+    //cVecReg.push_back ( { "fe_ctrl_regs.fifo_config.channel_of_interest", pScopeFIFOCh} ); // set channel for scope FIFO
+    //WriteStackReg (cVecReg);
+    //cVecReg.clear();
+
+    //// initialize Phase Finding
+    //WriteReg ("fe_ctrl_regs.initialize_swap", 1);
+    //std::cout << "Initializing Phase Finding ..." << std::endl << std::endl;
+    //std::chrono::milliseconds cWait ( 3000 );
+    //std::this_thread::sleep_for ( cWait );
+
+    ////here I might do the print loop again as Helmut does it in the latest version of the PixFED python script
+    //WriteReg ("fe_ctrl_regs.initialize_swap", 0);
+
+    //std::this_thread::sleep_for ( cWait );
+
+    //std::cout <<  "Phase finding Results: " << std::endl;
+
+    //uint32_t cNChannel = 24;
+    //std::vector<uint32_t> cReadValues = ReadBlockRegValue ( "idel_individual_stat_block", cNChannel * 4 );
+
+    //std::cout << BOLDGREEN << "FIBRE CTRL_RDY CNTVAL_Hi CNTVAL_Lo   pattern:                     S H1 L1 H0 L0   W R" << RESET << std::endl;
+
+    //for (uint32_t cChannel = 0; cChannel < cNChannel; cChannel++)
+        //prettyprintPhase (cReadValues, cChannel);
+
+    //readTTSState();
+//}
 
 void PixFEDFWInterface::monitorPhases (uint32_t pScopeFIFOCh)
 {
@@ -238,6 +265,17 @@ void PixFEDFWInterface::prettyprintPhase (const std::vector<uint32_t>& pData, in
 
 void PixFEDFWInterface::getSFPStatus (uint8_t pFMCId)
 {
+    WriteReg ("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 1);
+    sleep (0.5);
+    WriteReg ("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 0);
+
+    std::vector<std::pair<std::string, uint32_t> > cVecReg;
+    cVecReg.push_back ({"pixfed_ctrl_regs.fitel_sfp_i2c_req", 0});
+    cVecReg.push_back ({"pixfed_ctrl_regs.fitel_rx_i2c_req", 0});
+    cVecReg.push_back ({"pixfed_ctrl_regs.fitel_i2c_addr", 0x38});
+    WriteStackReg (cVecReg);
+    cVecReg.clear();
+
     //Vector for the reply
     std::vector<uint32_t> cVecRead;
     cVecRead.push_back ( pFMCId << 24 | 0x00 );
@@ -279,13 +317,12 @@ void PixFEDFWInterface::getSFPStatus (uint8_t pFMCId)
 
 std::vector<uint32_t> PixFEDFWInterface::readTransparentFIFO()
 {
-    //WriteReg("fe_ctrl_regs.decode_reg_reset", 1);
+    WriteReg("fe_ctrl_regs.decode_reg_reset", 1);
     std::vector<uint32_t> cFifoVec = ReadBlockRegValue ( "fifo.bit_stream", 512 );
     //vectors to pass to the NRZI decoder as reference to be filled by that
     std::vector<uint8_t> c5bSymbol, c5bNRZI, c4bNRZI;
     decode_symbols (cFifoVec, c5bSymbol, c5bNRZI, c4bNRZI);
     prettyPrintTransparentFIFO (cFifoVec, c5bSymbol, c5bNRZI, c4bNRZI);
-    std::cout << "All cool" << std::endl;
     return cFifoVec;
 }
 
@@ -302,33 +339,33 @@ void PixFEDFWInterface::prettyPrintTransparentFIFO (const std::vector<uint32_t>&
     for (uint32_t j = 0; j < 32; j++)
     {
         //first line with the timestamp
-        std::cout << ( (pFifoVec.at ( (j * 16) ) >> 20 ) & 0xfff) << ": ";
+        std::cout << "          " << ( (pFifoVec.at ( (j * 16) ) >> 20 ) & 0xfff) << ": ";
 
         for (uint32_t i = 0; i < 16; i++)
-            std::cout << " " << std::bitset<5> ( ( (p5bSymbol.at (i + (j * 16)) >> 0) & 0x1f) );
+            std::cout << " " << std::bitset<5> ( ( (p5bSymbol.at (i + (j * 16) ) >> 0) & 0x1f) );
 
         std::cout << std::endl << "               ";
 
         //now the line with the 5bNRZI word
         for (uint32_t i = 0; i < 16; i++)
         {
-            if (p5bNRZI.at (i + j * 16) == 0x1f) std::cout << "ERROR";
-            else std::cout << " " << std::bitset<5> ( ( (p5bNRZI.at (i + (j * 16)) >> 0) & 0x1f) );
+            if (p5bNRZI.at (i + j * 16) == 0x1f) std::cout << " " << "ERROR";
+            else std::cout << " " << std::bitset<5> ( ( (p5bNRZI.at (i + (j * 16) ) >> 0) & 0x1f) );
         }
 
         std::cout << std::endl << "               ";
 
         //now the line with the 4bNRZI word
         for (uint32_t i = 0; i < 16; i++)
-            std::cout << " " << std::bitset<4> ( ( (p4bNRZI.at (i + (j * 16)) >> 0) & 0x1f) ) << " ";
+            std::cout << " " << std::bitset<4> ( ( (p4bNRZI.at (i + (j * 16) ) >> 0) & 0x1f) ) << " ";
 
         std::cout << std::endl << "               ";
 
         //now the line with TBM Core A word
         for (uint32_t i = 0; i < 16; i++)
         {
-            std::cout << " " << std::bitset<4> ( ( (p4bNRZI.at (i + (j * 16)) >> 3) & 0x1) );
-            std::cout << " " << std::bitset<4> ( ( (p4bNRZI.at (i + (j * 16)) >> 1) & 0x1) );
+            std::cout << " " << std::bitset<1> ( ( (p4bNRZI.at (i + (j * 16) ) >> 3) & 0x1) );
+            std::cout << " " << std::bitset<1> ( ( (p4bNRZI.at (i + (j * 16) ) >> 1) & 0x1) );
         }
 
         std::cout << std::endl << "               ";
@@ -336,9 +373,11 @@ void PixFEDFWInterface::prettyPrintTransparentFIFO (const std::vector<uint32_t>&
         //now the line with TBM Core A word
         for (uint32_t i = 0; i < 16; i++)
         {
-            std::cout << " " << std::bitset<4> ( ( ( (p4bNRZI.at (i + (j * 16)) >> 2) & 0x1) ^ 0x1) );
-            std::cout << " " << std::bitset<4> ( ( ( (p4bNRZI.at (i + (j * 16)) >> 0) & 0x1) ^ 0x1) );
+            std::cout << " " << std::bitset<1> ( ( ( (p4bNRZI.at (i + (j * 16) ) >> 2) & 0x1) ^ 0x1) );
+            std::cout << " " << std::bitset<1> ( ( ( (p4bNRZI.at (i + (j * 16) ) >> 0) & 0x1) ^ 0x1) );
         }
+
+        std::cout << std::endl << std::endl;
     }
 }
 
@@ -560,7 +599,6 @@ bool PixFEDFWInterface::ConfigureBoard ( const PixFED* pPixFED, bool pFakeData )
     std::this_thread::sleep_for ( cPause );
 
     getSFPStatus (0);
-    getSFPStatus (1);
 
     readTTSState();
     // Read back the DDR3 calib done flag
@@ -1208,7 +1246,6 @@ void PixFEDFWInterface::checkIfUploading()
 
 void PixFEDFWInterface::decode_symbols (const std::vector<uint32_t>& pInData, std::vector<uint8_t>& p5bSymbol, std::vector<uint8_t>& p5bNRZI, std::vector<uint8_t>& p4bNRZI)
 {
-    std::cout << "In Data size " << pInData.size() << std::endl;
     //first, clear all the non-const references
     p5bSymbol.clear();
     p5bNRZI.clear();
@@ -1217,230 +1254,124 @@ void PixFEDFWInterface::decode_symbols (const std::vector<uint32_t>& pInData, st
     //ok, then internally generate a vector of 5b Symbols and use a uint8_t for that
     for (auto cWord : pInData)
     {
-        p5bSymbol.push_back (cWord & 0x1f);
-        //next, fill the 5bNRZI symbols with 0x1f
+        cWord &= 0x0000001f;
+        if(cWord == 0x1f)
+        p5bSymbol.push_back (cWord & 0x0000001f);
+        //next, fill the 5bNRZI 4bNRZI with 0 symbols with 0x1f
         p5bNRZI.push_back (0x1f);
+        p4bNRZI.push_back (0);
     }
 
-    for (uint32_t i = 0; i < pInData.size(); i++)
+
+    for (uint32_t i = 1; i < pInData.size(); i++)
     {
+
         if (p5bSymbol[i] == 0x1f) p5bNRZI[i] = 0x16; //print 10110
 
         if (p5bSymbol[i] == 0)    p5bNRZI[i] = 0x16; //print 10110
 
-        if( i == 0 )
-        {
-            std::cout << i << ". Index test" << std::endl;
-            if  (p5bSymbol[i] == 0x14)   p5bNRZI[i] = 0x1e, p4bNRZI[i] = 0x0; //# print '11110'
+        //if( i > 0 )
+        //{
 
-            if  (p5bSymbol[i] == 0x0e)   p5bNRZI[i] = 0x09, p4bNRZI[i] = 0x1; //# print '01001'
+        if ( (p5bSymbol[i] == 0x14) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x1e; //# print '11110'
 
-            if  (p5bSymbol[i] == 0x18)   p5bNRZI[i] = 0x14, p4bNRZI[i] = 0x2; //# print '10100'
+        if ( (p5bSymbol[i] == 0x0e) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x09; //# print '01001'
 
-            if  (p5bSymbol[i] == 0x19)   p5bNRZI[i] = 0x15, p4bNRZI[i] = 0x3; //# print '10101'
+        if ( (p5bSymbol[i] == 0x18) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x14; //# print '10100'
 
-            if  (p5bSymbol[i] == 0x0c)   p5bNRZI[i] = 0x0a, p4bNRZI[i] = 0x4; //# print '01010'
+        if ( (p5bSymbol[i] == 0x19) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x15; //# print '10101'
 
-            if  (p5bSymbol[i] == 0x0d)   p5bNRZI[i] = 0x0b, p4bNRZI[i] = 0x5; //# print '01011'
+        if ( (p5bSymbol[i] == 0x0c) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x0a; //# print '01010'
 
-            if  (p5bSymbol[i] == 0x0b)   p5bNRZI[i] = 0x0e, p4bNRZI[i] = 0x6; //# print '01110'
+        if ( (p5bSymbol[i] == 0x0d) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x0b; //# print '01011'
 
-            if  (p5bSymbol[i] == 0x0a)   p5bNRZI[i] = 0x0f, p4bNRZI[i] = 0x7; //# print '01111'
+        if ( (p5bSymbol[i] == 0x0b) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x0e; //# print '01110'
 
-            if  (p5bSymbol[i] == 0x1c)   p5bNRZI[i] = 0x12, p4bNRZI[i] = 0x8; //# print '10010'
+        if ( (p5bSymbol[i] == 0x0a) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x0f; //# print '01111'
 
-            if  (p5bSymbol[i] == 0x1d)   p5bNRZI[i] = 0x13, p4bNRZI[i] = 0x9; //# print '10011'
+        if ( (p5bSymbol[i] == 0x1c) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x12; //# print '10010'
 
-            if  (p5bSymbol[i] == 0x1b)   p5bNRZI[i] = 0x16, p4bNRZI[i] = 0xa; //# print '10110'
+        if ( (p5bSymbol[i] == 0x1d) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x13; //# print '10011'
 
-            if  (p5bSymbol[i] == 0x1a)   p5bNRZI[i] = 0x17, p4bNRZI[i] = 0xb; //# print '10111'
+        if ( (p5bSymbol[i] == 0x1b) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x16; //# print '10110'
 
-            if  (p5bSymbol[i] == 0x13)   p5bNRZI[i] = 0x1a, p4bNRZI[i] = 0xc; //# print '11010'
+        if ( (p5bSymbol[i] == 0x1a) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x17; //# print '10111'
 
-            if  (p5bSymbol[i] == 0x12)   p5bNRZI[i] = 0x1b, p4bNRZI[i] = 0xd; //# print '11011'
+        if ( (p5bSymbol[i] == 0x13) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x1a; //# print '11010'
 
-            if  (p5bSymbol[i] == 0x17)   p5bNRZI[i] = 0x1c, p4bNRZI[i] = 0xe; //# print '11100'
+        if ( (p5bSymbol[i] == 0x12) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x1b; //# print '11011'
 
-            if  (p5bSymbol[i] == 0x16)   p5bNRZI[i] = 0x1d, p4bNRZI[i] = 0xf; //# print '11101'
+        if ( (p5bSymbol[i] == 0x17) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x1c; //# print '11100'
 
-            if  (p5bSymbol[i] == 0x0b)   p5bNRZI[i] = 0x1e; //# print '11110'
+        if ( (p5bSymbol[i] == 0x16) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x1d; //# print '11101'
 
-            if  (p5bSymbol[i] == 0x11)   p5bNRZI[i] = 0x09; //# print '01001'
+        if ( (p5bSymbol[i] == 0x0b) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x1e; //# print '11110'
 
-            if  (p5bSymbol[i] == 0x07)   p5bNRZI[i] = 0x14; //# print '10100'
+        if ( (p5bSymbol[i] == 0x11) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x09; //# print '01001'
 
-            if  (p5bSymbol[i] == 0x06)   p5bNRZI[i] = 0x15; //# print '10101'
+        if ( (p5bSymbol[i] == 0x07) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x14; //# print '10100'
 
-            if  (p5bSymbol[i] == 0x13)   p5bNRZI[i] = 0x0a; //# print '01010'
+        if ( (p5bSymbol[i] == 0x06) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x15; //# print '10101'
 
-            if  (p5bSymbol[i] == 0x12)   p5bNRZI[i] = 0x0b; //# print '01011'
+        if ( (p5bSymbol[i] == 0x13) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x0a; //# print '01010'
 
-            if  (p5bSymbol[i] == 0x14)   p5bNRZI[i] = 0x0e; //# print '01110'
+        if ( (p5bSymbol[i] == 0x12) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x0b; //# print '01011'
 
-            if  (p5bSymbol[i] == 0x15)   p5bNRZI[i] = 0x0f; //# print '01111'
+        if ( (p5bSymbol[i] == 0x14) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x0e; //# print '01110'
 
-            if  (p5bSymbol[i] == 0x03)   p5bNRZI[i] = 0x12; //# print '10010'
+        if ( (p5bSymbol[i] == 0x15) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x0f; //# print '01111'
 
-            if  (p5bSymbol[i] == 0x02)   p5bNRZI[i] = 0x13; //# print '10011'
+        if ( (p5bSymbol[i] == 0x03) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x12; //# print '10010'
 
-            if  (p5bSymbol[i] == 0x04)   p5bNRZI[i] = 0x16; //# print '10110'
+        if ( (p5bSymbol[i] == 0x02) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x13; //# print '10011'
 
-            if  (p5bSymbol[i] == 0x05)   p5bNRZI[i] = 0x17; //# print '10111'
+        if ( (p5bSymbol[i] == 0x04) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x16; //# print '10110'
 
-            if  (p5bSymbol[i] == 0x0c)   p5bNRZI[i] = 0x1a; //# print '11010'
+        if ( (p5bSymbol[i] == 0x05) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x17; //# print '10111'
 
-            if  (p5bSymbol[i] == 0x0d)   p5bNRZI[i] = 0x1b; //# print '11011'
+        if ( (p5bSymbol[i] == 0x0c) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x1a; //# print '11010'
 
-            if  (p5bSymbol[i] == 0x08)   p5bNRZI[i] = 0x1c; //# print '11100'
+        if ( (p5bSymbol[i] == 0x0d) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x1b; //# print '11011'
 
-            if  (p5bSymbol[i] == 0x09)   p5bNRZI[i] = 0x1d; //# print '11101'
+        if ( (p5bSymbol[i] == 0x08) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x1c; //# print '11100'
 
-        }
-        else
-        {
-            std::cout << i << ". Index regular" << std::endl;
-            if ( (p5bSymbol[i] == 0x14) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x1e, p4bNRZI[i] = 0x0; //# print '11110'
+        if ( (p5bSymbol[i] == 0x09) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x1d; //# print '11101'
+    }
 
-            if ( (p5bSymbol[i] == 0x0e) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x09, p4bNRZI[i] = 0x1; //# print '01001'
+    for (uint32_t i = 0; i < pInData.size(); i++)
+    {
+        if (p5bNRZI[i] == 0x1e)  p4bNRZI[i] = 0x0; // #
 
-            if ( (p5bSymbol[i] == 0x18) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x14, p4bNRZI[i] = 0x2; //# print '10100'
+        if (p5bNRZI[i] == 0x09)  p4bNRZI[i] = 0x1; // #
 
-            if ( (p5bSymbol[i] == 0x19) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x15, p4bNRZI[i] = 0x3; //# print '10101'
+        if (p5bNRZI[i] == 0x14)  p4bNRZI[i] = 0x2; // #
 
-            if ( (p5bSymbol[i] == 0x0c) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x0a, p4bNRZI[i] = 0x4; //# print '01010'
+        if (p5bNRZI[i] == 0x15)  p4bNRZI[i] = 0x3; // #
 
-            if ( (p5bSymbol[i] == 0x0d) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x0b, p4bNRZI[i] = 0x5; //# print '01011'
+        if (p5bNRZI[i] == 0x0a)  p4bNRZI[i] = 0x4; // #
 
-            if ( (p5bSymbol[i] == 0x0b) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x0e, p4bNRZI[i] = 0x6; //# print '01110'
+        if (p5bNRZI[i] == 0x0b)  p4bNRZI[i] = 0x5; // #
 
-            if ( (p5bSymbol[i] == 0x0a) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x0f, p4bNRZI[i] = 0x7; //# print '01111'
+        if (p5bNRZI[i] == 0x0e)  p4bNRZI[i] = 0x6; // #
 
-            if ( (p5bSymbol[i] == 0x1c) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x12, p4bNRZI[i] = 0x8; //# print '10010'
+        if (p5bNRZI[i] == 0x0f)  p4bNRZI[i] = 0x7; // #
 
-            if ( (p5bSymbol[i] == 0x1d) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x13, p4bNRZI[i] = 0x9; //# print '10011'
+        if (p5bNRZI[i] == 0x12)  p4bNRZI[i] = 0x8; // #
 
-            if ( (p5bSymbol[i] == 0x1b) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x16, p4bNRZI[i] = 0xa; //# print '10110'
+        if (p5bNRZI[i] == 0x13)  p4bNRZI[i] = 0x9; // #
 
-            if ( (p5bSymbol[i] == 0x1a) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x17, p4bNRZI[i] = 0xb; //# print '10111'
+        if (p5bNRZI[i] == 0x16)  p4bNRZI[i] = 0xa; // #
 
-            if ( (p5bSymbol[i] == 0x13) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x1a, p4bNRZI[i] = 0xc; //# print '11010'
+        if (p5bNRZI[i] == 0x17)  p4bNRZI[i] = 0xb; // #
 
-            if ( (p5bSymbol[i] == 0x12) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x1b, p4bNRZI[i] = 0xd; //# print '11011'
+        if (p5bNRZI[i] == 0x1a)  p4bNRZI[i] = 0xc; // #
 
-            if ( (p5bSymbol[i] == 0x17) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x1c, p4bNRZI[i] = 0xe; //# print '11100'
+        if (p5bNRZI[i] == 0x1b)  p4bNRZI[i] = 0xd; // #
 
-            if ( (p5bSymbol[i] == 0x16) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x1d, p4bNRZI[i] = 0xf; //# print '11101'
+        if (p5bNRZI[i] == 0x1c)  p4bNRZI[i] = 0xe; // #
 
-            if ( (p5bSymbol[i] == 0x0b) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x1e; //# print '11110'
+        if (p5bNRZI[i] == 0x1d)  p4bNRZI[i] = 0xf; // #
 
-            if ( (p5bSymbol[i] == 0x11) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x09; //# print '01001'
-
-            if ( (p5bSymbol[i] == 0x07) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x14; //# print '10100'
-
-            if ( (p5bSymbol[i] == 0x06) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x15; //# print '10101'
-
-            if ( (p5bSymbol[i] == 0x13) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x0a; //# print '01010'
-
-            if ( (p5bSymbol[i] == 0x12) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x0b; //# print '01011'
-
-            if ( (p5bSymbol[i] == 0x14) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x0e; //# print '01110'
-
-            if ( (p5bSymbol[i] == 0x15) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x0f; //# print '01111'
-
-            if ( (p5bSymbol[i] == 0x03) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x12; //# print '10010'
-
-            if ( (p5bSymbol[i] == 0x02) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x13; //# print '10011'
-
-            if ( (p5bSymbol[i] == 0x04) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x16; //# print '10110'
-
-            if ( (p5bSymbol[i] == 0x05) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x17; //# print '10111'
-
-            if ( (p5bSymbol[i] == 0x0c) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x1a; //# print '11010'
-
-            if ( (p5bSymbol[i] == 0x0d) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x1b; //# print '11011'
-
-            if ( (p5bSymbol[i] == 0x08) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x1c; //# print '11100'
-
-            if ( (p5bSymbol[i] == 0x09) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x1d; //# print '11101'
-        }
-
-        if (p5bNRZI[i] == 0x1f) p4bNRZI[i] = 0x0; // # error
+        if (p5bNRZI[i] == 0x1f)  p4bNRZI[i] = 0x0; // #error
     }
 }
-//std::vector<uint32_t> PixFEDFWInterface::ReadNEvents ( PixFED* pPixFED, uint32_t pNEvents )
-//{
-//std::cout << "Requesting " << pNEvents << " Events from FW!" << std::endl;
-////first, set up calibration mode
-//std::vector< std::pair<std::string, uint32_t> > cVecReg;
-//WriteReg ( "pixfed_ctrl_regs.PC_CONFIG_OK", 0 );
-//cVecReg.push_back ({"pixfed_ctrl_regs.acq_ctrl.calib_mode", 1});
-//cVecReg.push_back ({"pixfed_ctrl_regs.acq_ctrl.calib_mode_NEvents", pNEvents - 1});
-//WriteStackReg ( cVecReg );
-//cVecReg.clear();
-
-//WriteReg ("pixfed_ctrl_regs.PC_CONFIG_OK", 1);
-//readTTSState();
-
-//// first set DDR bank to 0
-//SelectDaqDDR ( 0 );
-////uint32_t cBlockSize = 0;
-
-////if (pBlockSize == 0) cBlockSize = fBlockSize;
-////else cBlockSize = pBlockSize;
-
-//std::chrono::milliseconds cWait ( 10 );
-//// the fNthAcq variable is automatically used to determine which DDR FIFO to read - so it has to be incremented in this method!
-
-////std::cout << "Querying " << fStrDDR << " for FULL condition!" << std::endl;
-
-////uhal::ValWord<uint32_t> cSlinkStatus;
-////cSlinkStatus = ReadReg("pixfed_stat_regs.slink_core_status.sync_loss");
-
-////check the link status
-////PrintSlinkStatus();
-
-//uhal::ValWord<uint32_t> cVal;
-
-//do
-//{
-//cVal = ReadReg ( fStrFull );
-
-//if ( cVal == 0 ) std::this_thread::sleep_for ( cWait );
-//}
-//while ( cVal == 0 );
-
-////std::cout << fStrDDR << " full: " << ReadReg( fStrFull ) << std::endl;
-
-////now figure out how many 32 bit words to read
-//uint32_t cNWords32 = ReadReg ("pixfed_stat_regs.cnt_word32from_start");
-//std::cout << "Reading " << cNWords32 << " 32 bit words from DDR " << 0 << std::endl;
-////in normal TBM Fifo mode read 2* the number of words read from the FW
-////in FEROL IPBUS mode read the number of 32 bit words + 2*2*pNEvents (1 factor 2 is for 64 bit words)
-//uint32_t cBlockSize = (fAcq_mode == 1) ?  2 * cNWords32 + 1 :
-//cNWords32 + (2 * 2 * pNEvents) + 1;
-//std::cout << "This translates into " << cBlockSize << " words in the current mode: " << fAcq_mode << std::endl;
-
-//// DDR control: 0 = ipbus, 1 = user
-////WriteReg ( fStrDDRControl, 0 );
-//std::this_thread::sleep_for ( cWait );
-////std::cout << "Starting block read of " << fStrDDR << std::endl;
-
-//std::vector<uint32_t> cData = ReadBlockRegValue ( fStrDDR, cBlockSize );
-////WriteReg ( fStrDDRControl , 1 );
-//std::this_thread::sleep_for ( cWait );
-//WriteReg ( fStrReadout, 1 );
-//std::this_thread::sleep_for ( cWait );
-
-//// full handshake between SW & FW
-//while ( ReadReg ( fStrFull ) == 1 )
-//std::this_thread::sleep_for ( cWait );
-
-//WriteReg ( fStrReadout, 0 );
-
-//if (fAcq_mode == 1) prettyprintTBMFIFO (cData);
-//else if (fAcq_mode == 2) prettyprintSlink (expandto64 (cData) );
-
-//fNthAcq++;
-//readTTSState();
-//return cData;
-//}

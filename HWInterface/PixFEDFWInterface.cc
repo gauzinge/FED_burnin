@@ -238,53 +238,6 @@ void PixFEDFWInterface::prettyprintPhase (const std::vector<uint32_t>& pData, in
 
 void PixFEDFWInterface::getSFPStatus (uint8_t pFMCId)
 {
-    //std::cout << "Initializing SFP+ for SLINK" << std::endl;
-
-    //WriteReg ("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 1);
-    //sleep (0.5);
-    //WriteReg ("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 0);
-
-    //std::vector<std::pair<std::string, uint32_t> > cVecReg;
-    //cVecReg.push_back ({"pixfed_ctrl_regs.fitel_sfp_i2c_req", 0});
-    //cVecReg.push_back ({"pixfed_ctrl_regs.fitel_rx_i2c_req", 0});
-
-    //cVecReg.push_back ({"pixfed_ctrl_regs.fitel_i2c_addr", 0x38});
-
-    //WriteStackReg (cVecReg);
-
-    //// Vectors for write and read data!
-    //std::vector<uint32_t> cVecWrite;
-    //std::vector<uint32_t> cVecRead;
-
-    ////encode them in a 32 bit word and write, no readback yet
-    //cVecWrite.push_back (  pFMCId  << 24 |   0x00 );
-    //WriteBlockReg ("fitel_config_fifo_tx", cVecWrite);
-
-
-    //// sent an I2C write request
-    //// Edit G. Auzinger
-    //// write 1 to sfp_i2c_reg to trigger an I2C write transaction - Laurent's BS python script is ambiguous....
-    //WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 1);
-
-    //// wait for command acknowledge
-    //while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") == 0) usleep (100);
-
-    //uint32_t cVal = ReadReg ("pixfed_stat_regs.fitel_i2c_ack");
-
-    //if (cVal == 3)
-    //std::cout << "Error during i2c write!" << cVal << std::endl;
-
-    ////release handshake with I2C
-    //WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 0);
-
-    //// wait for command acknowledge
-    //while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") != 0) usleep (100);
-
-    //usleep (500);
-    //////////////////////////////////////////////////
-    ////THIS SHOULD BE THE END OF THE WRITE OPERATION, BUS SHOULD BE IDLE
-    /////////////////////////////////////////////////
-
     //Vector for the reply
     std::vector<uint32_t> cVecRead;
     cVecRead.push_back ( pFMCId << 24 | 0x00 );
@@ -309,10 +262,10 @@ void PixFEDFWInterface::getSFPStatus (uint8_t pFMCId)
     for (auto& cRead : cVecRead)
     {
         cRead = cRead & 0xF;
-        std::cout << "-> SFP_MOD_ABS = "  << (cRead >> 0 & 0x1) << std::endl;
-        std::cout << "-> SFP_TX_DIS = "   << (cRead >> 1 & 0x1) << std::endl;
-        std::cout << "-> SFP_TX_FAULT = " << (cRead >> 2 & 0x1) << std::endl;
-        std::cout << "-> SFP_RX_LOS = :"  << (cRead >> 3 & 0x1) << std::endl;
+        std::cout << "-> SFP_MOD_ABS:  "  << (cRead >> 0 & 0x1) << std::endl;
+        std::cout << "-> SFP_TX_DIS:   "   << (cRead >> 1 & 0x1) << std::endl;
+        std::cout << "-> SFP_TX_FAULT: " << (cRead >> 2 & 0x1) << std::endl;
+        std::cout << "-> SFP_RX_LOS:   "  << (cRead >> 3 & 0x1) << std::endl;
     }
 
     //release handshake with I2C
@@ -332,10 +285,11 @@ std::vector<uint32_t> PixFEDFWInterface::readTransparentFIFO()
     std::vector<uint8_t> c5bSymbol, c5bNRZI, c4bNRZI;
     decode_symbols (cFifoVec, c5bSymbol, c5bNRZI, c4bNRZI);
     prettyPrintTransparentFIFO (cFifoVec, c5bSymbol, c5bNRZI, c4bNRZI);
+    std::cout << "All cool" << std::endl;
     return cFifoVec;
 }
 
-void PixFEDFWInterface::prettyPrintTransparentFIFO(const std::vector<uint32_t>& pFifoVec, const std::vector<uint8_t>& p5bSymbol, const std::vector<uint8_t>& p5bNRZI, const std::vector<uint8_t>& p4bNRZI)
+void PixFEDFWInterface::prettyPrintTransparentFIFO (const std::vector<uint32_t>& pFifoVec, const std::vector<uint8_t>& p5bSymbol, const std::vector<uint8_t>& p5bNRZI, const std::vector<uint8_t>& p4bNRZI)
 {
     std::cout << std::endl << BOLDBLUE <<  "Transparent FIFO: "  << std::endl
               << " Timestamp      5b Symbol " << std::endl
@@ -348,10 +302,10 @@ void PixFEDFWInterface::prettyPrintTransparentFIFO(const std::vector<uint32_t>& 
     for (uint32_t j = 0; j < 32; j++)
     {
         //first line with the timestamp
-        std::cout << ( (pFifoVec.at ( (j * 16) ) >> 20 ) & 0xfff) << ":     ";
+        std::cout << ( (pFifoVec.at ( (j * 16) ) >> 20 ) & 0xfff) << ": ";
 
         for (uint32_t i = 0; i < 16; i++)
-            std::cout << " " << std::bitset<5> ( ( (p5bSymbol.at (i + j * 16) >> 0) & 0x1f) );
+            std::cout << " " << std::bitset<5> ( ( (p5bSymbol.at (i + (j * 16)) >> 0) & 0x1f) );
 
         std::cout << std::endl << "               ";
 
@@ -359,22 +313,22 @@ void PixFEDFWInterface::prettyPrintTransparentFIFO(const std::vector<uint32_t>& 
         for (uint32_t i = 0; i < 16; i++)
         {
             if (p5bNRZI.at (i + j * 16) == 0x1f) std::cout << "ERROR";
-            else std::cout << " " << std::bitset<5> ( ( (p5bNRZI.at (i + j * 16) >> 0) & 0x1f) );
+            else std::cout << " " << std::bitset<5> ( ( (p5bNRZI.at (i + (j * 16)) >> 0) & 0x1f) );
         }
 
         std::cout << std::endl << "               ";
 
         //now the line with the 4bNRZI word
         for (uint32_t i = 0; i < 16; i++)
-            std::cout << " " << std::bitset<4> ( ( (p4bNRZI.at (i + j * 16) >> 0) & 0x1f) ) << " ";
+            std::cout << " " << std::bitset<4> ( ( (p4bNRZI.at (i + (j * 16)) >> 0) & 0x1f) ) << " ";
 
         std::cout << std::endl << "               ";
 
         //now the line with TBM Core A word
         for (uint32_t i = 0; i < 16; i++)
         {
-            std::cout << " " << std::bitset<4> ( ( (p4bNRZI.at (i + j * 16) >> 3) & 0x1) );
-            std::cout << " " << std::bitset<4> ( ( (p4bNRZI.at (i + j * 16) >> 1) & 0x1) );
+            std::cout << " " << std::bitset<4> ( ( (p4bNRZI.at (i + (j * 16)) >> 3) & 0x1) );
+            std::cout << " " << std::bitset<4> ( ( (p4bNRZI.at (i + (j * 16)) >> 1) & 0x1) );
         }
 
         std::cout << std::endl << "               ";
@@ -382,8 +336,8 @@ void PixFEDFWInterface::prettyPrintTransparentFIFO(const std::vector<uint32_t>& 
         //now the line with TBM Core A word
         for (uint32_t i = 0; i < 16; i++)
         {
-            std::cout << " " << std::bitset<4> ( ( ( (p4bNRZI.at (i + j * 16) >> 2) & 0x1) ^ 0x1));
-            std::cout << " " << std::bitset<4> ( ( ( (p4bNRZI.at (i + j * 16) >> 0) & 0x1) ^ 0x1));
+            std::cout << " " << std::bitset<4> ( ( ( (p4bNRZI.at (i + (j * 16)) >> 2) & 0x1) ^ 0x1) );
+            std::cout << " " << std::bitset<4> ( ( ( (p4bNRZI.at (i + (j * 16)) >> 0) & 0x1) ^ 0x1) );
         }
     }
 }
@@ -1254,6 +1208,7 @@ void PixFEDFWInterface::checkIfUploading()
 
 void PixFEDFWInterface::decode_symbols (const std::vector<uint32_t>& pInData, std::vector<uint8_t>& p5bSymbol, std::vector<uint8_t>& p5bNRZI, std::vector<uint8_t>& p4bNRZI)
 {
+    std::cout << "In Data size " << pInData.size() << std::endl;
     //first, clear all the non-const references
     p5bSymbol.clear();
     p5bNRZI.clear();
@@ -1273,69 +1228,141 @@ void PixFEDFWInterface::decode_symbols (const std::vector<uint32_t>& pInData, st
 
         if (p5bSymbol[i] == 0)    p5bNRZI[i] = 0x16; //print 10110
 
-        if ( (p5bSymbol[i] == 0x14) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x1e, p4bNRZI[i] = 0x0; //# print '11110'
+        if( i == 0 )
+        {
+            std::cout << i << ". Index test" << std::endl;
+            if  (p5bSymbol[i] == 0x14)   p5bNRZI[i] = 0x1e, p4bNRZI[i] = 0x0; //# print '11110'
 
-        if ( (p5bSymbol[i] == 0x0e) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x09, p4bNRZI[i] = 0x1; //# print '01001'
+            if  (p5bSymbol[i] == 0x0e)   p5bNRZI[i] = 0x09, p4bNRZI[i] = 0x1; //# print '01001'
 
-        if ( (p5bSymbol[i] == 0x18) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x14, p4bNRZI[i] = 0x2; //# print '10100'
+            if  (p5bSymbol[i] == 0x18)   p5bNRZI[i] = 0x14, p4bNRZI[i] = 0x2; //# print '10100'
 
-        if ( (p5bSymbol[i] == 0x19) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x15, p4bNRZI[i] = 0x3; //# print '10101'
+            if  (p5bSymbol[i] == 0x19)   p5bNRZI[i] = 0x15, p4bNRZI[i] = 0x3; //# print '10101'
 
-        if ( (p5bSymbol[i] == 0x0c) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x0a, p4bNRZI[i] = 0x4; //# print '01010'
+            if  (p5bSymbol[i] == 0x0c)   p5bNRZI[i] = 0x0a, p4bNRZI[i] = 0x4; //# print '01010'
 
-        if ( (p5bSymbol[i] == 0x0d) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x0b, p4bNRZI[i] = 0x5; //# print '01011'
+            if  (p5bSymbol[i] == 0x0d)   p5bNRZI[i] = 0x0b, p4bNRZI[i] = 0x5; //# print '01011'
 
-        if ( (p5bSymbol[i] == 0x0b) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x0e, p4bNRZI[i] = 0x6; //# print '01110'
+            if  (p5bSymbol[i] == 0x0b)   p5bNRZI[i] = 0x0e, p4bNRZI[i] = 0x6; //# print '01110'
 
-        if ( (p5bSymbol[i] == 0x0a) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x0f, p4bNRZI[i] = 0x7; //# print '01111'
+            if  (p5bSymbol[i] == 0x0a)   p5bNRZI[i] = 0x0f, p4bNRZI[i] = 0x7; //# print '01111'
 
-        if ( (p5bSymbol[i] == 0x1c) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x12, p4bNRZI[i] = 0x8; //# print '10010'
+            if  (p5bSymbol[i] == 0x1c)   p5bNRZI[i] = 0x12, p4bNRZI[i] = 0x8; //# print '10010'
 
-        if ( (p5bSymbol[i] == 0x1d) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x13, p4bNRZI[i] = 0x9; //# print '10011'
+            if  (p5bSymbol[i] == 0x1d)   p5bNRZI[i] = 0x13, p4bNRZI[i] = 0x9; //# print '10011'
 
-        if ( (p5bSymbol[i] == 0x1b) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x16, p4bNRZI[i] = 0xa; //# print '10110'
+            if  (p5bSymbol[i] == 0x1b)   p5bNRZI[i] = 0x16, p4bNRZI[i] = 0xa; //# print '10110'
 
-        if ( (p5bSymbol[i] == 0x1a) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x17, p4bNRZI[i] = 0xb; //# print '10111'
+            if  (p5bSymbol[i] == 0x1a)   p5bNRZI[i] = 0x17, p4bNRZI[i] = 0xb; //# print '10111'
 
-        if ( (p5bSymbol[i] == 0x13) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x1a, p4bNRZI[i] = 0xc; //# print '11010'
+            if  (p5bSymbol[i] == 0x13)   p5bNRZI[i] = 0x1a, p4bNRZI[i] = 0xc; //# print '11010'
 
-        if ( (p5bSymbol[i] == 0x12) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x1b, p4bNRZI[i] = 0xd; //# print '11011'
+            if  (p5bSymbol[i] == 0x12)   p5bNRZI[i] = 0x1b, p4bNRZI[i] = 0xd; //# print '11011'
 
-        if ( (p5bSymbol[i] == 0x17) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x1c, p4bNRZI[i] = 0xe; //# print '11100'
+            if  (p5bSymbol[i] == 0x17)   p5bNRZI[i] = 0x1c, p4bNRZI[i] = 0xe; //# print '11100'
 
-        if ( (p5bSymbol[i] == 0x16) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x1d, p4bNRZI[i] = 0xf; //# print '11101'
+            if  (p5bSymbol[i] == 0x16)   p5bNRZI[i] = 0x1d, p4bNRZI[i] = 0xf; //# print '11101'
 
-        if ( (p5bSymbol[i] == 0x0b) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x1e; //# print '11110'
+            if  (p5bSymbol[i] == 0x0b)   p5bNRZI[i] = 0x1e; //# print '11110'
 
-        if ( (p5bSymbol[i] == 0x11) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x09; //# print '01001'
+            if  (p5bSymbol[i] == 0x11)   p5bNRZI[i] = 0x09; //# print '01001'
 
-        if ( (p5bSymbol[i] == 0x07) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x14; //# print '10100'
+            if  (p5bSymbol[i] == 0x07)   p5bNRZI[i] = 0x14; //# print '10100'
 
-        if ( (p5bSymbol[i] == 0x06) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x15; //# print '10101'
+            if  (p5bSymbol[i] == 0x06)   p5bNRZI[i] = 0x15; //# print '10101'
 
-        if ( (p5bSymbol[i] == 0x13) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x0a; //# print '01010'
+            if  (p5bSymbol[i] == 0x13)   p5bNRZI[i] = 0x0a; //# print '01010'
 
-        if ( (p5bSymbol[i] == 0x12) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x0b; //# print '01011'
+            if  (p5bSymbol[i] == 0x12)   p5bNRZI[i] = 0x0b; //# print '01011'
 
-        if ( (p5bSymbol[i] == 0x14) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x0e; //# print '01110'
+            if  (p5bSymbol[i] == 0x14)   p5bNRZI[i] = 0x0e; //# print '01110'
 
-        if ( (p5bSymbol[i] == 0x15) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x0f; //# print '01111'
+            if  (p5bSymbol[i] == 0x15)   p5bNRZI[i] = 0x0f; //# print '01111'
 
-        if ( (p5bSymbol[i] == 0x03) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x12; //# print '10010'
+            if  (p5bSymbol[i] == 0x03)   p5bNRZI[i] = 0x12; //# print '10010'
 
-        if ( (p5bSymbol[i] == 0x02) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x13; //# print '10011'
+            if  (p5bSymbol[i] == 0x02)   p5bNRZI[i] = 0x13; //# print '10011'
 
-        if ( (p5bSymbol[i] == 0x04) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x16; //# print '10110'
+            if  (p5bSymbol[i] == 0x04)   p5bNRZI[i] = 0x16; //# print '10110'
 
-        if ( (p5bSymbol[i] == 0x05) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x17; //# print '10111'
+            if  (p5bSymbol[i] == 0x05)   p5bNRZI[i] = 0x17; //# print '10111'
 
-        if ( (p5bSymbol[i] == 0x0c) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x1a; //# print '11010'
+            if  (p5bSymbol[i] == 0x0c)   p5bNRZI[i] = 0x1a; //# print '11010'
 
-        if ( (p5bSymbol[i] == 0x0d) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x1b; //# print '11011'
+            if  (p5bSymbol[i] == 0x0d)   p5bNRZI[i] = 0x1b; //# print '11011'
 
-        if ( (p5bSymbol[i] == 0x08) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x1c; //# print '11100'
+            if  (p5bSymbol[i] == 0x08)   p5bNRZI[i] = 0x1c; //# print '11100'
 
-        if ( (p5bSymbol[i] == 0x09) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x1d; //# print '11101'
+            if  (p5bSymbol[i] == 0x09)   p5bNRZI[i] = 0x1d; //# print '11101'
+
+        }
+        else
+        {
+            std::cout << i << ". Index regular" << std::endl;
+            if ( (p5bSymbol[i] == 0x14) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x1e, p4bNRZI[i] = 0x0; //# print '11110'
+
+            if ( (p5bSymbol[i] == 0x0e) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x09, p4bNRZI[i] = 0x1; //# print '01001'
+
+            if ( (p5bSymbol[i] == 0x18) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x14, p4bNRZI[i] = 0x2; //# print '10100'
+
+            if ( (p5bSymbol[i] == 0x19) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x15, p4bNRZI[i] = 0x3; //# print '10101'
+
+            if ( (p5bSymbol[i] == 0x0c) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x0a, p4bNRZI[i] = 0x4; //# print '01010'
+
+            if ( (p5bSymbol[i] == 0x0d) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x0b, p4bNRZI[i] = 0x5; //# print '01011'
+
+            if ( (p5bSymbol[i] == 0x0b) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x0e, p4bNRZI[i] = 0x6; //# print '01110'
+
+            if ( (p5bSymbol[i] == 0x0a) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x0f, p4bNRZI[i] = 0x7; //# print '01111'
+
+            if ( (p5bSymbol[i] == 0x1c) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x12, p4bNRZI[i] = 0x8; //# print '10010'
+
+            if ( (p5bSymbol[i] == 0x1d) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x13, p4bNRZI[i] = 0x9; //# print '10011'
+
+            if ( (p5bSymbol[i] == 0x1b) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x16, p4bNRZI[i] = 0xa; //# print '10110'
+
+            if ( (p5bSymbol[i] == 0x1a) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x17, p4bNRZI[i] = 0xb; //# print '10111'
+
+            if ( (p5bSymbol[i] == 0x13) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x1a, p4bNRZI[i] = 0xc; //# print '11010'
+
+            if ( (p5bSymbol[i] == 0x12) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x1b, p4bNRZI[i] = 0xd; //# print '11011'
+
+            if ( (p5bSymbol[i] == 0x17) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x1c, p4bNRZI[i] = 0xe; //# print '11100'
+
+            if ( (p5bSymbol[i] == 0x16) && ( (p5bSymbol[i - 1] & 0x1) == 0) )  p5bNRZI[i] = 0x1d, p4bNRZI[i] = 0xf; //# print '11101'
+
+            if ( (p5bSymbol[i] == 0x0b) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x1e; //# print '11110'
+
+            if ( (p5bSymbol[i] == 0x11) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x09; //# print '01001'
+
+            if ( (p5bSymbol[i] == 0x07) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x14; //# print '10100'
+
+            if ( (p5bSymbol[i] == 0x06) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x15; //# print '10101'
+
+            if ( (p5bSymbol[i] == 0x13) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x0a; //# print '01010'
+
+            if ( (p5bSymbol[i] == 0x12) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x0b; //# print '01011'
+
+            if ( (p5bSymbol[i] == 0x14) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x0e; //# print '01110'
+
+            if ( (p5bSymbol[i] == 0x15) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x0f; //# print '01111'
+
+            if ( (p5bSymbol[i] == 0x03) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x12; //# print '10010'
+
+            if ( (p5bSymbol[i] == 0x02) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x13; //# print '10011'
+
+            if ( (p5bSymbol[i] == 0x04) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x16; //# print '10110'
+
+            if ( (p5bSymbol[i] == 0x05) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x17; //# print '10111'
+
+            if ( (p5bSymbol[i] == 0x0c) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x1a; //# print '11010'
+
+            if ( (p5bSymbol[i] == 0x0d) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x1b; //# print '11011'
+
+            if ( (p5bSymbol[i] == 0x08) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x1c; //# print '11100'
+
+            if ( (p5bSymbol[i] == 0x09) && ( (p5bSymbol[i - 1] & 0x1) == 1) )  p5bNRZI[i] = 0x1d; //# print '11101'
+        }
 
         if (p5bNRZI[i] == 0x1f) p4bNRZI[i] = 0x0; // # error
     }

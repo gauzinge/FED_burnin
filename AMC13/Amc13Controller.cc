@@ -149,7 +149,7 @@ BGO* Amc13Controller::parseBGO(pugi::xml_node pNode,  std::ostream & os)
     BGO* cBGO = nullptr;
     if ( std::string(pNode.name()) == "BGO")
     {
-        cBGO = new BGO( convertAnyInt(pNode.attribute( "command" ).value()), bool(pNode.attribute( "repeat" ).value()), convertAnyInt(pNode.attribute( "prescale" ).value() ), convertAnyInt(pNode.attribute( "bx" ).value()) );
+        cBGO = new BGO( convertAnyInt(pNode.attribute( "command" ).value()), bool(convertAnyInt(pNode.attribute( "repeat" ).value())), convertAnyInt(pNode.attribute( "prescale" ).value() ), convertAnyInt(pNode.attribute( "bx" ).value()) );
         os <<  BOLDCYAN << "|" << "----" << "BGO : command " << cBGO->fCommand << " repeat " << cBGO->fRepeat << " Prescale " << cBGO->fPrescale << " start BX " << cBGO->fBX << RESET << std::endl;
     }
     return cBGO;

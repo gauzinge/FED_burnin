@@ -63,7 +63,6 @@ int main (int argc, char* argv[] )
 
     std::cout << "FED Configured, SLink Enabled, pressing Enter will send an EC0 & start periodic L1As" << std::endl;
     mypause();
-    cAmc13Controller.fAmc13Interface->SendBGO();
     cAmc13Controller.fAmc13Interface->SendEC0();
     cAmc13Controller.fAmc13Interface->StartL1A();
 
@@ -74,7 +73,7 @@ int main (int argc, char* argv[] )
             cSystemController.fFEDInterface->WriteBoardReg (cFED, "fe_ctrl_regs.decode_reg_reset", 1);
             mypause();
             //cSystemController.fFEDInterface->readTransparentFIFO(cFED);
-            //cSystemController.fFEDInterface->readSpyFIFO(cFED);
+            cSystemController.fFEDInterface->readSpyFIFO(cFED);
             //cSystemController.fFEDInterface->readOSDWord(cFED, cROCOfInterest, cChannelOfInterest);
             cSystemController.fFEDInterface->readFIFO1 (cFED);
             cSystemController.fFEDInterface->ReadData (cFED, 0 );
@@ -87,6 +86,6 @@ int main (int argc, char* argv[] )
         cSystemController.fFEDInterface->Stop (cFED);
 
     //cSystemController.HaltHw();
-    //cAmc13Controller.HaltAmc13();
+    cAmc13Controller.HaltAmc13();
     exit (0);
 }

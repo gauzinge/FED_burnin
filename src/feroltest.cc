@@ -67,7 +67,6 @@ int main (int argc, char* argv[] )
     std::cout << "Pressing Enter again will stop the application" << std::endl;
     mypause();
 
-    cAmc13Controller.fAmc13Interface->SendBGO();
     cAmc13Controller.fAmc13Interface->SendEC0();
     cAmc13Controller.fAmc13Interface->StartL1A();
 
@@ -96,6 +95,6 @@ int main (int argc, char* argv[] )
 
 
     //    cSystemController.HaltHw();
-    //    cAmc13Controller.HaltAmc13();
+        cAmc13Controller.HaltAmc13();
     exit (0);
 }

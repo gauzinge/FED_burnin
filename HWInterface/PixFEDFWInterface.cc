@@ -146,11 +146,22 @@ void PixFEDFWInterface::findPhases (uint32_t pScopeFIFOCh)
     WriteReg ("fe_ctrl_regs.initialize_swap", 0);
 
     std::cout << "Initializing ... " << std::endl;
-    while((ReadBlockRegValue("idel_individual_stat.CH0",4).at(2) >> 29) & 0x03 != 0x0)
-        usleep(1000);
+    Timer t;
+    t.start();
+
+    while ( (ReadBlockRegValue ("idel_individual_stat.CH0", 4).at (2) >> 29) & 0x03 != 0x0)
+        usleep (1000);
+
+    t.stop();
+    t.show("Time to run the initial phase finding: ");
+    t.reset();
     std::cout << "Swapping Phases ... " << std::endl;
-    while((ReadBlockRegValue("idel_individual_stat.CH0",4).at(2) >> 29) & 0x03 != 0x2)
-        usleep(1000);
+    t.start();
+    while ( (ReadBlockRegValue ("idel_individual_stat.CH0", 4).at (2) >> 29) & 0x03 != 0x2)
+        usleep (1000);
+
+    t.stop();
+    t.show("Additional Time for swap: ");
     std::cout << "Swap Finished!" << std::endl;
     std::cout <<  "Phase finding Results: " << std::endl;
 
@@ -168,71 +179,71 @@ void PixFEDFWInterface::findPhases (uint32_t pScopeFIFOCh)
 
 //void PixFEDFWInterface::findPhases (uint32_t pScopeFIFOCh)
 //{
-    //// Perform all the resets
-    //std::vector< std::pair<std::string, uint32_t> > cVecReg;
-    //cVecReg.push_back ( { "fe_ctrl_regs.decode_reset", 1 } ); // reset deocode auto clear
-    //cVecReg.push_back ( { "fe_ctrl_regs.decode_reg_reset", 1 } ); // reset REG auto clear
-    //cVecReg.push_back ( { "fe_ctrl_regs.idel_ctrl_reset", 1} );
-    //WriteStackReg (cVecReg);
-    //cVecReg.clear();
-    //cVecReg.push_back ( { "fe_ctrl_regs.idel_ctrl_reset", 0} );
-    //WriteStackReg (cVecReg);
-    //cVecReg.clear();
+//// Perform all the resets
+//std::vector< std::pair<std::string, uint32_t> > cVecReg;
+//cVecReg.push_back ( { "fe_ctrl_regs.decode_reset", 1 } ); // reset deocode auto clear
+//cVecReg.push_back ( { "fe_ctrl_regs.decode_reg_reset", 1 } ); // reset REG auto clear
+//cVecReg.push_back ( { "fe_ctrl_regs.idel_ctrl_reset", 1} );
+//WriteStackReg (cVecReg);
+//cVecReg.clear();
+//cVecReg.push_back ( { "fe_ctrl_regs.idel_ctrl_reset", 0} );
+//WriteStackReg (cVecReg);
+//cVecReg.clear();
 
-    //// NOTE: here the register idel_individual_ctrl is the base address of the registers for all 48 channels. So each 32-bit word contains the control info for 1 channel. Thus by creating a vector of 48 32-bit words and writing them at the same time I can write to each channel without using relative addresses!
+//// NOTE: here the register idel_individual_ctrl is the base address of the registers for all 48 channels. So each 32-bit word contains the control info for 1 channel. Thus by creating a vector of 48 32-bit words and writing them at the same time I can write to each channel without using relative addresses!
 
-    //// set the parameters for IDELAY scan
-    //std::vector<uint32_t> cValVec;
+//// set the parameters for IDELAY scan
+//std::vector<uint32_t> cValVec;
 
-    //for (uint32_t cChannel = 0; cChannel < 48; cChannel++)
-        //// create a Value Vector that contains the write value for each channel
-        //cValVec.push_back ( 0x80000000 );
+//for (uint32_t cChannel = 0; cChannel < 48; cChannel++)
+//// create a Value Vector that contains the write value for each channel
+//cValVec.push_back ( 0x80000000 );
 
-    //WriteBlockReg ( "fe_ctrl_regs.idel_individual_ctrl", cValVec );
-    //cValVec.clear();
+//WriteBlockReg ( "fe_ctrl_regs.idel_individual_ctrl", cValVec );
+//cValVec.clear();
 
-    //// set auto_delay_scan and set idel_RST
-    //for (uint32_t cChannel = 0; cChannel < 48; cChannel++)
-        //cValVec.push_back ( 0xc0000000 );
+//// set auto_delay_scan and set idel_RST
+//for (uint32_t cChannel = 0; cChannel < 48; cChannel++)
+//cValVec.push_back ( 0xc0000000 );
 
-    //WriteBlockReg ( "fe_ctrl_regs.idel_individual_ctrl", cValVec );
-    //cValVec.clear();
+//WriteBlockReg ( "fe_ctrl_regs.idel_individual_ctrl", cValVec );
+//cValVec.clear();
 
-    //// set auto_delay_scan and remove idel_RST
-    //for (uint32_t cChannel = 0; cChannel < 48; cChannel++)
-        //cValVec.push_back ( 0x80000000 );
+//// set auto_delay_scan and remove idel_RST
+//for (uint32_t cChannel = 0; cChannel < 48; cChannel++)
+//cValVec.push_back ( 0x80000000 );
 
-    //WriteBlockReg ( "fe_ctrl_regs.idel_individual_ctrl", cValVec );
-    //cValVec.clear();
+//WriteBlockReg ( "fe_ctrl_regs.idel_individual_ctrl", cValVec );
+//cValVec.clear();
 
-    //// some additional configuration
-    //cVecReg.push_back ( { "fe_ctrl_regs.fifo_config.overflow_value", 0x700e0}); // set 192val
-    //cVecReg.push_back ( { "fe_ctrl_regs.fifo_config.channel_of_interest", pScopeFIFOCh} ); // set channel for scope FIFO
-    //WriteStackReg (cVecReg);
-    //cVecReg.clear();
+//// some additional configuration
+//cVecReg.push_back ( { "fe_ctrl_regs.fifo_config.overflow_value", 0x700e0}); // set 192val
+//cVecReg.push_back ( { "fe_ctrl_regs.fifo_config.channel_of_interest", pScopeFIFOCh} ); // set channel for scope FIFO
+//WriteStackReg (cVecReg);
+//cVecReg.clear();
 
-    //// initialize Phase Finding
-    //WriteReg ("fe_ctrl_regs.initialize_swap", 1);
-    //std::cout << "Initializing Phase Finding ..." << std::endl << std::endl;
-    //std::chrono::milliseconds cWait ( 3000 );
-    //std::this_thread::sleep_for ( cWait );
+//// initialize Phase Finding
+//WriteReg ("fe_ctrl_regs.initialize_swap", 1);
+//std::cout << "Initializing Phase Finding ..." << std::endl << std::endl;
+//std::chrono::milliseconds cWait ( 3000 );
+//std::this_thread::sleep_for ( cWait );
 
-    ////here I might do the print loop again as Helmut does it in the latest version of the PixFED python script
-    //WriteReg ("fe_ctrl_regs.initialize_swap", 0);
+////here I might do the print loop again as Helmut does it in the latest version of the PixFED python script
+//WriteReg ("fe_ctrl_regs.initialize_swap", 0);
 
-    //std::this_thread::sleep_for ( cWait );
+//std::this_thread::sleep_for ( cWait );
 
-    //std::cout <<  "Phase finding Results: " << std::endl;
+//std::cout <<  "Phase finding Results: " << std::endl;
 
-    //uint32_t cNChannel = 24;
-    //std::vector<uint32_t> cReadValues = ReadBlockRegValue ( "idel_individual_stat_block", cNChannel * 4 );
+//uint32_t cNChannel = 24;
+//std::vector<uint32_t> cReadValues = ReadBlockRegValue ( "idel_individual_stat_block", cNChannel * 4 );
 
-    //std::cout << BOLDGREEN << "FIBRE CTRL_RDY CNTVAL_Hi CNTVAL_Lo   pattern:                     S H1 L1 H0 L0   W R" << RESET << std::endl;
+//std::cout << BOLDGREEN << "FIBRE CTRL_RDY CNTVAL_Hi CNTVAL_Lo   pattern:                     S H1 L1 H0 L0   W R" << RESET << std::endl;
 
-    //for (uint32_t cChannel = 0; cChannel < cNChannel; cChannel++)
-        //prettyprintPhase (cReadValues, cChannel);
+//for (uint32_t cChannel = 0; cChannel < cNChannel; cChannel++)
+//prettyprintPhase (cReadValues, cChannel);
 
-    //readTTSState();
+//readTTSState();
 //}
 
 void PixFEDFWInterface::monitorPhases (uint32_t pScopeFIFOCh)
@@ -265,6 +276,8 @@ void PixFEDFWInterface::prettyprintPhase (const std::vector<uint32_t>& pData, in
 
 void PixFEDFWInterface::getSFPStatus (uint8_t pFMCId)
 {
+    std::cout << "Initializing SFP+ for SLINK" << std::endl;
+
     WriteReg ("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 1);
     sleep (0.5);
     WriteReg ("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 0);
@@ -272,16 +285,24 @@ void PixFEDFWInterface::getSFPStatus (uint8_t pFMCId)
     std::vector<std::pair<std::string, uint32_t> > cVecReg;
     cVecReg.push_back ({"pixfed_ctrl_regs.fitel_sfp_i2c_req", 0});
     cVecReg.push_back ({"pixfed_ctrl_regs.fitel_rx_i2c_req", 0});
-    cVecReg.push_back ({"pixfed_ctrl_regs.fitel_i2c_addr", 0x38});
-    WriteStackReg (cVecReg);
-    cVecReg.clear();
 
-    //Vector for the reply
+    cVecReg.push_back ({"pixfed_ctrl_regs.fitel_i2c_addr", 0x38});
+
+    WriteStackReg (cVecReg);
+
+    // Vectors for write and read data!
+    std::vector<uint32_t> cVecWrite;
     std::vector<uint32_t> cVecRead;
-    cVecRead.push_back ( pFMCId << 24 | 0x00 );
-    WriteBlockReg ("fitel_config_fifo_tx", cVecRead);
-    //this issues an I2C read request via FW
-    WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 3);
+
+    //encode them in a 32 bit word and write, no readback yet
+    cVecWrite.push_back (  pFMCId  << 24 |   0x00 );
+    WriteBlockReg ("fitel_config_fifo_tx", cVecWrite);
+
+
+    // sent an I2C write request
+    // Edit G. Auzinger
+    // write 1 to sfp_i2c_reg to trigger an I2C write transaction - Laurent's BS python script is ambiguous....
+    WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 1);
 
     // wait for command acknowledge
     while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") == 0) usleep (100);
@@ -291,9 +312,46 @@ void PixFEDFWInterface::getSFPStatus (uint8_t pFMCId)
     if (cVal == 3)
         std::cout << "Error during i2c write!" << cVal << std::endl;
 
+    //release handshake with I2C
+    WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 0);
+
+    // wait for command acknowledge
+    while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") != 0) usleep (100);
+
+    usleep (500);
+    //////////////////////////////////////////////////
+    ////THIS SHOULD BE THE END OF THE WRITE OPERATION, BUS SHOULD BE IDLE
+    /////////////////////////////////////////////////
+
+    //WriteReg ("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 1);
+    //sleep (0.5);
+    //WriteReg ("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 0);
+
+    //std::vector<std::pair<std::string, uint32_t> > cVecReg;
+    //cVecReg.push_back ({"pixfed_ctrl_regs.fitel_sfp_i2c_req", 0});
+    //cVecReg.push_back ({"pixfed_ctrl_regs.fitel_rx_i2c_req", 0});
+    //cVecReg.push_back ({"pixfed_ctrl_regs.fitel_i2c_addr", 0x38});
+    //WriteStackReg (cVecReg);
+    //cVecReg.clear();
+
+    //Vector for the reply
+    //std::vector<uint32_t> cVecRead;
+    cVecRead.push_back ( pFMCId << 24 | 0x00 );
+    WriteBlockReg ("fitel_config_fifo_tx", cVecRead);
+    //this issues an I2C read request via FW
+    WriteReg ("pixfed_ctrl_regs.fitel_sfp_i2c_req", 3);
+
+    // wait for command acknowledge
+    while (ReadReg ("pixfed_stat_regs.fitel_i2c_ack") == 0) usleep (100);
+
+    cVal = ReadReg ("pixfed_stat_regs.fitel_i2c_ack");
+
+    if (cVal == 3)
+        std::cout << "Error during i2c write!" << cVal << std::endl;
+
     cVecRead.clear();
     //only read 1 word
-    cVecRead = ReadBlockRegValue ("fitel_config_fifo_rx", 1 );
+    cVecRead = ReadBlockRegValue ("fitel_config_fifo_rx", cVecWrite.size() );
 
     std::cout << "SFP+ Status of FMC " << +pFMCId << std::endl;
 
@@ -317,7 +375,7 @@ void PixFEDFWInterface::getSFPStatus (uint8_t pFMCId)
 
 std::vector<uint32_t> PixFEDFWInterface::readTransparentFIFO()
 {
-    WriteReg("fe_ctrl_regs.decode_reg_reset", 1);
+    WriteReg ("fe_ctrl_regs.decode_reg_reset", 1);
     std::vector<uint32_t> cFifoVec = ReadBlockRegValue ( "fifo.bit_stream", 512 );
     //vectors to pass to the NRZI decoder as reference to be filled by that
     std::vector<uint8_t> c5bSymbol, c5bNRZI, c4bNRZI;
@@ -556,6 +614,8 @@ uint8_t PixFEDFWInterface::readTTSState()
 
 bool PixFEDFWInterface::ConfigureBoard ( const PixFED* pPixFED, bool pFakeData )
 {
+    std::cout << "Initial SLINK status before any reset: " << std::endl;
+    PrintSlinkStatus();
     std::vector< std::pair<std::string, uint32_t> > cVecReg;
 
     std::chrono::milliseconds cPause ( 200 );
@@ -568,6 +628,7 @@ bool PixFEDFWInterface::ConfigureBoard ( const PixFED* pPixFED, bool pFakeData )
 
     // fitel I2C bus reset & fifo TX & RX reset
     cVecReg.push_back ({"pixfed_ctrl_regs.fitel_i2c_cmd_reset", 1});
+    
 
     // the FW needs to be aware of the true 32 bit workd Block size for some reason! This is the Packet_nb_true in the python script?!
     computeBlockSize ( pFakeData );
@@ -598,9 +659,22 @@ bool PixFEDFWInterface::ConfigureBoard ( const PixFED* pPixFED, bool pFakeData )
 
     std::this_thread::sleep_for ( cPause );
 
+    std::cout << RED << "Base Config done!" << RESET << std::endl;
+
     getSFPStatus (0);
 
+    //reset also the SLINK core manually
+    std::cout << RED << "Manually resetting Slink core" << RESET << std::endl;
+    WriteReg ("pixfed_ctrl_regs.slink_core_gtx_reset", 1);
+    usleep(10000);
+    WriteReg ("pixfed_ctrl_regs.slink_core_sys_reset", 1);
+    usleep(10000);
+    WriteReg ("pixfed_ctrl_regs.slink_core_gtx_reset", 0);
+    usleep(10000);
+    WriteReg ("pixfed_ctrl_regs.slink_core_sys_reset", 0);
     readTTSState();
+    std::cout << "Slink status after configure:" << std::endl;
+    PrintSlinkStatus();
     // Read back the DDR3 calib done flag
     bool cDDR3calibrated = ( ReadReg ( "pixfed_stat_regs.ddr3_init_calib_done" ) & 0x00000001 );
 
@@ -1160,10 +1234,10 @@ void PixFEDFWInterface::PrintSlinkStatus()
     std::cout <<  val << std::endl;
 
     //Status build
-    std::cout << "Status build: " << std::endl;
+    std::cout << "Status build: ";
     WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0x8);
-    std::cout << "data_63to32 " <<  ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << std::endl;
-    std::cout << "data_31to0 " <<  ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0") << std::endl;
+    val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
+    std::cout <<  val << std::endl;
 
     //Back pressure counter
     std::cout << "BackP counter: ";
@@ -1255,8 +1329,10 @@ void PixFEDFWInterface::decode_symbols (const std::vector<uint32_t>& pInData, st
     for (auto cWord : pInData)
     {
         cWord &= 0x0000001f;
-        if(cWord == 0x1f)
-        p5bSymbol.push_back (cWord & 0x0000001f);
+
+        if (cWord == 0x1f)
+            p5bSymbol.push_back (cWord & 0x0000001f);
+
         //next, fill the 5bNRZI 4bNRZI with 0 symbols with 0x1f
         p5bNRZI.push_back (0x1f);
         p4bNRZI.push_back (0);

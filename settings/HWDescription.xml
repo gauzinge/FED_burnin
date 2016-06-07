@@ -21,7 +21,7 @@
 
         <!-- ACQUISITION MODE & CALIBRATION MODE & DATA TYPE -->
         <!--1: TBM fifo, 2: Slink FIFO, 3: FEROL-->
-        <Register name="pixfed_ctrl_regs.acq_ctrl.acq_mode">2</Register>
+        <Register name="pixfed_ctrl_regs.acq_ctrl.acq_mode">3</Register>
         <Register name="pixfed_ctrl_regs.acq_ctrl.calib_mode"> 0 </Register>
         <!--this is 0-indexed so 9 will correspond to 10 events-->
         <Register name="pixfed_ctrl_regs.acq_ctrl.calib_mode_NEvents"> 9 </Register>
@@ -53,6 +53,7 @@
         <!--CLOCK-->
         <!--Used to set the CLK input to the TTC clock from the BP - 3 is XTAL, 0 is BP-->
         <Register name="ctrl.ttc_xpoint_A_out3">0</Register>
+        <Register name="ctrl.mgt_xpoint_out1">3 </Register>
 
         <!-- FITELS -->
         <Fitel_Files path="./settings/" />

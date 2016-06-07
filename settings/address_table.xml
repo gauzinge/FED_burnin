@@ -304,6 +304,9 @@
             <node id="slinkFormatH_Evt_stat" mask="0xf0000000" />
         </node>
         <node id="slink_core_status_addr" address="0x4001000a" mask="0x0000ffff" permission="rw" />
+        <node id="slink_core_gtx_reset" address="0x40010009" mask="0x10000000" permission="rw" />
+        <node id="slink_core_sys_reset" address="0x40010009" mask="0x20000000" permission="rw" />
+
         <node id="tts">
             <node id="evt_err_nb_oos_thresh" address="0x40010009" mask="0x0000ff00" permission="rw" />
             <node id="timeout_nb_oos_thresh" address="0x40010009" mask="0x00ff0000" permission="rw" />

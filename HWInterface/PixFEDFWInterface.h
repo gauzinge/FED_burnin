@@ -18,6 +18,7 @@
 #include "../Utils/Exception.h"
 #include "../Utils/ConsoleColor.h"
 #include "../Utils/Utilities.h"
+#include "../Utils/Timer.h"
 #include "../HWDescription/PixFED.h"
 #include "CtaFpgaConfig.h"
 

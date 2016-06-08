@@ -8,7 +8,7 @@
              on the TTCci - repeat is obvious, prescale is in orbits, the bx is selected such that it occurs 98 BX before the local
              L1A which is periodic at BX500 every orbit-->
         <!-- for the DEV lab setup in B186, the bx has to be 381 for the BU clock source and 380 for the TTCci as clock source -->
-        <BGO command="0x2c" repeat="1" prescale="0" bx="380" />
+        <BGO command="0x2c" repeat="1" prescale="0" bx="381" />
         <!--<BGO command="0x2e" repeat="0" prescale="0" bx="0" />-->
         <!-- Local enables Local L1A, mode 0 means a trigger every orbit at BX500, rate is 1 for every orbit and burst is 1 
              for 1 trigger when sending burst (equivalent to single trigger -->
@@ -21,7 +21,7 @@
 
         <!-- ACQUISITION MODE & CALIBRATION MODE & DATA TYPE -->
         <!--1: TBM fifo, 2: Slink FIFO, 3: FEROL-->
-        <Register name="pixfed_ctrl_regs.acq_ctrl.acq_mode">3</Register>
+        <Register name="pixfed_ctrl_regs.acq_ctrl.acq_mode">2</Register>
         <Register name="pixfed_ctrl_regs.acq_ctrl.calib_mode"> 0 </Register>
         <!--this is 0-indexed so 9 will correspond to 10 events-->
         <Register name="pixfed_ctrl_regs.acq_ctrl.calib_mode_NEvents"> 9 </Register>
@@ -29,7 +29,7 @@
         <Register name="pixfed_ctrl_regs.data_type">0</Register>
 
         <!--SLINK HEADER & TRAILER-->
-        <Register name="pixfed_ctrl_regs.slink_ctrl.privateEvtNb">0x02</Register>
+        <Register name="pixfed_ctrl_regs.slink_ctrl.privateEvtNb">0x01</Register>
         <Register name="pixfed_ctrl_regs.slink_ctrl.slinkFormatH_source_id">0x01</Register>
         <Register name="pixfed_ctrl_regs.slink_ctrl.slinkFormatH_FOV">0xe</Register>
         <Register name="pixfed_ctrl_regs.slink_ctrl.slinkFormatH_Evt_ty">0xa</Register>
@@ -53,7 +53,9 @@
         <!--CLOCK-->
         <!--Used to set the CLK input to the TTC clock from the BP - 3 is XTAL, 0 is BP-->
         <Register name="ctrl.ttc_xpoint_A_out3">0</Register>
-        <Register name="ctrl.mgt_xpoint_out1">3 </Register>
+        <!--<Register name="ctrl.mgt_xpoint_out1">3 </Register>-->
+	<!--Change on request from Laurent to enable 156,25MHz clock on SLink -->
+        <Register name="ctrl.mgt_xpoint_out1">2 </Register>
 
         <!-- FITELS -->
         <Fitel_Files path="./settings/" />

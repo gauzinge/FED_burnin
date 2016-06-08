@@ -48,7 +48,7 @@ int main (int argc, char* argv[] )
     {
         //cSystemController.fFEDInterface->getBoardInfo(cFED);
         cSystemController.fFEDInterface->findPhases (cFED, cChannelOfInterest);
-        cSystemController.fFEDInterface->Start (cFED);
+        //cSystemController.fFEDInterface->Start (cFED);
     }
 
     //std::cout << "Monitoring Phases for selected Channel of Interest for 10 seconds ... " << std::endl << std::endl;
@@ -69,6 +69,11 @@ int main (int argc, char* argv[] )
 
     cAmc13Controller.fAmc13Interface->SendEC0();
     cAmc13Controller.fAmc13Interface->StartL1A();
+    for (auto& cFED : cSystemController.fPixFEDVector)
+    {
+        //cSystemController.fFEDInterface->getBoardInfo(cFED);
+        cSystemController.fFEDInterface->Start (cFED);
+    }
 
     while ( !kbhit() )
     {

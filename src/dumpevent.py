@@ -8,7 +8,7 @@ from sys import argv,exit
 # open the input file
 
 if( len(argv) == 1 or len(argv) > 2 ):
-    print "USAGE: ./dumpevent <filepath><filename>" 
+    print "USAGE: ./dumpevent <filepath>" 
     exit()
 
 try:

@@ -26,8 +26,8 @@ while (line and line != '================ END OF DUMP ===================\n'):
     if( cells[0] == '00000000'):
         foundStartMarker = True
     if(foundStartMarker):
-        data.append([int(i,16) for i in cells[11:13]]) 
-        data.append([int(i,16) for i in cells[13:15]]) 
+        data.append([int(i,16) for i in cells[2:4]]) 
+        data.append([int(i,16) for i in cells[4:6]]) 
     line = DataFile.readline()
 
 
@@ -38,7 +38,7 @@ print data
 
 for cWord in data:
 
-    fullWord = ( cWord[0] << 32 ) + cWord[1]
+    fullWord = ( cWord[1] << 32 ) + cWord[0]
 #    print(hex(cWord[0]),hex(cWord[1]))
 #    print hex(fullWord)
 

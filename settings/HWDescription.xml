@@ -20,8 +20,8 @@
         <connection id="board0" uri="chtcp-2.0://cmsuppixch:10203?target=devfed:50001" address_table="file://settings/address_table.xml" />
 
         <!-- ACQUISITION MODE & CALIBRATION MODE & DATA TYPE -->
-        <!--1: TBM fifo, 2: Slink FIFO, 3: FEROL-->
-        <Register name="pixfed_ctrl_regs.acq_ctrl.acq_mode">3</Register>
+        <!--1: TBM fifo, 2: Slink FIFO, 4: FEROL-->
+        <Register name="pixfed_ctrl_regs.acq_ctrl.acq_mode">4</Register>
         <Register name="pixfed_ctrl_regs.acq_ctrl.calib_mode"> 0 </Register>
         <!--this is 0-indexed so 9 will correspond to 10 events-->
         <Register name="pixfed_ctrl_regs.acq_ctrl.calib_mode_NEvents"> 9 </Register>

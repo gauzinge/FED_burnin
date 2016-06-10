@@ -1078,11 +1078,11 @@ std::vector<double> PixFEDFWInterface::ReadADC ( const uint8_t pFMCId, const uin
     // the ADC always reads the sum of all the enabled channels!
     //initial FW setup
     WriteReg ("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 1);
+    sleep (0.5);
+    WriteReg ("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 0);
 
     std::vector<std::pair<std::string, uint32_t> > cVecReg;
-    cVecReg.push_back ({"pixfed_ctrl_regs.fitel_i2c_cmd_reset", 0});
     cVecReg.push_back ({"pixfed_ctrl_regs.fitel_rx_i2c_req", 0});
-    //Laurent is a Bastard because he changes the i2c addr register!
     cVecReg.push_back ({"pixfed_ctrl_regs.fitel_i2c_addr", 0x77});
 
     WriteStackReg (cVecReg);
@@ -1113,6 +1113,7 @@ std::vector<double> PixFEDFWInterface::ReadADC ( const uint8_t pFMCId, const uin
 
     // release
     i2cRelease (10);
+    sleep (2);
 
     //now prepare the read-back of the values
     uint8_t cNWord = 10;
@@ -1135,11 +1136,13 @@ std::vector<double> PixFEDFWInterface::ReadADC ( const uint8_t pFMCId, const uin
     if (cVal == 3)
         std::cout << "Error reading registers!" << std::endl;
 
+    cVecRead.clear();
+    // clear the vector & read the data from the fifo
+    cVecRead = ReadBlockRegValue ("fitel_config_fifo_rx", cNWord);
+
     // release
     i2cRelease (10);
-
-    // clear the vector & read the data from the fifo
-    cVecRead = ReadBlockRegValue ("fitel_config_fifo_rx", cVecRead.size() );
+    usleep (500);
 
     // now convert to Voltages!
     std::vector<double> cLTCValues (cNWord / 2, 0);
@@ -1182,10 +1185,9 @@ void PixFEDFWInterface::PrintSlinkStatus()
     // A function to print all Slink status values
     readTTSState();
 
-    for(int i = 0; i < 50; i++)
-    {
+    for (int i = 0; i < 50; i++)
         std::cout << " *";
-    }
+
     std::cout << std::endl;
 
     //check the link status
@@ -1321,10 +1323,9 @@ void PixFEDFWInterface::PrintSlinkStatus()
     std::cout << " | Block4: ";
     ( (cLinkStatus & 0x00000001) >> 0) ? std::cout << BOLDRED << "used    " << RESET : std::cout << BOLDGREEN << "not used " << RESET << std::endl;
 
-    for(int i = 0; i < 50; i++)
-    {
+    for (int i = 0; i < 50; i++)
         std::cout << " *";
-    }
+
     std::cout << std::endl;
 
 }

@@ -25,7 +25,7 @@ endif
 .PHONY: clean $(binaries) 
 	#run fpgaconfig amc13test
 
-binaries=print run fpgaconfig amc13test fedconfig feroltest clt
+binaries=print run fpgaconfig amc13test fedconfig feroltest clt rssiread
 
 
 all: $(binaries)
@@ -59,5 +59,8 @@ fpgaconfig: fpgaconfig.cc
 	$(CXX) -std=c++11 $(CCFlags) -o $@ $< $(IncludePaths) $(ExternalObjects)
 	cp $@ ../bin
 
+rssiread: rssiread.cc
+	$(CXX) -std=c++11 $(CCFlags) -o $@ $< $(IncludePaths) $(ExternalObjects)
+	cp $@ ../bin
 clean:
 	rm -f $(binaries) *.o
